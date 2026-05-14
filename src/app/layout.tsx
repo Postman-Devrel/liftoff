@@ -5,6 +5,7 @@ import { ProgressProvider } from "@/context/ProgressContext";
 import CelebrationOverlay from "@/components/scoring/CelebrationOverlay";
 import ImportProgressModal from "@/components/auth/ImportProgressModal";
 import DiscordCommunityModal from "@/components/auth/DiscordCommunityModal";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
             {children}
           </ProgressProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
