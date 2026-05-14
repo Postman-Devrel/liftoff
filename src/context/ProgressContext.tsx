@@ -286,7 +286,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           {
             user_id: supabaseUser.id,
             postman_user_id: localContext.userId,
-            context: localContext as Record<string, unknown>,
+            context: localContext as unknown as import("@/types/supabase").Json,
             is_active: true,
           },
           { onConflict: "user_id,postman_user_id" }
