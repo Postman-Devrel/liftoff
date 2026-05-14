@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { getModule } from "@/lib/content-loader";
 import { useProgress } from "@/context/ProgressContext";
 import AuthGuard from "@/components/auth/AuthGuard";
+import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
 import ModuleBadge from "@/components/scoring/ModuleBadge";
 
@@ -61,6 +62,10 @@ export default function ModuleOverviewPage() {
         </nav>
 
         <main className="max-w-3xl mx-auto px-6 py-8">
+          <div className="mb-6">
+            <PostmanConnectionBar />
+          </div>
+
           <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
             {mod.description}
           </p>

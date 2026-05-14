@@ -279,6 +279,20 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         onConflict: "user_id,step_id",
       });
 
+      // Import validation context if present
+      const localContext = local.validationContext ?? {};
+      if (Object.keys(localContext).length > 0 && localContext.userId) {
+        await supabase.from("validation_contexts").upsert(
+          {
+            user_id: supabaseUser.id,
+            postman_user_id: localContext.userId,
+            context: localContext as Record<string, unknown>,
+            is_active: true,
+          },
+          { onConflict: "user_id,postman_user_id" }
+        );
+      }
+
       localStorage.removeItem("liftoff_progress");
       setHasLocalProgress(false);
 
@@ -287,6 +301,13 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         .from("progress")
         .select("step_id, points_awarded")
         .eq("user_id", supabaseUser.id);
+
+      const { data: ctxRows } = await supabase
+        .from("validation_contexts")
+        .select("context")
+        .eq("user_id", supabaseUser.id)
+        .eq("is_active", true)
+        .limit(1);
 
       const completedSteps: Record<string, boolean> = {};
       let points = 0;
@@ -297,9 +318,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      const importedContext = ctxRows?.[0]?.context as ValidationContext ?? {};
+
       dispatch({
         type: "LOAD",
-        state: { completedSteps, points, validationContext: state.validationContext },
+        state: { completedSteps, points, validationContext: importedContext },
       });
     } catch {
       // ignore

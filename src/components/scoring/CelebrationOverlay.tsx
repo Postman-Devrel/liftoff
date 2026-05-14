@@ -97,7 +97,7 @@ export default function CelebrationOverlay() {
       }
     }
 
-    if (newRank.id !== prevRank.id) {
+    if (newRank.id !== prevRank.id && points > prevPointsRef.current) {
       setCelebration({
         type: "rank-up",
         title: "Rank Up!",

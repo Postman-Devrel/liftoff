@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getLesson, getModule } from "@/lib/content-loader";
 import AuthGuard from "@/components/auth/AuthGuard";
+import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import StepCard from "@/components/lesson/StepCard";
 import ProgressBar from "@/components/lesson/ProgressBar";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
@@ -92,6 +93,10 @@ export default function LessonPage() {
         </nav>
 
         <main className="max-w-3xl mx-auto px-6 py-8">
+          <div className="mb-6">
+            <PostmanConnectionBar />
+          </div>
+
           <ProgressBar steps={lesson.steps} />
 
           <div className="mt-8 flex flex-col gap-5">

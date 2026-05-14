@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ProgressProvider } from "@/context/ProgressContext";
 import CelebrationOverlay from "@/components/scoring/CelebrationOverlay";
 import ImportProgressModal from "@/components/auth/ImportProgressModal";
+import DiscordCommunityModal from "@/components/auth/DiscordCommunityModal";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({
           <ProgressProvider>
             <CelebrationOverlay />
             <ImportProgressModal />
+            <DiscordCommunityModal />
             {children}
           </ProgressProvider>
         </AuthProvider>
