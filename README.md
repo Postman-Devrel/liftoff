@@ -149,13 +149,13 @@ Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environmen
 
 | Rank | Points | Badge |
 |------|--------|-------|
-| Space Cadet | 0 | 🌟 |
-| Mission Specialist | 50 | 🛰️ |
-| Commander | 100 | ⭐ |
-| Flight Director | 500 | 🚀 |
-| Galaxy Brain | 1,000 | 🧠 |
-| Supernova | 5,000 | 💥 |
-| Mass Relay | 10,000 | 🌌 |
+| Space Cadet | 0 | ![Space Cadet](public/ranks/cadet.png) |
+| Mission Specialist | 50 | ![Mission Specialist](public/ranks/specialist.png) |
+| Commander | 100 | ![Commander](public/ranks/commander.png) |
+| Flight Director | 500 | ![Flight Director](public/ranks/flight-director.png) |
+| Galaxy Brain | 1,000 | ![Galaxy Brain](public/ranks/galaxy-brain.png) |
+| Supernova | 5,000 | ![Supernova](public/ranks/supernova.png) |
+| Mass Relay | 10,000 | ![Mass Relay](public/ranks/mass-relay.png) |
 
 ## Tech Stack
 
