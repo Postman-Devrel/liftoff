@@ -322,7 +322,7 @@ export default function Home() {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--orange)]/10 border border-[var(--orange)]/20 text-[var(--orange)] text-sm font-medium mb-8">
-            <span>🚀</span>
+            <img src="/postman-logo.png" alt="Postman" className="w-5 h-5" />
             <span>Powered by Postman</span>
           </div>
           <h1 className="text-6xl md:text-7xl font-black tracking-tight mb-4">
