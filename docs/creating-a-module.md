@@ -17,10 +17,10 @@ You provide learning content as a **markdown file** or a **URL** (blog post, tut
 
 ## Starting from a URL
 
-If your content already exists online — a blog post, a Postman Learning Center page, a GitHub README — just paste the URL when Claude asks for your source:
+If your content already exists online — a quickstart, tutorial, a Postman Learning Center page,etc — just paste the URL when Claude asks for your source. It is designed to work best when the page has a learning structure: steps, instructions, and how to validate results.
 
 ```
-/liftoff-module create
+/liftoff-module create your-url.com
 ```
 
 Claude will fetch the page, extract the learning content, and structure it into the standard lesson/step format. It works best when the source has clear sections and actionable steps.
@@ -60,7 +60,7 @@ More instructions...
 ...and so on.
 ```
 
-Then run `/liftoff-module create` and point Claude to your file.
+Then run `/liftoff-module create your-markdown.md` and point Claude to your file.
 
 ### Content Guidelines
 
