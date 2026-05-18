@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
           data: { user: supabaseUser },
         } = await supabase.auth.getUser();
 
+        console.log("[validate] supabaseUser:", supabaseUser?.id ?? "NOT AUTHENTICATED");
         if (supabaseUser) {
           await supabase.from("progress").upsert(
             {
@@ -78,8 +79,8 @@ export async function POST(request: NextRequest) {
               .eq("is_active", true);
           }
         }
-      } catch {
-        // Don't fail the validation response if persistence fails
+      } catch (persistErr) {
+        console.error("[validate] persistence failed:", persistErr);
       }
     }
 
