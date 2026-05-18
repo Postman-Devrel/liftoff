@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 export const validateBankingTransactionId: ValidatorFn = async (apiKey, context) => {
   if (!context.workspaceId) {
@@ -27,32 +28,14 @@ export const validateBankingTransactionId: ValidatorFn = async (apiKey, context)
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);
-  const values: { key: string; value: string; current_value?: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const transactionIdVar = values.find(
-    (v) => v.key.toLowerCase() === "transactionid"
+  const effectiveValue = resolveEnvVar(
+    values,
+    "transactionId",
+    'Variable "transactionId" not found in Banking.local. Add the post-response script to the Create new transaction request and send it.'
   );
-
-  if (!transactionIdVar) {
-    return {
-      success: false,
-      message:
-        'Variable "transactionId" not found in Banking.local. Add the post-response script to the Create new transaction request and send it. Remember to click Share/Persist All.',
-      pointsAwarded: 0,
-    };
-  }
-
-  const effectiveValue = transactionIdVar.current_value || transactionIdVar.value;
-
-  if (!effectiveValue || effectiveValue.trim() === "") {
-    return {
-      success: false,
-      message:
-        'Variable "transactionId" exists but is empty. Send the Create new transaction request to populate it, then click Share/Persist All.',
-      pointsAwarded: 0,
-    };
-  }
+  if (typeof effectiveValue !== "string") return effectiveValue;
 
   return {
     success: true,

@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 export const validateEnvironmentValues: ValidatorFn = async (
   apiKey,
@@ -14,28 +15,22 @@ export const validateEnvironmentValues: ValidatorFn = async (
   }
 
   const envDetail = await getEnvironment(apiKey, context.environmentId);
-  const values: { key: string; value: string; current_value?: string; type: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const baseUrl = values.find(
-    (v) => v.key.toLowerCase() === "baseurl"
-  );
-  const apiKeyVar = values.find(
-    (v) => v.key.toLowerCase() === "apikey"
-  );
+  const baseUrlValue = resolveEnvVar(values, "baseUrl");
+  if (typeof baseUrlValue !== "string") return baseUrlValue;
 
   const issues: string[] = [];
 
-  if (!baseUrl) {
-    issues.push("baseUrl variable not found");
-  } else {
-    const effectiveValue = baseUrl.current_value || baseUrl.value;
-    if (effectiveValue !== "https://artemis.up.railway.app") {
-      issues.push(
-        `baseUrl is "${effectiveValue}" — should be exactly "https://artemis.up.railway.app"`
-      );
-    }
+  if (baseUrlValue !== "https://artemis.up.railway.app") {
+    issues.push(
+      `baseUrl is "${baseUrlValue}" — should be exactly "https://artemis.up.railway.app"`
+    );
   }
+
+  const apiKeyVar = values.find(
+    (v: { key: string }) => v.key.toLowerCase() === "apikey"
+  );
 
   if (!apiKeyVar) {
     issues.push("apiKey variable not found");

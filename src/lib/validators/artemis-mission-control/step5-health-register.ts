@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 const ARTEMIS_API = "https://artemis.up.railway.app";
 
@@ -35,22 +36,14 @@ export const validateHealthAndRegister: ValidatorFn = async (
 
   // Check that apiKey env variable now has a value (from registration)
   const envDetail = await getEnvironment(apiKey, context.environmentId);
-  const values: { key: string; value: string; current_value?: string; type: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const apiKeyVar = values.find(
-    (v) => v.key.toLowerCase() === "apikey"
+  const apiKeyValue = resolveEnvVar(
+    values,
+    "apiKey",
+    "API is running but no `apiKey` variable found. Register with POST /register using your name and email, then save the returned API key."
   );
-
-  const apiKeyValue = apiKeyVar?.current_value || apiKeyVar?.value;
-  if (!apiKeyVar || !apiKeyValue) {
-    return {
-      success: false,
-      message:
-        "API is running but your apiKey environment variable is empty. Register with POST /register using your name and email, then save the returned API key.",
-      pointsAwarded: 0,
-    };
-  }
+  if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   return {
     success: true,

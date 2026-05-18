@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 export const validateApiBasicsCreateEnvironment: ValidatorFn = async (
   apiKey,
@@ -33,28 +34,19 @@ export const validateApiBasicsCreateEnvironment: ValidatorFn = async (
   }
 
   const envDetail = await getEnvironment(apiKey, localEnv.uid);
-  const values: { key: string; value: string; current_value?: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const baseUrlVar = values.find(
-    (v) => v.key.toLowerCase() === "baseurl"
+  const baseUrlValue = resolveEnvVar(
+    values,
+    "baseURL",
+    'Environment "Local" found but missing the "baseURL" variable. Add it with the value "https://api.sampleapis.com".'
   );
+  if (typeof baseUrlValue !== "string") return baseUrlValue;
 
-  if (!baseUrlVar) {
+  if (baseUrlValue !== "https://api.sampleapis.com") {
     return {
       success: false,
-      message:
-        'Environment "Local" found but missing the "baseURL" variable. Add it with the value "https://api.sampleapis.com".',
-      pointsAwarded: 0,
-    };
-  }
-
-  const effectiveValue = baseUrlVar.current_value || baseUrlVar.value;
-
-  if (effectiveValue !== "https://api.sampleapis.com") {
-    return {
-      success: false,
-      message: `Variable "baseURL" found but its value is "${effectiveValue}". Set it to "https://api.sampleapis.com".`,
+      message: `Variable "baseURL" found but its value is "${baseUrlValue}". Set it to "https://api.sampleapis.com".`,
       pointsAwarded: 0,
     };
   }

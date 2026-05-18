@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 export const validateBankingSetBaseUrl: ValidatorFn = async (apiKey, context) => {
   if (!context.workspaceId) {
@@ -27,28 +28,19 @@ export const validateBankingSetBaseUrl: ValidatorFn = async (apiKey, context) =>
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);
-  const values: { key: string; value: string; current_value?: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const baseUrlVar = values.find(
-    (v) => v.key.toLowerCase() === "baseurl"
+  const effectiveValue = resolveEnvVar(
+    values,
+    "baseUrl",
+    'Variable "baseUrl" not found in Banking.local. Use Agent Mode to add it.'
   );
-
-  if (!baseUrlVar) {
-    return {
-      success: false,
-      message:
-        'Variable "baseUrl" not found in Banking.local. Use Agent Mode to add it. Remember to click Share/Persist All after setting values.',
-      pointsAwarded: 0,
-    };
-  }
-
-  const effectiveValue = baseUrlVar.current_value || baseUrlVar.value;
+  if (typeof effectiveValue !== "string") return effectiveValue;
 
   if (effectiveValue !== "https://ai-powered-bootcamp-production.up.railway.app") {
     return {
       success: false,
-      message: `Variable "baseUrl" found but its value is "${effectiveValue}". Expected "https://ai-powered-bootcamp-production.up.railway.app". Remember to click Share/Persist All.`,
+      message: `Variable "baseUrl" found but its value is "${effectiveValue}". Expected "https://ai-powered-bootcamp-production.up.railway.app".`,
       pointsAwarded: 0,
     };
   }

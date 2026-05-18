@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 const ARTEMIS_API = "https://artemis.up.railway.app";
 
@@ -13,22 +14,14 @@ export const validateApiKeySaved: ValidatorFn = async (apiKey, context) => {
   }
 
   const envDetail = await getEnvironment(apiKey, context.environmentId);
-  const values: { key: string; value: string; current_value?: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const apiKeyVar = values.find(
-    (v) => v.key.toLowerCase() === "apikey"
+  const apiKeyValue = resolveEnvVar(
+    values,
+    "apiKey",
+    "No `apiKey` variable found in your environment. Register first, then add an `apiKey` variable with the returned key."
   );
-
-  const apiKeyValue = apiKeyVar?.current_value || apiKeyVar?.value;
-  if (!apiKeyVar || !apiKeyValue) {
-    return {
-      success: false,
-      message:
-        "apiKey environment variable is empty. Register first, then save the key.",
-      pointsAwarded: 0,
-    };
-  }
+  if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   // Verify the key works by calling GET /mission
   try {

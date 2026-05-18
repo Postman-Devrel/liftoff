@@ -1,5 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
 import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 
 export const validateBankingToAccount: ValidatorFn = async (apiKey, context) => {
   if (!context.workspaceId) {
@@ -27,32 +28,14 @@ export const validateBankingToAccount: ValidatorFn = async (apiKey, context) => 
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);
-  const values: { key: string; value: string; current_value?: string }[] =
-    envDetail.values || [];
+  const values = envDetail.values || [];
 
-  const toAccountVar = values.find(
-    (v) => v.key.toLowerCase() === "toaccount"
+  const effectiveValue = resolveEnvVar(
+    values,
+    "toAccount",
+    'Variable "toAccount" not found in Banking.local. Add the post-response script and send the toAccount request.'
   );
-
-  if (!toAccountVar) {
-    return {
-      success: false,
-      message:
-        'Variable "toAccount" not found in Banking.local. Add the post-response script and send the toAccount request. Remember to click Share/Persist All.',
-      pointsAwarded: 0,
-    };
-  }
-
-  const effectiveValue = toAccountVar.current_value || toAccountVar.value;
-
-  if (!effectiveValue || effectiveValue.trim() === "") {
-    return {
-      success: false,
-      message:
-        'Variable "toAccount" exists but is empty. Send the toAccount request to populate it, then click Share/Persist All.',
-      pointsAwarded: 0,
-    };
-  }
+  if (typeof effectiveValue !== "string") return effectiveValue;
 
   return {
     success: true,
