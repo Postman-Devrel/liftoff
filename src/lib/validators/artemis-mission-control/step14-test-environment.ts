@@ -1,24 +1,26 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace } from "@/lib/postman-api";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateTestEnvironment: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  if (!context.workspaceId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
+  const ws = await resolveWorkspace(
+    apiKey,
+    context,
+    context.artemisWorkspaceId,
+    /^Artemis\s+II\s*-\s*.+$/i,
+    "Artemis II - [your name]"
+  );
+  if ("error" in ws) return ws.error;
 
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
-  const environments = workspace.environments || [];
+  const environments = (
+    (ws.detail as Record<string, unknown>).environments as
+      { name: string; uid: string }[]
+  ) || [];
 
   const testEnv = environments.find(
-    (e: { name: string }) =>
-      e.name.trim().toLowerCase() === "artemis.test"
+    (e) => e.name.trim().toLowerCase() === "artemis.test"
   );
 
   if (!testEnv) {

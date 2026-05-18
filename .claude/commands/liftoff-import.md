@@ -87,6 +87,10 @@ More instructions...
 - Keep steps small — if a tutorial section bundles multiple actions, split them into separate steps
 - Preserve code snippets, URLs, and specific values from the original
 - **URLs must use markdown link syntax** `[text](url)` — bare URLs will not render as clickable links in the UI. Convert any bare URL to `[url](url)` format.
+- **Copyable content detection:** The UI automatically adds "Copy" buttons to fenced code blocks and blockquotes. Use these conventions:
+  - **AI/Agent Mode prompts** → wrap in blockquotes (`> prompt text here`) so the learner gets a "Copy prompt" button
+  - **JSON payloads, code snippets, URLs to paste** → wrap in fenced code blocks (triple backticks) so the learner gets a "Copy" button
+  - Do NOT use inline code (single backticks) for content the learner needs to copy — inline code does not get a copy button
 - Add the Postman environment share notice to any step that sets environment variables:
   > **Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.
 

@@ -1,23 +1,22 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { getEnvironment } from "@/lib/postman-api";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateEnvironmentExists: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  const wsId = context.artemisWorkspaceId || context.workspaceId;
-  if (!wsId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
+  const ws = await resolveWorkspace(
+    apiKey,
+    context,
+    context.artemisWorkspaceId,
+    /^Artemis\s+II\s*-\s*.+$/i,
+    "Artemis II - [your name]"
+  );
+  if ("error" in ws) return ws.error;
 
-  // Only look at environments inside the user's Artemis workspace
-  const workspace = await getWorkspace(apiKey, wsId);
   const wsEnvironments: { id: string; name: string; uid: string }[] =
-    workspace.environments || [];
+    ((ws.detail as Record<string, unknown>).environments as { id: string; name: string; uid: string }[]) || [];
 
   const artemisEnv = wsEnvironments.find(
     (env) => env.name.trim().toLowerCase() === "artemis.local"

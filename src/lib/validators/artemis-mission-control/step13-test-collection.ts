@@ -1,24 +1,26 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace } from "@/lib/postman-api";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateTestCollection: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  if (!context.workspaceId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
+  const ws = await resolveWorkspace(
+    apiKey,
+    context,
+    context.artemisWorkspaceId,
+    /^Artemis\s+II\s*-\s*.+$/i,
+    "Artemis II - [your name]"
+  );
+  if ("error" in ws) return ws.error;
 
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
-  const collections = workspace.collections || [];
+  const collections = (
+    (ws.detail as Record<string, unknown>).collections as
+      { name: string; uid: string }[]
+  ) || [];
 
-  // Look for a test/integration collection (separate from the main API collection)
   const testCollection = collections.find(
-    (c: { name: string }) =>
+    (c) =>
       c.name.toLowerCase().includes("test") ||
       c.name.toLowerCase().includes("integration")
   );

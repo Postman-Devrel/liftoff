@@ -4,6 +4,10 @@ import ReactMarkdown from "react-markdown";
 import { useProgress } from "@/context/ProgressContext";
 import ValidateButton from "./ValidateButton";
 import { Step } from "@/types/module";
+import {
+  CopyableCodeBlock,
+  CopyableBlockquote,
+} from "./CopyableBlock";
 
 interface StepCardProps {
   step: Step;
@@ -39,7 +43,12 @@ export default function StepCard({ step, moduleColor = "#FF6C37" }: StepCardProp
             {step.title}
           </h3>
           <div className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-strong:text-white prose-code:text-[var(--orange)] prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-a:text-[var(--orange)] prose-a:no-underline hover:prose-a:underline prose-pre:overflow-x-auto prose-pre:max-w-full">
-            <ReactMarkdown>{step.description}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                pre: CopyableCodeBlock,
+                blockquote: CopyableBlockquote,
+              }}
+            >{step.description}</ReactMarkdown>
           </div>
           <ValidateButton
             stepId={step.id}
