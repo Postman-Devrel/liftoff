@@ -5,11 +5,14 @@ import { getMe } from "@/lib/postman-api";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
-  const { stepId, apiKey, context } = (await request.json()) as {
+  const { stepId, validatorId, apiKey, context } = (await request.json()) as {
     stepId: string;
+    validatorId?: string;
     apiKey: string;
     context?: ValidationContext;
   };
+
+  const lookupId = validatorId || stepId;
 
   if (!apiKey || !stepId) {
     return NextResponse.json(
@@ -18,10 +21,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const validator = validatorRegistry[stepId];
+  const validator = validatorRegistry[lookupId];
   if (!validator) {
     return NextResponse.json(
-      { success: false, message: `Unknown validator: ${stepId}`, pointsAwarded: 0 },
+      { success: false, message: `Unknown validator: ${lookupId}`, pointsAwarded: 0 },
       { status: 400 }
     );
   }
@@ -34,6 +37,7 @@ export async function POST(request: NextRequest) {
     };
 
     const result = await validator(apiKey, enrichedContext);
+    console.log(`[validate] stepId=${stepId} success=${result.success} points=${result.pointsAwarded}`);
 
     // Persist for registered users on success
     if (result.success) {
@@ -45,7 +49,7 @@ export async function POST(request: NextRequest) {
 
         console.log("[validate] supabaseUser:", supabaseUser?.id ?? "NOT AUTHENTICATED");
         if (supabaseUser) {
-          await supabase.from("progress").upsert(
+          const { error: upsertErr } = await supabase.from("progress").upsert(
             {
               user_id: supabaseUser.id,
               step_id: stepId,
@@ -54,6 +58,7 @@ export async function POST(request: NextRequest) {
             },
             { onConflict: "user_id,step_id" }
           );
+          if (upsertErr) console.error("[validate] upsert error:", upsertErr);
 
           if (result.context) {
             const { data: activeCtx } = await supabase

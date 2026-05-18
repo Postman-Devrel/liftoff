@@ -66,7 +66,8 @@ export default function ValidateButton({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          stepId: validatorId,
+          stepId,
+          validatorId,
           apiKey,
           context: validationContext,
         }),
