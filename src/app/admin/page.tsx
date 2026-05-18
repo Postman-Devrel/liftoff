@@ -353,6 +353,7 @@ function ModuleChart({ data }: { data: ModuleStat[] }) {
               width={160}
             />
             <Tooltip
+              cursor={false}
               content={
                 <ChartTooltip formatter={(v) => `${v}% avg completion`} />
               }
@@ -1079,14 +1080,16 @@ function Dashboard({ password }: { password: string }) {
 // ─── Top Learners Chart ──────────────────────────────────
 
 function TopLearnersChart({ users }: { users: LeaderboardUser[] }) {
-  const chartData = [...users].reverse().map((u) => ({
-    name:
-      u.displayName.length > 14
-        ? u.displayName.slice(0, 14) + "…"
-        : u.displayName,
-    points: u.totalPoints,
-    badge: u.rankBadge,
-  }));
+  const chartData = [...users]
+    .sort((a, b) => a.totalPoints - b.totalPoints)
+    .map((u) => ({
+      name:
+        u.displayName.length > 14
+          ? u.displayName.slice(0, 14) + "…"
+          : u.displayName,
+      points: u.totalPoints,
+      badge: u.rankBadge,
+    }));
 
   return (
     <div className="glass-card p-6">
@@ -1116,6 +1119,7 @@ function TopLearnersChart({ users }: { users: LeaderboardUser[] }) {
               width={120}
             />
             <Tooltip
+              cursor={false}
               content={
                 <ChartTooltip formatter={(v) => `${v.toLocaleString()} pts`} />
               }
