@@ -27,7 +27,7 @@ export const validateWorkspace: ValidatorFn = async (apiKey, context) => {
         success: true,
         message: `Workspace "${ws.name}" found and verified as yours!`,
         pointsAwarded: 10,
-        context: { ...context, workspaceId: ws.id },
+        context: { ...context, workspaceId: ws.id, artemisWorkspaceId: ws.id },
       };
     }
   }

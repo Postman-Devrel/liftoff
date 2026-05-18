@@ -12,28 +12,24 @@ export const validateLogDeleted: ValidatorFn = async (apiKey, context) => {
   if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   try {
-    const res = await fetch(`${ARTEMIS_API}/mission`, {
+    const res = await fetch(`${ARTEMIS_API}/logs`, {
       headers: { "x-api-key": apiKeyValue },
     });
     if (!res.ok) {
       return {
         success: false,
-        message: `GET /mission returned ${res.status}.`,
+        message: `GET /logs returned ${res.status}.`,
         pointsAwarded: 0,
       };
     }
 
     const data = await res.json();
-    const steps = data.steps || data.mission_steps || [];
-    const deleteStep = steps.find(
-      (s: { name: string; completed: boolean }) =>
-        s.name?.toLowerCase().includes("delete") && s.completed
-    );
+    const logCount = data.count ?? (data.logs || []).length;
 
-    if (deleteStep) {
+    if (logCount < 3) {
       return {
         success: true,
-        message: "Log deletion confirmed! Remember: anomaly logs can't be deleted.",
+        message: `Log deleted! You now have ${logCount} log(s). Remember: anomaly logs can't be deleted.`,
         pointsAwarded: 10,
         context,
       };
@@ -41,8 +37,7 @@ export const validateLogDeleted: ValidatorFn = async (apiKey, context) => {
 
     return {
       success: false,
-      message:
-        "No log deletion detected. Use DELETE /logs/:id (pick a non-anomaly log).",
+      message: `You still have ${logCount} logs. Use DELETE /logs/:id to remove a non-anomaly log.`,
       pointsAwarded: 0,
     };
   } catch {

@@ -1,7 +1,7 @@
 import { ValidationResult } from "@/types/validation";
 
 const PERSIST_HINT =
-  "The Postman API can only read **initial values**, not current (local) values. In Postman, paste your value into the **Initial value** column (or click the **Persist All** button), then try again.";
+  "The Postman API can only read **shared values**. In your Postman environment editor, make sure the value appears in the **Shared value** column (not just the local **Value** column), then try again.";
 
 export function resolveEnvVar(
   values: { key: string; value: string; current_value?: string }[],

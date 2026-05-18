@@ -25,7 +25,7 @@ export const validateApiBasicsCreateWorkspace: ValidatorFn = async (apiKey, cont
         success: true,
         message: `Workspace "${ws.name}" found and verified as yours!`,
         pointsAwarded: 10,
-        context: { ...context, workspaceId: ws.id },
+        context: { ...context, workspaceId: ws.id, apiBasicsWorkspaceId: ws.id },
       };
     }
   }

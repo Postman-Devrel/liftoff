@@ -24,7 +24,8 @@ export const validateSplashdown: ValidatorFn = async (apiKey, context) => {
     }
 
     const data = await res.json();
-    const completion = data.completion_percentage ?? data.completionPercentage;
+    const completion =
+      data.mission_status?.completion_percentage ?? data.completion_percentage;
 
     if (completion === 100) {
       return {
@@ -36,7 +37,7 @@ export const validateSplashdown: ValidatorFn = async (apiKey, context) => {
       };
     }
 
-    const steps = data.steps || data.mission_steps || [];
+    const steps = data.mission_status?.steps || [];
     const incomplete = steps.filter(
       (s: { completed: boolean }) => !s.completed
     );

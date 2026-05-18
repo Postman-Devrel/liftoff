@@ -1,18 +1,12 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace } from "@/lib/postman-api";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateBankingCreateEnvironment: ValidatorFn = async (apiKey, context) => {
-  if (!context.workspaceId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
-
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
+  const ws = await resolveWorkspace(apiKey, context, context.bankingWorkspaceId, /intergalactic\s+banking/i, "Intergalactic Banking");
+  if ("error" in ws) return ws.error;
+  const workspace = ws.detail as Record<string, unknown>;
   const wsEnvironments: { id: string; name: string; uid: string }[] =
-    workspace.environments || [];
+    (workspace.environments as { id: string; name: string; uid: string }[]) || [];
 
   const bankingEnv = wsEnvironments.find(
     (env) => env.name.trim().toLowerCase() === "banking.local"

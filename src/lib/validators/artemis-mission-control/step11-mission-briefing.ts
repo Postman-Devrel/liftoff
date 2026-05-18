@@ -15,28 +15,29 @@ export const validateMissionBriefing: ValidatorFn = async (
   if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   try {
-    const res = await fetch(`${ARTEMIS_API}/mission`, {
-      headers: { "x-api-key": apiKeyValue },
+    const res = await fetch(`${ARTEMIS_API}/mission/brief`, {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKeyValue,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
     });
+
     if (!res.ok) {
       return {
         success: false,
-        message: `GET /mission returned ${res.status}.`,
+        message: `POST /mission/brief returned ${res.status}.`,
         pointsAwarded: 0,
       };
     }
 
     const data = await res.json();
-    const steps = data.steps || data.mission_steps || [];
-    const briefingStep = steps.find(
-      (s: { name: string; completed: boolean }) =>
-        s.name?.toLowerCase().includes("brief") && s.completed
-    );
 
-    if (briefingStep) {
+    if (data.briefing) {
       return {
         success: true,
-        message: "Mission briefing completed!",
+        message: `Mission briefing received! ${data.briefing.total_logs} log(s) across ${Object.keys(data.briefing.categories || {}).length} category/ies.`,
         pointsAwarded: 10,
         context,
       };
@@ -45,7 +46,7 @@ export const validateMissionBriefing: ValidatorFn = async (
     return {
       success: false,
       message:
-        'No mission briefing detected. Send POST /mission/brief with body `{}`.',
+        'No briefing data returned. Send POST /mission/brief with body `{}`.',
       pointsAwarded: 0,
     };
   } catch {

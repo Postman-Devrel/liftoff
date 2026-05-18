@@ -8,6 +8,12 @@ export interface ValidationContext {
   userId?: string;
   workspaceId?: string;
   environmentId?: string;
+  artemisWorkspaceId?: string;
+  artemisEnvironmentId?: string;
+  apiBasicsWorkspaceId?: string;
+  apiBasicsEnvironmentId?: string;
+  bankingWorkspaceId?: string;
+  bankingEnvironmentId?: string;
 }
 
 export interface ValidationResult {

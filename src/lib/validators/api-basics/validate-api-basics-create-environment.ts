@@ -1,22 +1,18 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace, getEnvironment } from "@/lib/postman-api";
+import { getEnvironment } from "@/lib/postman-api";
 import { resolveEnvVar } from "@/lib/validators/env-helpers";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateApiBasicsCreateEnvironment: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  if (!context.workspaceId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
+  const ws = await resolveWorkspace(apiKey, context, context.apiBasicsWorkspaceId, /^API\s+Basics\s*-\s*.+$/i, "API Basics - [your name]");
+  if ("error" in ws) return ws.error;
 
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
+  const workspace = ws.detail as Record<string, unknown>;
   const wsEnvironments: { id: string; name: string; uid: string }[] =
-    workspace.environments || [];
+    (workspace.environments as { id: string; name: string; uid: string }[]) || [];
 
   const localEnv = wsEnvironments.find(
     (env) => env.name.trim().toLowerCase() === "local"

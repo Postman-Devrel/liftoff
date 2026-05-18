@@ -1,17 +1,12 @@
 import { ValidatorFn } from "@/types/validation";
-import { getWorkspace, getCollection } from "@/lib/postman-api";
+import { getCollection } from "@/lib/postman-api";
+import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateBankingGenerateTests: ValidatorFn = async (apiKey, context) => {
-  if (!context.workspaceId) {
-    return {
-      success: false,
-      message: "Please complete Step 1 first (create the workspace).",
-      pointsAwarded: 0,
-    };
-  }
-
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
-  const collections = workspace.collections || [];
+  const ws = await resolveWorkspace(apiKey, context, context.bankingWorkspaceId, /intergalactic\s+banking/i, "Intergalactic Banking");
+  if ("error" in ws) return ws.error;
+  const workspace = ws.detail as Record<string, unknown>;
+  const collections = (workspace.collections as { name: string; uid: string }[]) || [];
 
   const bankingCollection = collections.find(
     (c: { name: string }) => /intergalactic\s+bank\s+api/i.test(c.name)

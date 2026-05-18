@@ -12,28 +12,27 @@ export const validateLogUpdated: ValidatorFn = async (apiKey, context) => {
   if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   try {
-    const res = await fetch(`${ARTEMIS_API}/mission`, {
+    const res = await fetch(`${ARTEMIS_API}/logs`, {
       headers: { "x-api-key": apiKeyValue },
     });
     if (!res.ok) {
       return {
         success: false,
-        message: `GET /mission returned ${res.status}.`,
+        message: `GET /logs returned ${res.status}.`,
         pointsAwarded: 0,
       };
     }
 
     const data = await res.json();
-    const steps = data.steps || data.mission_steps || [];
-    const updateStep = steps.find(
-      (s: { name: string; completed: boolean }) =>
-        s.name?.toLowerCase().includes("update") && s.completed
-    );
+    const logs: { id: number; created_at: string; updated_at: string }[] =
+      data.logs || [];
 
-    if (updateStep) {
+    const updatedLog = logs.find((l) => l.updated_at !== l.created_at);
+
+    if (updatedLog) {
       return {
         success: true,
-        message: "Log update detected! PATCH /logs/:id completed.",
+        message: `Log #${updatedLog.id} has been updated! PATCH /logs/:id completed.`,
         pointsAwarded: 10,
         context,
       };

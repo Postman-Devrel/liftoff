@@ -5,7 +5,8 @@ export const validateEnvironmentExists: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  if (!context.workspaceId) {
+  const wsId = context.artemisWorkspaceId || context.workspaceId;
+  if (!wsId) {
     return {
       success: false,
       message: "Please complete Step 1 first (create the workspace).",
@@ -14,7 +15,7 @@ export const validateEnvironmentExists: ValidatorFn = async (
   }
 
   // Only look at environments inside the user's Artemis workspace
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
+  const workspace = await getWorkspace(apiKey, wsId);
   const wsEnvironments: { id: string; name: string; uid: string }[] =
     workspace.environments || [];
 

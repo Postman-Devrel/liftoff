@@ -2,7 +2,8 @@ import { ValidatorFn } from "@/types/validation";
 import { getWorkspace } from "@/lib/postman-api";
 
 export const validateCollection: ValidatorFn = async (apiKey, context) => {
-  if (!context.workspaceId) {
+  const wsId = context.artemisWorkspaceId || context.workspaceId;
+  if (!wsId) {
     return {
       success: false,
       message: "Please complete Step 1 first (create the workspace).",
@@ -10,7 +11,7 @@ export const validateCollection: ValidatorFn = async (apiKey, context) => {
     };
   }
 
-  const workspace = await getWorkspace(apiKey, context.workspaceId);
+  const workspace = await getWorkspace(apiKey, wsId);
   const collections = workspace.collections || [];
 
   // The OpenAPI spec generates a collection named "Artemis Mission Control API"

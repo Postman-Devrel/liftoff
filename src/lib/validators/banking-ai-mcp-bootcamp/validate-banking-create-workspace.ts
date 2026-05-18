@@ -24,7 +24,7 @@ export const validateBankingCreateWorkspace: ValidatorFn = async (apiKey, contex
         success: true,
         message: `Workspace "${ws.name}" found and verified as yours!`,
         pointsAwarded: 10,
-        context: { ...context, workspaceId: ws.id },
+        context: { ...context, workspaceId: ws.id, bankingWorkspaceId: ws.id },
       };
     }
   }
