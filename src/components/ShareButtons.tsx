@@ -28,7 +28,8 @@ export default function ShareButtons({ text, variant = "inline" }: ShareButtonsP
   const encodedUrl = encodeURIComponent(APP_URL);
 
   const twitterUrl = `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}&summary=${encodedText}`;
+  const linkedinText = encodeURIComponent(`${text}\n\n${APP_URL}`);
+  const linkedinUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${linkedinText}`;
 
   const buttonBase =
     "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all hover:scale-105 cursor-pointer";
