@@ -6,6 +6,7 @@ import { useProgress } from "@/context/ProgressContext";
 import { calculateRank } from "@/lib/scoring";
 import { getAllModules } from "@/lib/content-loader";
 import RankBadge from "@/components/scoring/RankBadge";
+import ShareButtons from "@/components/ShareButtons";
 
 const CELEBRATED_KEY = "liftoff_celebrated";
 
@@ -162,13 +163,21 @@ export default function CelebrationOverlay() {
         >
           {celebration.title}
         </h2>
-        <p className="text-lg text-[var(--text-secondary)] mb-6">
+        <p className="text-lg text-[var(--text-secondary)] mb-5">
           {celebration.subtitle}
         </p>
+        <div className="mb-4">
+          <ShareButtons
+            text={
+              celebration.type === "module-complete"
+                ? `I just completed the ${celebration.subtitle.replace("You finished ", "")} module on LiftOff by @getpostman!`
+                : `I just reached ${celebration.subtitle.replace("You reached ", "")} rank on LiftOff by @getpostman!`
+            }
+          />
+        </div>
         <button
           onClick={() => setCelebration(null)}
-          className="px-6 py-2.5 rounded-xl font-bold text-white transition-all hover:scale-105"
-          style={{ background: celebration.color }}
+          className="px-6 py-2.5 rounded-xl font-bold text-white/60 hover:text-white transition-all text-sm"
         >
           Continue
         </button>

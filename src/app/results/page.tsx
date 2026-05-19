@@ -6,6 +6,7 @@ import { getAllModules } from "@/lib/content-loader";
 import ModuleBadge from "@/components/scoring/ModuleBadge";
 import RankBadge from "@/components/scoring/RankBadge";
 import Link from "next/link";
+import ShareButtons from "@/components/ShareButtons";
 
 export default function ResultsPage() {
   const { points, completedSteps, isStepCompleted } = useProgress();
@@ -86,6 +87,15 @@ export default function ResultsPage() {
             </span>
           </p>
         )}
+
+        <div className="mb-6">
+          <p className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-3">
+            Share Your Progress
+          </p>
+          <ShareButtons
+            text={`I've earned ${points} points and reached ${rank.title} rank on LiftOff by @getpostman!${completedModules.length > 0 ? ` Completed ${completedModules.length} module${completedModules.length > 1 ? "s" : ""}!` : ""}`}
+          />
+        </div>
 
         <div className="flex gap-3 justify-center">
           <Link href="/" className="btn-primary inline-block">
