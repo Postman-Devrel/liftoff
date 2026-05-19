@@ -1,6 +1,5 @@
 import { ValidatorFn } from "@/types/validation";
 import { getEnvironment } from "@/lib/postman-api";
-import { resolveEnvVar } from "@/lib/validators/env-helpers";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
 
 export const validateBankingSetApiKey: ValidatorFn = async (apiKey, context) => {
@@ -23,18 +22,31 @@ export const validateBankingSetApiKey: ValidatorFn = async (apiKey, context) => 
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);
-  const values = envDetail.values || [];
+  const values: { key: string; value: string; type?: string }[] = envDetail.values || [];
 
-  const effectiveValue = resolveEnvVar(
-    values,
-    "apiKey",
-    'Variable "apiKey" not found in Banking.local. Send the Generate API Key request and ensure the value is saved.'
+  const apiKeyVar = values.find(
+    (v) => v.key === "apiKey" && v.value && v.value.trim().length > 0
   );
-  if (typeof effectiveValue !== "string") return effectiveValue;
+
+  if (!apiKeyVar) {
+    return {
+      success: false,
+      message: 'Variable "apiKey" not found or is empty in Banking.local. Send the Generate API Key request and ensure the value is saved.',
+      pointsAwarded: 0,
+    };
+  }
+
+  if (apiKeyVar.type !== "secret") {
+    return {
+      success: false,
+      message: 'Variable "apiKey" is set but not marked as sensitive. Go to Environments, click on the apiKey value, and set its type to "secret".',
+      pointsAwarded: 0,
+    };
+  }
 
   return {
     success: true,
-    message: 'Variable "apiKey" is set in Banking.local!',
+    message: 'Variable "apiKey" is set and marked as sensitive!',
     pointsAwarded: 10,
     context: { ...context, environmentId: bankingEnv.uid },
   };

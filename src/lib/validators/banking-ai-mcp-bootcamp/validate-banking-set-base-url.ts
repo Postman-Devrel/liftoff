@@ -1,7 +1,33 @@
 import { ValidatorFn } from "@/types/validation";
-import { getEnvironment } from "@/lib/postman-api";
+import { getCollection, getEnvironment } from "@/lib/postman-api";
 import { resolveEnvVar } from "@/lib/validators/env-helpers";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
+
+type CollectionItem = {
+  name?: string;
+  request?: { url?: { raw?: string } | string };
+  item?: CollectionItem[];
+};
+
+function countUrlUsage(items: CollectionItem[]): { total: number; usingVariable: number } {
+  let total = 0;
+  let usingVariable = 0;
+  for (const item of items) {
+    if (item.request) {
+      total++;
+      const raw = typeof item.request.url === "string"
+        ? item.request.url
+        : item.request.url?.raw || "";
+      if (raw.includes("{{baseUrl}}")) usingVariable++;
+    }
+    if (item.item) {
+      const sub = countUrlUsage(item.item);
+      total += sub.total;
+      usingVariable += sub.usingVariable;
+    }
+  }
+  return { total, usingVariable };
+}
 
 export const validateBankingSetBaseUrl: ValidatorFn = async (apiKey, context) => {
   const ws = await resolveWorkspace(apiKey, context, context.bankingWorkspaceId, /intergalactic\s+banking/i, "Intergalactic Banking");
@@ -40,9 +66,36 @@ export const validateBankingSetBaseUrl: ValidatorFn = async (apiKey, context) =>
     };
   }
 
+  const collections = (workspace.collections as { name: string; uid: string }[]) || [];
+  const bankingCollection = collections.find(
+    (c) => /intergalactic\s+bank\s+api/i.test(c.name)
+  );
+
+  if (bankingCollection) {
+    const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
+    const items: CollectionItem[] = collectionDetail.item || [];
+    const { total, usingVariable } = countUrlUsage(items);
+
+    if (total > 0 && usingVariable === 0) {
+      return {
+        success: false,
+        message: 'Variable "baseUrl" is set correctly, but no requests in the collection use {{baseUrl}} in their URL. Use Agent Mode to update all request URLs.',
+        pointsAwarded: 0,
+      };
+    }
+
+    if (total > 0 && usingVariable < total) {
+      return {
+        success: false,
+        message: `Variable "baseUrl" is set, but only ${usingVariable} of ${total} requests use {{baseUrl}}. Update all request URLs to use the variable.`,
+        pointsAwarded: 0,
+      };
+    }
+  }
+
   return {
     success: true,
-    message: 'Variable "baseUrl" is correctly set!',
+    message: 'Variable "baseUrl" is correctly set and all requests use {{baseUrl}}!',
     pointsAwarded: 10,
     context: { ...context, environmentId: bankingEnv.uid },
   };

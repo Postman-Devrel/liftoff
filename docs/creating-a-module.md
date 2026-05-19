@@ -143,13 +143,19 @@ Your `**Validation:**` blocks should describe one of these check types:
 
 | Check Type | Description | Example |
 |------------|-------------|---------|
-| Workspace exists | Check a workspace with a specific name pattern | "Workspace named 'Artemis II - [name]' exists" |
-| Collection exists | Check a collection exists in a workspace | "Collection containing 'Mission Control' in name" |
-| Environment exists | Check an environment with specific variables | "Environment 'artemis.local' with vars: baseUrl, apiKey" |
-| Environment values | Check specific variable values/types | "baseUrl = 'https://example.com', apiKey is secret" |
-| Request exists | Check a request exists in a collection | "GET request to /health endpoint exists" |
-| API response | Call an API and check the response | "GET /health returns 200 OK" |
-| Collection run | Check that a collection run passed | "All tests in the collection pass" |
+| Api Response | Call an API and check the response | "GET /health returns 200 OK" |
+| Collection Exists | Check a collection exists in a workspace | "Collection containing 'Mission Control' in name" |
+| Collection Requests | Verify a collection contains expected requests by name | "Collection has fromAccount, toAccount, and Create new transaction requests" |
+| Collection Run | Check that a collection run passed | "All tests in the collection pass" |
+| Env Var Secret | Verify an environment variable is marked as sensitive/secret | "apiKey variable type is 'secret'" |
+| Environment Exists | Check an environment with specific name exists | "Environment 'Banking.local' exists in workspace" |
+| Environment Values | Check specific variable values or presence | "baseUrl = 'https://example.com', apiKey is non-empty" |
+| Manual | Self-verified step that cannot be validated via API | "Learner confirmed MCP server is configured" |
+| Post Response Script | Check a request has a post-response script setting a variable | "fromAccount request has script saving accountId to env var" |
+| Request Urls | Verify request URLs use a variable instead of hardcoded values | "All requests use {{baseUrl}} in their URL" |
+| Test Scripts | Verify requests have test scripts (pm.test) | "All requests have status code and response time tests" |
+| Workspace Exists | Check a workspace with a specific name pattern | "Workspace named 'Artemis II - [name]' exists" |
+| Workspace Visibility | Verify workspace visibility/type settings | "Workspace visibility is Internal (team)" |
 
 ## Module Badge
 

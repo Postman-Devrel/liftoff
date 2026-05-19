@@ -20,9 +20,17 @@ export const validateBankingCreateWorkspace: ValidatorFn = async (apiKey, contex
   for (const ws of candidates) {
     const detail = await getWorkspace(apiKey, ws.id);
     if (context.userId && detail.createdBy === context.userId) {
+      if (ws.type !== "team") {
+        return {
+          success: false,
+          message: `Workspace "${ws.name}" found, but its visibility is "${ws.type}" instead of "team" (Internal). Update the workspace visibility to Internal.`,
+          pointsAwarded: 0,
+        };
+      }
+
       return {
         success: true,
-        message: `Workspace "${ws.name}" found and verified as yours!`,
+        message: `Workspace "${ws.name}" found with correct visibility!`,
         pointsAwarded: 10,
         context: { ...context, workspaceId: ws.id, bankingWorkspaceId: ws.id },
       };

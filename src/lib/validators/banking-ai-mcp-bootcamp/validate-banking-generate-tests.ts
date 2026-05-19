@@ -23,40 +23,57 @@ export const validateBankingGenerateTests: ValidatorFn = async (apiKey, context)
   const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
   const items = collectionDetail.item || [];
 
-  let hasTests = false;
+  let totalRequests = 0;
+  let requestsWithTests = 0;
 
-  function checkForTests(itemList: { event?: { listen: string; script?: { exec?: string[] } }[]; item?: unknown[] }[]) {
+  type CollectionItem = {
+    request?: unknown;
+    event?: { listen: string; script?: { exec?: string[] } }[];
+    item?: CollectionItem[];
+  };
+
+  function countTests(itemList: CollectionItem[]) {
     for (const item of itemList) {
-      if (item.event) {
-        const testEvent = item.event.find((e) => e.listen === "test");
-        if (testEvent?.script?.exec && testEvent.script.exec.length > 0) {
-          const scriptContent = testEvent.script.exec.join("\n");
-          if (/status/i.test(scriptContent) || /pm\.test/i.test(scriptContent)) {
-            hasTests = true;
-            return;
+      if (item.request) {
+        totalRequests++;
+        if (item.event) {
+          const testEvent = item.event.find((e) => e.listen === "test");
+          if (testEvent?.script?.exec && testEvent.script.exec.length > 0) {
+            const scriptContent = testEvent.script.exec.join("\n");
+            if (/status/i.test(scriptContent) || /pm\.test/i.test(scriptContent)) {
+              requestsWithTests++;
+            }
           }
         }
       }
       if (item.item) {
-        checkForTests(item.item as typeof itemList);
+        countTests(item.item);
       }
     }
   }
 
-  checkForTests(items);
+  countTests(items);
 
-  if (!hasTests) {
+  if (requestsWithTests === 0) {
     return {
       success: false,
       message:
-        'No test scripts found in the collection. Use Agent Mode with the prompt: `Write tests for all the requests in this collection. Include only status code tests and response time tests.`',
+        'No test scripts found in the collection. Use Agent Mode with the prompt: "Write tests for all the requests in this collection. Include only status code tests and response time tests."',
+      pointsAwarded: 0,
+    };
+  }
+
+  if (totalRequests > 0 && requestsWithTests < totalRequests) {
+    return {
+      success: false,
+      message: `Only ${requestsWithTests} of ${totalRequests} requests have test scripts. Use Agent Mode to write tests for all requests in the collection.`,
       pointsAwarded: 0,
     };
   }
 
   return {
     success: true,
-    message: "Test scripts found in the collection!",
+    message: `All ${requestsWithTests} requests have test scripts — nice work!`,
     pointsAwarded: 10,
     context,
   };
