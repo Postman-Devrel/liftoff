@@ -169,10 +169,17 @@ Read the current `module.json` and generate any missing validators, register the
    **Environment check pattern:**
    ```typescript
    import { getWorkspace, getEnvironment } from "@/lib/postman-api";
-   // Get workspace environments, find by name, check variables
+   import { resolveEnvVar } from "@/lib/validators/env-helpers";
+   // Get workspace environments, find by name, then use resolveEnvVar to read each variable.
+   // resolveEnvVar automatically handles: variable missing → error, value empty/unshared → PERSIST_HINT.
    // IMPORTANT: The Postman API only returns shared/initial values — NOT local current values.
-   // Users must click "Share" or "Persist All" in the Postman environment editor before
-   // values are visible to the API. Always check: const effectiveValue = variable.current_value || variable.value;
+   ```
+
+   **ALWAYS use `resolveEnvVar` from `@/lib/validators/env-helpers`** when reading environment variable values. Never manually check variable values with `.find()` or inline logic — `resolveEnvVar` returns either the value string or a `ValidationResult` with the correct error message, including the sharing/persist hint when the value is empty. Usage:
+   ```typescript
+   const val = resolveEnvVar(envValues, "varName", "Optional custom missing message");
+   if (typeof val !== "string") return val; // propagate error with auto-hint
+   // val is the verified non-empty string value
    ```
 
    **Environment step instructions rule:**
@@ -265,6 +272,7 @@ The user can also manually place a 512x512 PNG at `src/content/modules/<module-i
 - Validation types: `src/types/validation.ts`
 - Postman API client: `src/lib/postman-api.ts`
 - Existing validators: `src/lib/validators/`
+- Environment variable helper: `src/lib/validators/env-helpers.ts` (resolveEnvVar — MUST use for all env var checks)
 - Validator registry: `src/lib/validators/index.ts`
 - Content loader: `src/lib/content-loader.ts`
 - Module authoring guide: `docs/creating-a-module.md`
