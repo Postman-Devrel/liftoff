@@ -1,22 +1,17 @@
 import { ValidatorFn } from "@/types/validation";
+import { resolveEnvVar } from "@/lib/validators/env-helpers";
 import { resolveArtemisEnvironment } from "./resolve-environment";
 
 export const validateApiKeySaved: ValidatorFn = async (apiKey, context) => {
   const envResult = await resolveArtemisEnvironment(apiKey, context);
   if ("success" in envResult) return envResult;
 
-  const apiKeyVar = envResult.values.find(
-    (v: { key: string }) => v.key.toLowerCase() === "apikey"
+  const apiKeyValue = resolveEnvVar(
+    envResult.values,
+    "apiKey",
+    "No `apiKey` variable found in your environment. Register first, then add an `apiKey` variable with the returned key."
   );
-
-  if (!apiKeyVar) {
-    return {
-      success: false,
-      message:
-        "No `apiKey` variable found in your environment. Register first, then add an `apiKey` variable with the returned key.",
-      pointsAwarded: 0,
-    };
-  }
+  if (typeof apiKeyValue !== "string") return apiKeyValue;
 
   return {
     success: true,
