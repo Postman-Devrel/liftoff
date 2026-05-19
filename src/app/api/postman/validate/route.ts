@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     context?: ValidationContext;
   };
 
-  const lookupId = validatorId || stepId;
+  const lookupId = validatorId ?? stepId;
 
   if (!apiKey || !stepId) {
     return NextResponse.json(

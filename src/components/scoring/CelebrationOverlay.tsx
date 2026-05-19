@@ -1,11 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import confetti from "canvas-confetti";
 import { useProgress } from "@/context/ProgressContext";
 import { calculateRank } from "@/lib/scoring";
 import { getAllModules } from "@/lib/content-loader";
 import RankBadge from "@/components/scoring/RankBadge";
+
+const CELEBRATED_KEY = "liftoff_celebrated";
+
+function getCelebrated(): { ranks: string[]; modules: string[] } {
+  try {
+    const stored = localStorage.getItem(CELEBRATED_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return { ranks: [], modules: [] };
+}
+
+function markCelebrated(type: "ranks" | "modules", id: string) {
+  const data = getCelebrated();
+  if (!data[type].includes(id)) {
+    data[type].push(id);
+    localStorage.setItem(CELEBRATED_KEY, JSON.stringify(data));
+  }
+}
 
 interface Celebration {
   type: "rank-up" | "module-complete";
@@ -20,8 +38,6 @@ interface Celebration {
 export default function CelebrationOverlay() {
   const { points, completedSteps, isHydrated } = useProgress();
   const [celebration, setCelebration] = useState<Celebration | null>(null);
-  const prevPointsRef = useRef<number | null>(null);
-  const prevCompletedRef = useRef<Record<string, boolean> | null>(null);
 
   const fireConfetti = useCallback(() => {
     const duration = 2500;
@@ -53,68 +69,46 @@ export default function CelebrationOverlay() {
   useEffect(() => {
     if (!isHydrated) return;
 
-    if (prevPointsRef.current === null) {
-      prevPointsRef.current = points;
-      prevCompletedRef.current = completedSteps;
+    const celebrated = getCelebrated();
+    const currentRank = calculateRank(points);
+
+    if (!celebrated.ranks.includes(currentRank.id) && currentRank.minPoints > 0) {
+      markCelebrated("ranks", currentRank.id);
+      setCelebration({
+        type: "rank-up",
+        title: "Rank Up!",
+        subtitle: `You reached ${currentRank.title}`,
+        badge: currentRank.badge,
+        badgeImg: currentRank.badgeImg,
+        badgeImgFull: currentRank.badgeImgFull,
+        color: "#8B5CF6",
+      });
+      fireConfetti();
       return;
     }
 
-    if (points === prevPointsRef.current) return;
-
-    const prevRank = calculateRank(prevPointsRef.current);
-    const newRank = calculateRank(points);
-
     const modules = getAllModules();
-    let moduleCelebration: Celebration | null = null;
-
     for (const mod of modules) {
+      if (celebrated.modules.includes(mod.id)) continue;
       const totalSteps = mod.lessons.reduce((a, l) => a + l.steps.length, 0);
-      const nowCompleted = mod.lessons.reduce(
+      const doneSteps = mod.lessons.reduce(
         (a, l) => a + l.steps.filter((s) => completedSteps[s.id]).length,
         0
       );
-      const prevCompleted = mod.lessons.reduce(
-        (a, l) =>
-          a +
-          l.steps.filter((s) => prevCompletedRef.current?.[s.id]).length,
-        0
-      );
-
-      if (
-        nowCompleted === totalSteps &&
-        prevCompleted < totalSteps &&
-        totalSteps > 0
-      ) {
-        moduleCelebration = {
+      if (doneSteps === totalSteps && totalSteps > 0) {
+        markCelebrated("modules", mod.id);
+        setCelebration({
           type: "module-complete",
           title: "Module Complete!",
           subtitle: `You finished ${mod.title}`,
           badge: mod.icon,
           badgeImg: `/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`,
           color: mod.color,
-        };
-        break;
+        });
+        fireConfetti();
+        return;
       }
     }
-
-    if (newRank.id !== prevRank.id && points > prevPointsRef.current) {
-      setCelebration({
-        type: "rank-up",
-        title: "Rank Up!",
-        subtitle: `You reached ${newRank.title}`,
-        badge: newRank.badge,
-        badgeImg: newRank.badgeImg,
-        badgeImgFull: newRank.badgeImgFull,
-        color: "#8B5CF6",
-      });
-      fireConfetti();
-    } else if (moduleCelebration) {
-      setCelebration(moduleCelebration);
-      fireConfetti();
-    }
-
-    prevPointsRef.current = points;
-    prevCompletedRef.current = completedSteps;
   }, [points, completedSteps, isHydrated, fireConfetti]);
 
   if (!celebration) return null;

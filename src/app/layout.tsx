@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProgressProvider } from "@/context/ProgressContext";
 import LearnerOverlays from "@/components/LearnerOverlays";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({
             {children}
           </ProgressProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );

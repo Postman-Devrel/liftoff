@@ -1,19 +1,33 @@
 # Creating a LiftOff Learning Module
 
-This guide walks you through creating a new learning module for LiftOff. A module is a self-contained learning path with lessons and steps that are validated against the Postman API.
+LiftOff modules are created using Claude Code skills that turn markdown content into a fully wired learning module — complete with lesson structure, server-side validators, and optional badge art. You don't need to write any code manually.
 
-## Module Structure
+## How It Works
 
 ```
-src/content/modules/<module-id>/
-├── module.json          # Module metadata, lessons, and steps
-├── content.md           # The learning content in markdown
-└── badge.png            # Module completion badge (512x512 PNG)
+Content Source          Claude Code Skill          Output
+─────────────          ─────────────────          ──────
+URL or markdown   →   /liftoff-module create   →   module.json
+                                                    validators/
+                                                    content.md
+                                                    badge.png (optional)
 ```
 
-## Step 1: Write Your Content
+You provide learning content as a **markdown file** or a **URL** (blog post, tutorial, doc page). Claude reads it, structures it into lessons and steps, generates the `module.json`, writes all the server-side Postman API validators, registers everything, and verifies the build passes.
 
-Create a markdown file that describes the learning path. Use this format:
+## Starting from a URL
+
+If your content already exists online — a quickstart, tutorial, a Postman Learning Center page,etc — just paste the URL when Claude asks for your source. It is designed to work best when the page has a learning structure: steps, instructions, and how to validate results.
+
+```
+/liftoff-module create your-url.com
+```
+
+Claude will fetch the page, extract the learning content, and structure it into the standard lesson/step format. It works best when the source has clear sections and actionable steps.
+
+## Starting from a Markdown File
+
+If you prefer to write content from scratch (or want more control), create a markdown file in `docs/` using this format:
 
 ```markdown
 # Module Title
@@ -46,10 +60,12 @@ More instructions...
 ...and so on.
 ```
 
+Then run `/liftoff-module create your-markdown.md` and point Claude to your file.
+
 ### Content Guidelines
 
-- Each **Part** becomes a **Lesson** (a groupable section)
-- Each **Step** within a Part is an individually validated task worth 10 points
+- Each **Part** (`## Part N`) becomes a **Lesson** (a groupable section)
+- Each **Step** (`### Step N`) within a Part is an individually validated task worth 10 points
 - Always include a `**Validation:**` block describing what the Postman API should check
 - Be specific about expected names, values, and states
 - Include URLs, code snippets, and exact values the learner will need
@@ -75,7 +91,55 @@ Step descriptions are the ONLY thing the learner sees. They must be **self-conta
 
 ### Validation Types
 
-Your validation block should describe one of these check types:
+## What `/liftoff-module create` Does
+
+When you run the skill, Claude handles the entire pipeline:
+
+1. **Reads your source** — fetches a URL or reads a local markdown file
+2. **Parses the structure** — H1 becomes the module title, H2s become lessons, H3s become steps
+3. **Generates `module.json`** — the structured definition with lesson/step metadata and validator IDs
+4. **Saves to `src/content/modules/<module-id>/`** — creates the module directory with `module.json` and `content.md`
+5. **Registers the module** in `src/lib/content-loader.ts`
+6. **Generates all validators** — one TypeScript file per step in `src/lib/validators/<module-id>/`
+7. **Wires the validator registry** — imports and entries in `src/lib/validators/index.ts`
+8. **Verifies the build** — runs `npx next build` to catch any errors
+9. **(Optional) Generates a badge** — if you pass `--badge`, creates a 512x512 badge via the Gemini API
+
+## Module Structure
+
+After creation, your module directory looks like this:
+
+```
+src/content/modules/<module-id>/
+├── module.json          # Module metadata, lessons, and steps
+├── content.md           # The learning content in markdown
+└── badge.png            # Module completion badge (512x512 PNG, optional)
+```
+
+## Updating an Existing Module
+
+Edit the module's `content.md` (the source of truth), then run:
+
+```
+/liftoff-module update
+```
+
+Claude diffs the markdown against the current `module.json` and applies all changes — adding new lessons/steps, removing deleted ones, and regenerating validators as needed. Step numbering is automatically adjusted.
+
+## Other Skills
+
+| Command | What it does |
+|---------|-------------|
+| `/liftoff-module create` | Create a new module from a URL or markdown file |
+| `/liftoff-module create --badge` | Create a new module and auto-generate a completion badge |
+| `/liftoff-module update` | Sync `module.json` to match the current `content.md` |
+| `/liftoff-module update --badge` | Update and generate a badge if one doesn't exist |
+| `/liftoff-module badge` | Generate or regenerate a badge for an existing module |
+| `/liftoff-module sync` | Regenerate missing validators and verify the build |
+
+## Validation Types
+
+Your `**Validation:**` blocks should describe one of these check types:
 
 | Check Type | Description | Example |
 |------------|-------------|---------|
@@ -87,59 +151,37 @@ Your validation block should describe one of these check types:
 | API response | Call an API and check the response | "GET /health returns 200 OK" |
 | Collection run | Check that a collection run passed | "All tests in the collection pass" |
 
-## Step 2: Generate the Module
+## Module Badge
 
-Once your content markdown is ready, use the Claude Code skill:
+Each module can have a completion badge displayed when the learner finishes all steps.
+
+- **File:** `badge.png` in the module directory (alongside `module.json`)
+- **Dimensions:** 512 x 512 pixels
+- **Format:** PNG with transparency supported
+- **Style:** Achievement emblem / shield / badge — dark background to match the app theme
+
+### Auto-generate with Gemini
+
+Pass `--badge` when creating or updating, or use the standalone command:
 
 ```
-/liftoff-module create
+/liftoff-module create --badge
+/liftoff-module badge
 ```
 
-This will:
-1. Read your content markdown
-2. Generate a `module.json` with proper lesson/step structure and validator IDs
-3. Save it to `src/content/modules/<module-id>/`
-4. Register it in the content loader
-5. Automatically generate all validator functions
-6. Register validators and verify the build passes
+Requires a `GEMINI_API_KEY` in `.env.local` — get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-## Adding More Lessons Later
+You can also run the script directly:
 
-To add new lessons or steps to an existing module:
-
-1. Write the new content in markdown (same format as above)
-2. Run `/liftoff-module update` — it will merge the new content and automatically generate validators
-
-## Example Content
-
-Here's a minimal example:
-
-```markdown
-# API Basics
-
-Learn the fundamentals of REST APIs using Postman.
-
-## Part 1: Your First Request
-
-Set up your workspace and make your first API call.
-
-### Step 1: Create a Workspace
-
-Sign in to Postman and create a new blank workspace.
-Name it: **API Basics - [your name]**
-
-**Validation:** Workspace named "API Basics - [name]" exists and was created by the current user.
-
-### Step 2: Create a Collection
-
-Create a new collection in your workspace called **My First Collection** and add a GET request to `https://api.sampleapis.com/coffee/hot`.
-
-**Validation:** Collection named "My First Collection" exists in the workspace with at least one request.
+```bash
+npx tsx scripts/generate-badge.ts <module-id> "your prompt here"
 ```
 
----
+### Manual badge
 
-### Full Example: Getting Started with Postman
+Place any 512x512 PNG at `src/content/modules/<module-id>/badge.png`. If no badge is present, the module's emoji icon is displayed instead.
+
+## Full Example
 
 Below is a complete, ready-to-use module markdown. Save it to `docs/` and run `/liftoff-module create` to generate the module.
 
@@ -217,36 +259,6 @@ Postman lets you write test scripts that run automatically after every request. 
 
 **Validation:** The "List All Coffees" request has a post-response script containing at least one `pm.test` call, and sending the request returns a 200 status.
 ```
-
-## Module Badge
-
-Each module can have a completion badge displayed when the learner finishes all steps.
-
-- **File:** `badge.png` in the module directory (alongside `module.json`)
-- **Dimensions:** 512 x 512 pixels
-- **Format:** PNG with transparency supported
-- **Style:** Achievement emblem / shield / badge — dark background to match the app theme
-
-### Auto-generate with Gemini
-
-Pass `--badge` when creating or updating a module to generate the badge automatically:
-
-```
-/liftoff-module create --badge
-/liftoff-module badge              # standalone, for existing modules
-```
-
-This calls the Google Gemini API directly (no CLI tools needed). Requires a `GEMINI_API_KEY` in `.env.local` — get a free key at [Google AI Studio](https://aistudio.google.com/app/apikey).
-
-You can also run the script directly:
-
-```bash
-npx tsx scripts/generate-badge.ts <module-id> "your prompt here"
-```
-
-### Manual badge
-
-Place any 512x512 PNG at `src/content/modules/<module-id>/badge.png`. If no badge is present, the module's emoji icon is displayed instead.
 
 ## Tips
 
