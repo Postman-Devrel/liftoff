@@ -1,6 +1,6 @@
 "use client";
 
-const APP_URL = "https://liftoff.postman.com";
+const APP_URL = "https://quickstarts.postman.com";
 
 function XIcon({ size = 18 }: { size?: number }) {
   return (
