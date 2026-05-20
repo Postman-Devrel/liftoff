@@ -42,7 +42,7 @@ export default function DiscordHelpButton({
     navigator.clipboard.writeText(lines.join("\n"));
 
     setToast(true);
-    setTimeout(() => setToast(false), 12000);
+    setTimeout(() => setToast(false), 5000);
 
     setTimeout(() => {
       if (hasJoined) {
@@ -52,7 +52,7 @@ export default function DiscordHelpButton({
         setHasJoined(true);
         window.open(DISCORD_INVITE, "_blank", "noopener,noreferrer");
       }
-    }, 600);
+    }, 3000);
   }
 
   return (
