@@ -321,12 +321,12 @@ function ActivityChart({
             className="flex items-center"
           >
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={customDays}
-              onChange={(e) => setCustomDays(e.target.value)}
+              onChange={(e) => setCustomDays(e.target.value.replace(/\D/g, ""))}
               placeholder="#"
-              min="1"
-              max="365"
               className="w-10 px-1.5 py-1 rounded-lg text-[11px] font-mono bg-transparent border border-white/10 text-white placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--orange)]/40 text-center"
             />
           </form>

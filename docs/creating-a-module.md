@@ -67,6 +67,7 @@ Then run `/liftoff-module create your-markdown.md` and point Claude to your file
 - Each **Part** (`## Part N`) becomes a **Lesson** (a groupable section)
 - Each **Step** (`### Step N`) within a Part is an individually validated task worth 10 points
 - Always include a `**Validation:**` block describing what the Postman API should check
+- For steps that **cannot** be validated via the Postman API (local CLI commands, MCP configuration, etc.), prefix the validation block with `[MANUAL]`: `**Validation:** [MANUAL] Learner should verify that...`. This sets `"manual": true` in module.json and shows a **Done** button instead of **Validate** in the UI
 - Be specific about expected names, values, and states
 - Include URLs, code snippets, and exact values the learner will need
 
