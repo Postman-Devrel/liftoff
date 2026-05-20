@@ -26,7 +26,7 @@ export interface DiscordProfile {
 }
 
 interface AuthState {
-  // Postman (ephemeral, sessionStorage)
+  // Postman (ephemeral, localStorage)
   apiKey: string | null;
   profile: PostmanProfile | null;
   isAuthenticated: boolean;
@@ -69,10 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<PostmanProfile | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
 
-  // Load Postman auth from sessionStorage
+  // Load Postman auth from localStorage
   useEffect(() => {
-    const stored = sessionStorage.getItem("postman_api_key");
-    const storedProfile = sessionStorage.getItem("postman_profile");
+    const stored = localStorage.getItem("postman_api_key");
+    const storedProfile = localStorage.getItem("postman_profile");
     if (stored) setApiKeyState(stored);
     if (storedProfile) {
       try {
@@ -99,15 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setAuth = useCallback((key: string, prof: PostmanProfile) => {
-    sessionStorage.setItem("postman_api_key", key);
-    sessionStorage.setItem("postman_profile", JSON.stringify(prof));
+    localStorage.setItem("postman_api_key", key);
+    localStorage.setItem("postman_profile", JSON.stringify(prof));
     setApiKeyState(key);
     setProfile(prof);
   }, []);
 
   const clearApiKey = useCallback(() => {
-    sessionStorage.removeItem("postman_api_key");
-    sessionStorage.removeItem("postman_profile");
+    localStorage.removeItem("postman_api_key");
+    localStorage.removeItem("postman_profile");
     setApiKeyState(null);
     setProfile(null);
   }, []);

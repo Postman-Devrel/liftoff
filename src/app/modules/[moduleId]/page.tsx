@@ -9,6 +9,7 @@ import AuthGuard from "@/components/auth/AuthGuard";
 import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
 import ModuleBadge from "@/components/scoring/ModuleBadge";
+import ShareDebug from "@/components/ShareDebug";
 
 export default function ModuleOverviewPage() {
   const params = useParams();
@@ -192,6 +193,8 @@ export default function ModuleOverviewPage() {
               );
             })}
           </div>
+
+          <ShareDebug moduleId={mod.id} />
         </main>
 
         {showResetConfirm && (
