@@ -125,9 +125,8 @@ export default async function SharePage({ params }: Props) {
           </Link>
 
           <div className="mt-6 flex items-center justify-center gap-2">
-            <span className="text-2xl font-black text-white">Lift</span>
-            <span className="text-2xl font-black gradient-text">Off</span>
-            <span className="text-sm text-[var(--text-tertiary)] ml-1">by Postman</span>
+            <span className="text-2xl font-black"><span className="text-white">Lift</span><span className="gradient-text">Off</span></span>
+            <span className="text-sm text-[var(--text-tertiary)]">by Postman</span>
           </div>
         </div>
       </div>
@@ -180,9 +179,8 @@ export default async function SharePage({ params }: Props) {
           </Link>
 
           <div className="mt-6 flex items-center justify-center gap-2">
-            <span className="text-2xl font-black text-white">Lift</span>
-            <span className="text-2xl font-black gradient-text">Off</span>
-            <span className="text-sm text-[var(--text-tertiary)] ml-1">by Postman</span>
+            <span className="text-2xl font-black"><span className="text-white">Lift</span><span className="gradient-text">Off</span></span>
+            <span className="text-sm text-[var(--text-tertiary)]">by Postman</span>
           </div>
         </div>
       </div>
