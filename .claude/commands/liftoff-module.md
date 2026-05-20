@@ -48,7 +48,8 @@ Create a brand new module from a content markdown file.
           "title": "<Step Title>",
           "description": "<Full step instructions from the markdown, preserving all formatting including markdown links>",
           "points": 10,
-          "validatorId": "validate-<module-id>-<step-kebab-slug>"
+          "validatorId": "validate-<module-id>-<step-kebab-slug>",
+          "manual": true  // ONLY if the Validation block contains [MANUAL] — omit this field otherwise
         }
       ]
     }
@@ -67,6 +68,7 @@ Create a brand new module from a content markdown file.
 - Validator IDs follow pattern: `validate-<module-id>-<step-slug>`
 - Check existing modules in `src/content/modules/` to pick a unique color
 - Every step gets 10 points
+- Steps with `[MANUAL]` in their `**Validation:**` block must include `"manual": true` in module.json — the UI shows "Done" instead of "Validate" for these steps
 - **URLs in descriptions must use markdown link syntax** `[text](url)` — bare URLs will not render as clickable links. When copying descriptions from content.md, preserve all markdown link formatting.
 
 ### Rich description requirements — CRITICAL:

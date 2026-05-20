@@ -11,6 +11,7 @@ interface ValidateButtonProps {
   stepTitle: string;
   validatorId: string;
   points: number;
+  manual?: boolean;
   moduleColor?: string;
   onError?: (message: string) => void;
 }
@@ -19,6 +20,7 @@ export default function ValidateButton({
   stepId,
   validatorId,
   points,
+  manual,
   moduleColor = "#FF6C37",
   onError,
 }: ValidateButtonProps) {
@@ -106,7 +108,7 @@ export default function ValidateButton({
           boxShadow: `0 4px 16px ${moduleColor}30`,
         }}
       >
-        {loading ? "Validating..." : "Validate"}
+        {loading ? (manual ? "Completing..." : "Validating...") : (manual ? "Done" : "Validate")}
       </button>
       {result && !result.success && (
         <div className="mt-3 px-4 py-3 rounded-xl bg-[var(--pink)]/8 border border-[var(--pink)]/20">

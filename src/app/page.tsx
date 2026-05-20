@@ -78,6 +78,12 @@ function ProfileSection() {
           >
             Settings
           </Link>
+          <Link
+            href="/about"
+            className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+          >
+            About
+          </Link>
           <button
             onClick={signOut}
             className="text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"

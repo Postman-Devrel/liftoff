@@ -121,7 +121,8 @@
           "title": "Generate Your Postman API Key",
           "description": "In Postman, click your **user icon** in the top right, go to **Settings**, then navigate to **API Keys**. Generate a new key and give it an appropriate name (e.g. **Workshop**). Copy the key and store it somewhere accessible — you will not be able to view it again.",
           "points": 10,
-          "validatorId": "validate-banking-generate-api-key"
+          "validatorId": "validate-banking-generate-api-key",
+          "manual": true
         },
         {
           "id": "banking-step-12-create-mcp-request",
@@ -129,7 +130,8 @@
           "title": "Create an MCP Request",
           "description": "Return to your **Your Name – Intergalactic Banking** workspace and select **MCP Request**. Set the transport type to **HTTP** and use the following MCP Server URL:\n\n```\nhttps://mcp.postman.com/mcp\n```\n\nSet the authentication type to **Bearer Token** and enter the API key you generated. You can find additional guidance in the Learning Center.",
           "points": 10,
-          "validatorId": "validate-banking-create-mcp-request"
+          "validatorId": "validate-banking-create-mcp-request",
+          "manual": true
         },
         {
           "id": "banking-step-13-query-mcp",
@@ -137,7 +139,8 @@
           "title": "Query Collections via MCP Server",
           "description": "Navigate to **Tool 49 – getCollection** and run the request using your **Workspace ID**.\n\nYou can find your **Workspace ID** in the **Overview** tab.",
           "points": 10,
-          "validatorId": "validate-banking-query-mcp"
+          "validatorId": "validate-banking-query-mcp",
+          "manual": true
         }
       ]
     },
@@ -153,7 +156,8 @@
           "title": "Add the MCP Server to Claude Code",
           "description": "Explore the **Postman MCP Server** on GitHub: [https://github.com/postmanlabs/postman-mcp-server](https://github.com/postmanlabs/postman-mcp-server)\n\nRun the following command in your terminal to register the **Postman MCP Server** with **Claude Code**:\n\n```bash\nclaude mcp add --transport http postman https://mcp.postman.com/mcp --header \"Authorization: Bearer <YOUR_API_KEY>\"\n```\n\nExpected `mcp.json` configuration:\n\n```json\n{\n  \"mcpServers\": {\n    \"postman_mcp_server\": {\n      \"url\": \"https://mcp.postman.com/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer PMAK-YOUR-KEY-HERE\"\n      }\n    }\n  }\n}\n```",
           "points": 10,
-          "validatorId": "validate-banking-add-mcp-claude"
+          "validatorId": "validate-banking-add-mcp-claude",
+          "manual": true
         },
         {
           "id": "banking-step-15-verify-connection",
@@ -161,7 +165,8 @@
           "title": "Verify the Connection",
           "description": "Use `claude mcp list` in your terminal or `/mcp` in **Claude** to list your registered MCP servers.\n\n> **Claude Prompt:** `List all my Postman workspaces.`\n\nYou should receive a list of your Postman workspaces. If so, everything is configured correctly.",
           "points": 10,
-          "validatorId": "validate-banking-verify-connection"
+          "validatorId": "validate-banking-verify-connection",
+          "manual": true
         },
         {
           "id": "banking-step-16-add-tests-mcp",
@@ -169,7 +174,8 @@
           "title": "Add Tests via the MCP Server",
           "description": "Use the MCP server to locate your workshop workspace ID and then add tests to the collection.\n\nGet the workspace ID:\n\n> **Claude Prompt:** `Get the workspace ID for \"[WORKSHOP-WORKSPACE-NAME]\".`\n\nAdd tests to the collection:\n\n> **Claude Prompt:**\n> ```\n> Using the Postman MCP server, add tests to [workshop collection name].\n> For each request:\n>   1. Add a status code check (200 OK)\n>   2. Validate the response has a 'success' property set to true\n> ```\n\nRun the tests:\n\n> **Claude Prompt:** `Run the \"[workshop collection name]\" collection and show me the test results.`",
           "points": 10,
-          "validatorId": "validate-banking-add-tests-mcp"
+          "validatorId": "validate-banking-add-tests-mcp",
+          "manual": true
         }
       ]
     }

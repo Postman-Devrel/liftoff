@@ -22,4 +22,5 @@ export interface Step {
   description: string;
   points: number;
   validatorId: string;
+  manual?: boolean;
 }

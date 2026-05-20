@@ -73,6 +73,7 @@ export default function StepCard({ step, moduleTitle, moduleColor = "#FF6C37" }:
             stepTitle={step.title}
             validatorId={step.validatorId}
             points={step.points}
+            manual={step.manual}
             moduleColor={moduleColor}
             onError={setLastError}
           />
