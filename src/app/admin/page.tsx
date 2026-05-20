@@ -262,7 +262,24 @@ function ChartTooltip({
 
 // ─── Activity Chart ──────────────────────────────────────
 
-function ActivityChart({ data }: { data: ActivityPoint[] }) {
+const TIME_RANGES = [
+  { label: "30d", value: "30" },
+  { label: "60d", value: "60" },
+  { label: "90d", value: "90" },
+  { label: "All", value: "all" },
+];
+
+function ActivityChart({
+  data,
+  activeDays,
+  onDaysChange,
+}: {
+  data: ActivityPoint[];
+  activeDays: string;
+  onDaysChange: (days: string) => void;
+}) {
+  const [customDays, setCustomDays] = useState("");
+
   const formatted = data.map((d) => ({
     ...d,
     label: new Date(d.date + "T00:00:00").toLocaleDateString("en-US", {
@@ -271,11 +288,50 @@ function ActivityChart({ data }: { data: ActivityPoint[] }) {
     }),
   }));
 
+  const rangeLabel = activeDays === "all"
+    ? "All Time"
+    : `Last ${activeDays} Days`;
+
   return (
     <div className="glass-card p-6">
-      <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-6">
-        Step Completions — Last 30 Days
-      </h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+          Step Completions — {rangeLabel}
+        </h3>
+        <div className="flex items-center gap-1">
+          {TIME_RANGES.map((r) => (
+            <button
+              key={r.value}
+              onClick={() => onDaysChange(r.value)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-colors ${
+                activeDays === r.value
+                  ? "bg-[var(--orange)]/20 text-[var(--orange)]"
+                  : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-white/5"
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const v = parseInt(customDays, 10);
+              if (v > 0) onDaysChange(String(v));
+            }}
+            className="flex items-center"
+          >
+            <input
+              type="number"
+              value={customDays}
+              onChange={(e) => setCustomDays(e.target.value)}
+              placeholder="#"
+              min="1"
+              max="365"
+              className="w-10 px-1.5 py-1 rounded-lg text-[11px] font-mono bg-transparent border border-white/10 text-white placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--orange)]/40 text-center"
+            />
+          </form>
+        </div>
+      </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={formatted}>
@@ -910,9 +966,9 @@ function Dashboard({ password }: { password: string }) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [activityDays, setActivityDays] = useState<string>("30");
 
-  const fetchData = useCallback((days?: string) => {
+  const fetchData = useCallback((daysOverride?: string) => {
     setLoading(true);
-    const d = days ?? activityDays;
+    const d = daysOverride ?? activityDays;
     fetch(`/api/admin/dashboard?days=${d}`, {
       headers: { Authorization: `Bearer ${password}` },
     })
@@ -920,8 +976,8 @@ function Dashboard({ password }: { password: string }) {
         if (!r.ok) throw new Error("Failed to load");
         return r.json();
       })
-      .then((d) => {
-        setData(d);
+      .then((result) => {
+        setData(result);
         setLoading(false);
       })
       .catch((e) => {
@@ -929,6 +985,15 @@ function Dashboard({ password }: { password: string }) {
         setLoading(false);
       });
   }, [password, activityDays]);
+
+  function handleRefresh() {
+    fetchData();
+  }
+
+  function handleDaysChange(days: string) {
+    setActivityDays(days);
+    fetchData(days);
+  }
 
   useEffect(() => {
     fetchData();
@@ -959,7 +1024,7 @@ function Dashboard({ password }: { password: string }) {
           <div className="text-4xl mb-4">⚠️</div>
           <p className="text-white font-medium mb-2">Failed to load data</p>
           <p className="text-sm text-[var(--text-tertiary)] mb-4">{error}</p>
-          <button onClick={fetchData} className="btn-primary">
+          <button onClick={handleRefresh} className="btn-primary">
             Retry
           </button>
         </div>
@@ -986,7 +1051,7 @@ function Dashboard({ password }: { password: string }) {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={fetchData}
+              onClick={handleRefresh}
               className="btn-ghost !py-2 !px-4 text-xs flex items-center gap-2"
               title="Refresh data"
             >
@@ -1046,7 +1111,7 @@ function Dashboard({ password }: { password: string }) {
 
         {/* Charts Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-          <ActivityChart data={data.activity} />
+          <ActivityChart data={data.activity} activeDays={activityDays} onDaysChange={handleDaysChange} />
           <ModuleChart data={data.moduleStats} />
         </div>
 
