@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useProgress } from "@/context/ProgressContext";
 import ValidateButton from "./ValidateButton";
 import DiscordHelpButton from "./DiscordHelpButton";
@@ -60,8 +61,9 @@ export default function StepCard({ step, moduleTitle, moduleColor = "#FF6C37" }:
               errorMessage={lastError}
             />
           </div>
-          <div className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-strong:text-white prose-code:text-[var(--orange)] prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-a:text-[var(--orange)] prose-a:no-underline hover:prose-a:underline prose-pre:overflow-x-auto prose-pre:max-w-full">
+          <div className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-strong:text-white prose-code:text-[var(--orange)] prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-a:text-[var(--orange)] prose-a:no-underline hover:prose-a:underline prose-pre:overflow-x-auto prose-pre:max-w-full prose-table:border-collapse prose-th:border prose-th:border-white/10 prose-th:px-3 prose-th:py-2 prose-th:text-left prose-th:text-white prose-th:bg-white/5 prose-td:border prose-td:border-white/10 prose-td:px-3 prose-td:py-2">
             <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               components={{
                 pre: CopyableCodeBlock,
                 blockquote: CopyableBlockquote,
