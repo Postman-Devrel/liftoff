@@ -14,21 +14,29 @@ export async function GET(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const url = new URL(request.url);
+  const daysParam = url.searchParams.get("days");
+  const days = daysParam === "all" ? null : Math.min(parseInt(daysParam || "30", 10) || 30, 365);
+
   const supabase = createAdminClient();
   const modules = getAllModules();
+
+  let activityQuery = supabase
+    .from("progress")
+    .select("completed_at")
+    .order("completed_at", { ascending: true });
+  if (days) {
+    activityQuery = activityQuery.gte(
+      "completed_at",
+      new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+    );
+  }
 
   const [profilesRes, progressRes, activityRes, userPointsRes] =
     await Promise.all([
       supabase.from("profiles").select("*"),
       supabase.from("progress").select("*"),
-      supabase
-        .from("progress")
-        .select("completed_at")
-        .gte(
-          "completed_at",
-          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-        )
-        .order("completed_at", { ascending: true }),
+      activityQuery,
       supabase.from("user_points").select("*"),
     ]);
 
@@ -85,9 +93,20 @@ export async function GET(request: Request) {
   });
 
   const activityByDate = new Map<string, number>();
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-    activityByDate.set(d.toISOString().split("T")[0], 0);
+  if (days) {
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+      activityByDate.set(d.toISOString().split("T")[0], 0);
+    }
+  } else {
+    const dates = recentActivity.map((a) => a.completed_at.split("T")[0]);
+    if (dates.length > 0) {
+      const first = new Date(dates[0] + "T00:00:00");
+      const last = new Date();
+      for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+        activityByDate.set(d.toISOString().split("T")[0], 0);
+      }
+    }
   }
   for (const a of recentActivity) {
     const date = a.completed_at.split("T")[0];

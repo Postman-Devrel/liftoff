@@ -908,10 +908,12 @@ function Dashboard({ password }: { password: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [activityDays, setActivityDays] = useState<string>("30");
 
-  const fetchData = useCallback(() => {
+  const fetchData = useCallback((days?: string) => {
     setLoading(true);
-    fetch("/api/admin/dashboard", {
+    const d = days ?? activityDays;
+    fetch(`/api/admin/dashboard?days=${d}`, {
       headers: { Authorization: `Bearer ${password}` },
     })
       .then((r) => {
@@ -926,7 +928,7 @@ function Dashboard({ password }: { password: string }) {
         setError(e.message);
         setLoading(false);
       });
-  }, [password]);
+  }, [password, activityDays]);
 
   useEffect(() => {
     fetchData();
