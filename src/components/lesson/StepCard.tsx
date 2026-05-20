@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useProgress } from "@/context/ProgressContext";
 import ValidateButton from "./ValidateButton";
@@ -16,12 +17,17 @@ interface StepCardProps {
 }
 
 export default function StepCard({ step, moduleColor = "#FF6C37" }: StepCardProps) {
+  const [stepUrl, setStepUrl] = useState("");
+  useEffect(() => {
+    setStepUrl(`${window.location.origin}${window.location.pathname}#${step.id}`);
+  }, [step.id]);
   const { isStepCompleted } = useProgress();
   const completed = isStepCompleted(step.id);
 
   return (
     <div
-      className="glass-card p-6 transition-all"
+      id={step.id}
+      className="glass-card p-6 transition-all scroll-mt-24"
       style={{
         borderLeftWidth: "3px",
         borderLeftColor: completed ? "var(--green)" : moduleColor,
@@ -44,7 +50,7 @@ export default function StepCard({ step, moduleColor = "#FF6C37" }: StepCardProp
             <h3 className="text-base font-bold text-white">
               {step.title}
             </h3>
-            <DiscordHelpButton stepId={step.id} stepTitle={step.title} />
+            <DiscordHelpButton stepId={step.id} stepTitle={step.title} stepUrl={stepUrl} />
           </div>
           <div className="mt-2 text-sm text-[var(--text-secondary)] leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-strong:text-white prose-code:text-[var(--orange)] prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:font-mono prose-a:text-[var(--orange)] prose-a:no-underline hover:prose-a:underline prose-pre:overflow-x-auto prose-pre:max-w-full">
             <ReactMarkdown
