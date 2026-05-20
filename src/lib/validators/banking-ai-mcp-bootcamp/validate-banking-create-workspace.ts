@@ -28,9 +28,13 @@ export const validateBankingCreateWorkspace: ValidatorFn = async (apiKey, contex
         };
       }
 
+      const warning = candidates.length > 1
+        ? ` Note: you have ${candidates.length} workspaces matching "Intergalactic Banking" — using "${ws.name}". Consider deleting duplicates to avoid confusion.`
+        : "";
+
       return {
         success: true,
-        message: `Workspace "${ws.name}" found with correct visibility!`,
+        message: `Workspace "${ws.name}" found with correct visibility!${warning}`,
         pointsAwarded: 10,
         context: { ...context, workspaceId: ws.id, bankingWorkspaceId: ws.id },
       };

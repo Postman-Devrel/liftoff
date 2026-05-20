@@ -14,6 +14,7 @@ export interface ValidationContext {
   apiBasicsEnvironmentId?: string;
   bankingWorkspaceId?: string;
   bankingEnvironmentId?: string;
+  bankingCollectionUid?: string;
 }
 
 export interface ValidationResult {

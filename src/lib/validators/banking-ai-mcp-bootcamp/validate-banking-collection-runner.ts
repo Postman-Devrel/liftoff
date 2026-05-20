@@ -1,6 +1,7 @@
 import { ValidatorFn } from "@/types/validation";
 import { getCollection } from "@/lib/postman-api";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
+import { resolveBankingCollection } from "./resolve-collection";
 
 type CollectionItem = {
   name?: string;
@@ -14,19 +15,14 @@ export const validateBankingCollectionRunner: ValidatorFn = async (apiKey, conte
   if ("error" in ws) return ws.error;
   const workspace = ws.detail as Record<string, unknown>;
 
-  const collections = (workspace.collections as { name: string; uid: string }[]) || [];
-  const bankingCollection = collections.find(
-    (c) => /intergalactic\s+bank\s+api/i.test(c.name)
-  );
-  if (!bankingCollection) {
-    return {
-      success: false,
-      message: "Banking API collection not found. Complete the earlier steps first.",
-      pointsAwarded: 0,
-    };
+  let collectionUid = context.bankingCollectionUid;
+  if (!collectionUid) {
+    const collections = (workspace.collections as { name: string; uid: string }[]) || [];
+    const resolved = await resolveBankingCollection(apiKey, collections);
+    if (!resolved) return { success: false, message: "Banking API collection not found. Complete the earlier steps first.", pointsAwarded: 0 };
+    collectionUid = resolved.uid;
   }
-
-  const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
+  const collectionDetail = await getCollection(apiKey, collectionUid);
   const items: CollectionItem[] = collectionDetail.item || [];
 
   let totalRequests = 0;

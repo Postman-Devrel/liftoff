@@ -2,6 +2,7 @@ import { ValidatorFn } from "@/types/validation";
 import { getCollection, getEnvironment } from "@/lib/postman-api";
 import { resolveEnvVar } from "@/lib/validators/env-helpers";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
+import { resolveBankingCollection } from "./resolve-collection";
 
 type CollectionItem = {
   name?: string;
@@ -66,13 +67,15 @@ export const validateBankingSetBaseUrl: ValidatorFn = async (apiKey, context) =>
     };
   }
 
-  const collections = (workspace.collections as { name: string; uid: string }[]) || [];
-  const bankingCollection = collections.find(
-    (c) => /intergalactic\s+bank\s+api/i.test(c.name)
-  );
+  let collectionUid = context.bankingCollectionUid;
+  if (!collectionUid) {
+    const collections = (workspace.collections as { name: string; uid: string }[]) || [];
+    const resolved = await resolveBankingCollection(apiKey, collections);
+    if (resolved) collectionUid = resolved.uid;
+  }
 
-  if (bankingCollection) {
-    const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
+  if (collectionUid) {
+    const collectionDetail = await getCollection(apiKey, collectionUid);
     const items: CollectionItem[] = collectionDetail.item || [];
     const { total, usingVariable } = countUrlUsage(items);
 

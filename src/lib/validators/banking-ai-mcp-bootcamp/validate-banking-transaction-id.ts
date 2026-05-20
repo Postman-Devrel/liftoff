@@ -2,6 +2,7 @@ import { ValidatorFn } from "@/types/validation";
 import { getCollection, getEnvironment } from "@/lib/postman-api";
 import { resolveEnvVar } from "@/lib/validators/env-helpers";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
+import { resolveBankingCollection } from "./resolve-collection";
 
 type CollectionItem = {
   name?: string;
@@ -34,36 +35,24 @@ export const validateBankingTransactionId: ValidatorFn = async (apiKey, context)
   if ("error" in ws) return ws.error;
   const workspace = ws.detail as Record<string, unknown>;
 
-  const collections = (workspace.collections as { name: string; uid: string }[]) || [];
-  const bankingCollection = collections.find(
-    (c) => /intergalactic\s+bank\s+api/i.test(c.name)
-  );
-  if (!bankingCollection) {
-    return {
-      success: false,
-      message: "Banking API collection not found. Complete the earlier steps first.",
-      pointsAwarded: 0,
-    };
+  let collectionUid = context.bankingCollectionUid;
+  if (!collectionUid) {
+    const collections = (workspace.collections as { name: string; uid: string }[]) || [];
+    const resolved = await resolveBankingCollection(apiKey, collections);
+    if (!resolved) return { success: false, message: "Banking API collection not found. Complete the earlier steps first.", pointsAwarded: 0 };
+    collectionUid = resolved.uid;
   }
 
-  const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
+  const collectionDetail = await getCollection(apiKey, collectionUid);
   const items: CollectionItem[] = collectionDetail.item || [];
 
   const transactionReq = findRequest(items, /new\s+transaction|create.*transaction/i);
   if (!transactionReq) {
-    return {
-      success: false,
-      message: 'Could not find a "Create new transaction" request in the collection.',
-      pointsAwarded: 0,
-    };
+    return { success: false, message: 'Could not find a "Create new transaction" request in the collection.', pointsAwarded: 0 };
   }
 
   if (!hasPostResponseScript(transactionReq, /transactionId/i)) {
-    return {
-      success: false,
-      message: 'The Create new transaction request does not have a post-response script that saves the transactionId. Use Agent Mode to add one.',
-      pointsAwarded: 0,
-    };
+    return { success: false, message: 'The Create new transaction request does not have a post-response script that saves the transactionId. Use Agent Mode to add one.', pointsAwarded: 0 };
   }
 
   const wsEnvironments: { id: string; name: string; uid: string }[] =
@@ -72,11 +61,7 @@ export const validateBankingTransactionId: ValidatorFn = async (apiKey, context)
     (env) => env.name.trim().toLowerCase() === "banking.local"
   );
   if (!bankingEnv) {
-    return {
-      success: false,
-      message: 'Environment "Banking.local" not found. Complete the previous steps first.',
-      pointsAwarded: 0,
-    };
+    return { success: false, message: 'Environment "Banking.local" not found. Complete the previous steps first.', pointsAwarded: 0 };
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);

@@ -1,29 +1,6 @@
 import { ValidatorFn } from "@/types/validation";
-import { getCollection } from "@/lib/postman-api";
 import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
-
-type CollectionItem = {
-  name?: string;
-  request?: unknown;
-  item?: CollectionItem[];
-};
-
-function collectRequestNames(items: CollectionItem[]): string[] {
-  const names: string[] = [];
-  for (const item of items) {
-    if (item.request && item.name) names.push(item.name);
-    if (item.item) names.push(...collectRequestNames(item.item));
-  }
-  return names;
-}
-
-const EXPECTED_REQUESTS = [
-  /generate\s+api\s+key/i,
-  /fromAccount/i,
-  /toAccount/i,
-  /new\s+transaction|create.*transaction/i,
-  /transaction\s+by\s+id/i,
-];
+import { resolveBankingCollection } from "./resolve-collection";
 
 export const validateBankingForkCollection: ValidatorFn = async (apiKey, context) => {
   const ws = await resolveWorkspace(apiKey, context, context.bankingWorkspaceId, /intergalactic\s+banking/i, "Intergalactic Banking");
@@ -31,13 +8,25 @@ export const validateBankingForkCollection: ValidatorFn = async (apiKey, context
   const workspace = ws.detail as Record<string, unknown>;
   const collections = (workspace.collections as { name: string; uid: string }[]) || [];
 
-  const bankingCollection = collections.find(
-    (c: { name: string }) => /intergalactic\s+bank\s+api/i.test(c.name)
-  );
+  const bankingCollection = await resolveBankingCollection(apiKey, collections);
 
   if (!bankingCollection) {
+    const hasAny = collections.some(
+      (c) => /intergalactic\s+bank\s+api/i.test(c.name)
+    );
+    if (hasAny) {
+      const names = collections
+        .filter((c) => /intergalactic\s+bank\s+api/i.test(c.name))
+        .map((c) => `"${c.name}"`)
+        .join(", ");
+      return {
+        success: false,
+        message: `Found ${names} but none contain the expected requests (Generate API Key, fromAccount, toAccount, Create new transaction). Make sure you forked the correct "[Do It Yourself] Intergalactic Bank API" collection.`,
+        pointsAwarded: 0,
+      };
+    }
     if (collections.length > 0) {
-      const names = collections.map((c: { name: string }) => c.name).join(", ");
+      const names = collections.map((c) => c.name).join(", ");
       return {
         success: false,
         message: `Found collections (${names}) but none matching "Intergalactic Bank API". Fork the "[Do It Yourself] Intergalactic Bank API" collection from the bootcamp workspace.`,
@@ -52,26 +41,10 @@ export const validateBankingForkCollection: ValidatorFn = async (apiKey, context
     };
   }
 
-  const collectionDetail = await getCollection(apiKey, bankingCollection.uid);
-  const items: CollectionItem[] = collectionDetail.item || [];
-  const requestNames = collectRequestNames(items);
-
-  const missing = EXPECTED_REQUESTS.filter(
-    (pattern) => !requestNames.some((name) => pattern.test(name))
-  );
-
-  if (missing.length > 0) {
-    return {
-      success: false,
-      message: `Collection "${bankingCollection.name}" found but it's missing expected requests. Make sure you forked the correct "[Do It Yourself] Intergalactic Bank API" collection — it should contain requests like Generate API Key, fromAccount, toAccount, and Create new transaction.`,
-      pointsAwarded: 0,
-    };
-  }
-
   return {
     success: true,
     message: `Collection "${bankingCollection.name}" found with all expected requests!`,
     pointsAwarded: 10,
-    context,
+    context: { ...context, bankingCollectionUid: bankingCollection.uid },
   };
 };
