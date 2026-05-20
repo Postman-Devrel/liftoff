@@ -55,7 +55,7 @@ export default function DiscordHelpButton({
         setHasJoined(true);
         window.open(DISCORD_INVITE, "_blank", "noopener,noreferrer");
       }
-    }, 3000);
+    }, 2000);
   }
 
   return (
