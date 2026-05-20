@@ -22,7 +22,6 @@ interface ShareButtonsProps {
   text: string;
   shareType?: "module" | "rank" | "results";
   shareId?: string;
-  points?: number;
   variant?: "inline" | "stacked";
 }
 
@@ -30,13 +29,11 @@ export default function ShareButtons({
   text,
   shareType = "results",
   shareId,
-  points,
   variant = "inline",
 }: ShareButtonsProps) {
-  const shareParams = new URLSearchParams({ type: shareType });
-  if (shareId) shareParams.set("id", shareId);
-  if (points !== undefined) shareParams.set("points", String(points));
-  const shareUrl = `${APP_URL}/share?${shareParams.toString()}`;
+  const shareUrl = shareId
+    ? `${APP_URL}/share/${shareType}/${shareId}`
+    : APP_URL;
 
   const encodedText = encodeURIComponent(text);
   const encodedUrl = encodeURIComponent(shareUrl);

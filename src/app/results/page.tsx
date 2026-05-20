@@ -94,9 +94,8 @@ export default function ResultsPage() {
           </p>
           <ShareButtons
             text={`I've earned ${points} points and reached ${rank.title} rank on LiftOff by @getpostman!${completedModules.length > 0 ? ` Completed ${completedModules.length} module${completedModules.length > 1 ? "s" : ""}!` : ""}`}
-            shareType="results"
+            shareType="rank"
             shareId={rank.id}
-            points={points}
           />
         </div>
 

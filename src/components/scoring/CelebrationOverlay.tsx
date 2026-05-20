@@ -178,7 +178,6 @@ export default function CelebrationOverlay() {
             }
             shareType={celebration.type === "module-complete" ? "module" : "rank"}
             shareId={celebration.id}
-            points={points}
           />
         </div>
         <button
