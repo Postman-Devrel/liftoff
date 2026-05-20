@@ -1,6 +1,9 @@
 "use client";
 
-const APP_URL = "https://quickstarts.postman.com";
+function getAppUrl() {
+  if (typeof window !== "undefined") return window.location.origin;
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://quickstarts.postman.com";
+}
 
 function XIcon({ size = 18 }: { size?: number }) {
   return (
@@ -31,9 +34,10 @@ export default function ShareButtons({
   shareId,
   variant = "inline",
 }: ShareButtonsProps) {
+  const appUrl = getAppUrl();
   const shareUrl = shareId
-    ? `${APP_URL}/share/${shareType}/${shareId}`
-    : APP_URL;
+    ? `${appUrl}/share/${shareType}/${shareId}`
+    : appUrl;
 
   const encodedText = encodeURIComponent(text);
   const encodedUrl = encodeURIComponent(shareUrl);

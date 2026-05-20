@@ -1,10 +1,16 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { getAllModules } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
 
-const APP_URL = "https://quickstarts.postman.com";
+async function getAppUrl() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") || h.get("host") || "quickstarts.postman.com";
+  const proto = h.get("x-forwarded-proto") || "https";
+  return `${proto}://${host}`;
+}
 
 interface Props {
   params: Promise<{ type: string; id: string }>;
@@ -12,6 +18,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { type, id } = await params;
+  const appUrl = await getAppUrl();
 
   let title = "LiftOff — Learn APIs by Doing";
   let description = "Interactive learning modules with real-time Postman API validation.";
@@ -27,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ogSubtitle = mod.description;
       title = `${mod.title} — LiftOff`;
       description = mod.description;
-      badgeUrl = `${APP_URL}/api/modules/${mod.id}/badge`;
+      badgeUrl = `${appUrl}/api/modules/${mod.id}/badge`;
     }
   } else if (type === "rank") {
     const rank = ranks.find((r) => r.id === id);
@@ -37,14 +44,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title = `${rank.title} — LiftOff`;
       description = rank.description;
       badgeUrl = rank.badgeImgFull
-        ? `${APP_URL}${rank.badgeImgFull.split("?")[0]}`
+        ? `${appUrl}${rank.badgeImgFull.split("?")[0]}`
         : "";
     }
   }
 
   const ogParams = new URLSearchParams({ type, title: ogTitle, subtitle: ogSubtitle });
   if (badgeUrl) ogParams.set("badge", badgeUrl);
-  const ogImage = `${APP_URL}/api/og?${ogParams.toString()}`;
+  const ogImage = `${appUrl}/api/og?${ogParams.toString()}`;
 
   return {
     title,
