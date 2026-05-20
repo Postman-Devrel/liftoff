@@ -9,12 +9,14 @@ const JOINED_KEY = "liftoff_discord_joined";
 interface DiscordHelpButtonProps {
   stepId: string;
   stepTitle: string;
+  moduleTitle: string;
   stepUrl?: string;
 }
 
 export default function DiscordHelpButton({
   stepId,
   stepTitle,
+  moduleTitle,
   stepUrl,
 }: DiscordHelpButtonProps) {
   const [toast, setToast] = useState(false);
@@ -27,6 +29,7 @@ export default function DiscordHelpButton({
   function handleAskForHelp() {
     const url = stepUrl || window.location.href;
     const lines = [
+      `**Module:** ${moduleTitle}`,
       `**Step:** ${stepTitle}`,
       `**Step ID:** \`${stepId}\``,
       `**Link:** ${url}`,
@@ -38,15 +41,17 @@ export default function DiscordHelpButton({
     navigator.clipboard.writeText(lines.join("\n"));
 
     setToast(true);
-    setTimeout(() => setToast(false), 3000);
+    setTimeout(() => setToast(false), 8000);
 
-    if (hasJoined) {
-      window.open(DISCORD_CHANNEL, "_blank", "noopener,noreferrer");
-    } else {
-      localStorage.setItem(JOINED_KEY, "1");
-      setHasJoined(true);
-      window.open(DISCORD_INVITE, "_blank", "noopener,noreferrer");
-    }
+    setTimeout(() => {
+      if (hasJoined) {
+        window.open(DISCORD_CHANNEL, "_blank", "noopener,noreferrer");
+      } else {
+        localStorage.setItem(JOINED_KEY, "1");
+        setHasJoined(true);
+        window.open(DISCORD_INVITE, "_blank", "noopener,noreferrer");
+      }
+    }, 600);
   }
 
   return (
@@ -61,8 +66,11 @@ export default function DiscordHelpButton({
         Ask for help
       </button>
       {toast && (
-        <div className="absolute right-0 top-full mt-2 z-10 px-3 py-2 rounded-lg bg-[#5865F2] text-white text-xs font-medium whitespace-nowrap animate-fade-up shadow-lg">
-          Copied to clipboard — paste in #liftoff-feedback
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-[#5865F2] text-white text-sm font-medium whitespace-nowrap animate-fade-up shadow-xl flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Step info copied — paste in #liftoff-feedback
         </div>
       )}
     </div>

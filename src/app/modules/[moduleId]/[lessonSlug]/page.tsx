@@ -101,7 +101,7 @@ export default function LessonPage() {
 
           <div className="mt-8 flex flex-col gap-5">
             {lesson.steps.map((step) => (
-              <StepCard key={step.id} step={step} moduleColor={mod.color} />
+              <StepCard key={step.id} step={step} moduleTitle={mod.title} moduleColor={mod.color} />
             ))}
           </div>
 
