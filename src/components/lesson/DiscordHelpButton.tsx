@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
-const DISCORD_INVITE = "https://discord.gg/XJbdvQJQqU";
+const DISCORD_INVITE = "https://discord.gg/PZjM6hxBKe";
 const DISCORD_CHANNEL = "https://discord.com/channels/831210428314157076/1506690554363121775";
 const JOINED_KEY = "liftoff_discord_joined";
 

@@ -45,7 +45,7 @@ export default function DiscordCommunityModal() {
 
         <div className="flex flex-col gap-3">
           <a
-            href="https://discord.gg/45zMGKDpg2"
+            href="https://discord.gg/PZjM6hxBKe"
             target="_blank"
             rel="noopener noreferrer"
             onClick={dismiss}
