@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+const COOKIE_NAME = "postman_api_key";
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
 export async function POST(request: NextRequest) {
   const { apiKey } = await request.json();
 
@@ -23,7 +26,6 @@ export async function POST(request: NextRequest) {
 
       let isNewOrg = false;
 
-      // Check for org switch if user is registered
       try {
         const supabase = await createClient();
         const {
@@ -41,7 +43,6 @@ export async function POST(request: NextRequest) {
           const activeCtx = contextRows?.[0];
 
           if (activeCtx && activeCtx.postman_user_id !== postmanUserId) {
-            // Different Postman org — switch context
             await supabase.rpc("switch_postman_org", {
               p_user_id: supabaseUser.id,
               p_postman_user_id: postmanUserId,
@@ -49,7 +50,6 @@ export async function POST(request: NextRequest) {
             });
             isNewOrg = true;
           } else if (!activeCtx) {
-            // First time connecting Postman — create initial context
             await supabase.from("validation_contexts").insert({
               user_id: supabaseUser.id,
               postman_user_id: postmanUserId,
@@ -62,16 +62,24 @@ export async function POST(request: NextRequest) {
         // Don't fail key validation if Supabase ops fail
       }
 
-      return NextResponse.json({
-        valid: true,
-        isNewOrg,
-        profile: {
-          username: user.username || "Unknown",
-          fullName: user.fullName || user.username || "Unknown",
-          email: user.email || "",
-          avatar: user.avatar || "",
-        },
+      const profile = {
+        username: user.username || "Unknown",
+        fullName: user.fullName || user.username || "Unknown",
+        email: user.email || "",
+        avatar: user.avatar || "",
+      };
+
+      const response = NextResponse.json({ valid: true, isNewOrg, profile });
+
+      response.cookies.set(COOKIE_NAME, apiKey, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: COOKIE_MAX_AGE,
       });
+
+      return response;
     }
 
     return NextResponse.json(
@@ -84,4 +92,16 @@ export async function POST(request: NextRequest) {
       { status: 502 }
     );
   }
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ cleared: true });
+  response.cookies.set(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 0,
+  });
+  return response;
 }

@@ -9,14 +9,15 @@ const MODULE_WORKSPACE_PATTERNS: Record<string, { contextKey: keyof ValidationCo
 };
 
 export async function POST(request: NextRequest) {
-  const { apiKey, moduleId, context } = (await request.json()) as {
-    apiKey: string;
+  const apiKey = request.cookies.get("postman_api_key")?.value;
+
+  const { moduleId, context } = (await request.json()) as {
     moduleId: string;
     context?: ValidationContext;
   };
 
   if (!apiKey) {
-    return NextResponse.json({ error: "Missing API key" }, { status: 400 });
+    return NextResponse.json({ error: "Not connected to Postman" }, { status: 400 });
   }
 
   try {

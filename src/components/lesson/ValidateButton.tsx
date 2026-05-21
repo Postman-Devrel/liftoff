@@ -24,7 +24,7 @@ export default function ValidateButton({
   moduleColor = "#FF6C37",
   onError,
 }: ValidateButtonProps) {
-  const { apiKey, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { isStepCompleted, completeStep, validationContext } = useProgress();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
@@ -32,7 +32,7 @@ export default function ValidateButton({
   const completed = isStepCompleted(stepId);
 
   async function handleValidate() {
-    if (!apiKey || completed) return;
+    if (!isAuthenticated || completed) return;
     setLoading(true);
     setResult(null);
 
@@ -43,7 +43,6 @@ export default function ValidateButton({
         body: JSON.stringify({
           stepId,
           validatorId,
-          apiKey,
           context: validationContext,
         }),
       });

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { apiKey } = await request.json();
+  const apiKey = request.cookies.get("postman_api_key")?.value;
 
   if (!apiKey) {
-    return NextResponse.json({ error: "No API key" }, { status: 400 });
+    return NextResponse.json({ error: "Not connected to Postman" }, { status: 400 });
   }
 
   const headers = { "x-api-key": apiKey };

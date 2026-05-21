@@ -5,10 +5,11 @@ import { getMe } from "@/lib/postman-api";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
-  const { stepId, validatorId, apiKey, context } = (await request.json()) as {
+  const apiKey = request.cookies.get("postman_api_key")?.value;
+
+  const { stepId, validatorId, context } = (await request.json()) as {
     stepId: string;
     validatorId?: string;
-    apiKey: string;
     context?: ValidationContext;
   };
 
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
 
   if (!apiKey || !stepId) {
     return NextResponse.json(
-      { success: false, message: "Missing stepId or apiKey", pointsAwarded: 0 },
+      { success: false, message: "Missing stepId or Postman connection", pointsAwarded: 0 },
       { status: 400 }
     );
   }
@@ -39,7 +40,6 @@ export async function POST(request: NextRequest) {
     const result = await validator(apiKey, enrichedContext);
     console.log(`[validate] stepId=${stepId} success=${result.success} points=${result.pointsAwarded}`);
 
-    // Persist for registered users on success
     if (result.success) {
       try {
         const supabase = await createClient();

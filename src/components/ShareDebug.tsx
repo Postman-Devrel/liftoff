@@ -16,7 +16,7 @@ interface ShareDebugProps {
 }
 
 export default function ShareDebug({ moduleId }: ShareDebugProps) {
-  const { apiKey, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { validationContext } = useProgress();
   const [info, setInfo] = useState<DebugInfo | null>(null);
   const [error, setError] = useState("");
@@ -24,7 +24,7 @@ export default function ShareDebug({ moduleId }: ShareDebugProps) {
   const [open, setOpen] = useState(false);
 
   async function fetchDebug() {
-    if (!apiKey) return;
+    if (!isAuthenticated) return;
     setLoading(true);
     setError("");
     setInfo(null);
@@ -33,7 +33,7 @@ export default function ShareDebug({ moduleId }: ShareDebugProps) {
       const res = await fetch("/api/postman/debug-info", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey, moduleId, context: validationContext }),
+        body: JSON.stringify({ moduleId, context: validationContext }),
       });
       const data = await res.json();
       if (data.error) {

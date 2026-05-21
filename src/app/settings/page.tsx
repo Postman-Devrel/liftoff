@@ -27,7 +27,7 @@ export default function SettingsPage() {
       const data = await res.json();
 
       if (data.valid) {
-        setAuth(key.trim(), data.profile);
+        setAuth(data.profile);
         setKey("");
       } else {
         setError(data.message || "Invalid API key");

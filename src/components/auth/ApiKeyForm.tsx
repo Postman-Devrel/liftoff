@@ -25,7 +25,7 @@ export default function ApiKeyForm() {
       const data = await res.json();
 
       if (data.valid) {
-        setAuth(key.trim(), data.profile);
+        setAuth(data.profile);
         router.push("/");
       } else {
         setError(data.message || "Invalid API key");

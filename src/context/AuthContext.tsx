@@ -26,19 +26,15 @@ export interface DiscordProfile {
 }
 
 interface AuthState {
-  // Postman (ephemeral, localStorage)
-  apiKey: string | null;
   profile: PostmanProfile | null;
   isAuthenticated: boolean;
 
-  // Discord/Supabase (persistent)
   supabaseUser: User | null;
   isRegistered: boolean;
   discordProfile: DiscordProfile | null;
 
-  // Actions
-  setAuth: (key: string, profile: PostmanProfile) => void;
-  clearApiKey: () => void;
+  setAuth: (profile: PostmanProfile) => void;
+  clearApiKey: () => Promise<void>;
   signInWithDiscord: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -65,15 +61,11 @@ function extractDiscordProfile(user: User): DiscordProfile {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [apiKey, setApiKeyState] = useState<string | null>(null);
   const [profile, setProfile] = useState<PostmanProfile | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
 
-  // Load Postman auth from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("postman_api_key");
     const storedProfile = localStorage.getItem("postman_profile");
-    if (stored) setApiKeyState(stored);
     if (storedProfile) {
       try {
         setProfile(JSON.parse(storedProfile));
@@ -81,9 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // ignore
       }
     }
+
+    // Clean up legacy apiKey from localStorage if present
+    localStorage.removeItem("postman_api_key");
   }, []);
 
-  // Listen for Supabase auth state changes
   useEffect(() => {
     getSupabase().auth.getUser().then(({ data: { user } }) => {
       setSupabaseUser(user);
@@ -98,18 +92,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const setAuth = useCallback((key: string, prof: PostmanProfile) => {
-    localStorage.setItem("postman_api_key", key);
+  const setAuth = useCallback((prof: PostmanProfile) => {
     localStorage.setItem("postman_profile", JSON.stringify(prof));
-    setApiKeyState(key);
     setProfile(prof);
   }, []);
 
-  const clearApiKey = useCallback(() => {
-    localStorage.removeItem("postman_api_key");
+  const clearApiKey = useCallback(async () => {
     localStorage.removeItem("postman_profile");
-    setApiKeyState(null);
     setProfile(null);
+    await fetch("/api/postman/validate-key", { method: "DELETE" });
   }, []);
 
   const signInWithDiscord = useCallback(async () => {
@@ -133,9 +124,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      apiKey,
       profile,
-      isAuthenticated: !!apiKey,
+      isAuthenticated: !!profile,
       supabaseUser,
       isRegistered,
       discordProfile,
@@ -145,7 +135,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
     }),
     [
-      apiKey,
       profile,
       supabaseUser,
       isRegistered,

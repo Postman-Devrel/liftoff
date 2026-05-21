@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAllModules } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
@@ -5,8 +6,12 @@ import { ranks } from "@/lib/scoring";
 function verifyAdmin(request: Request): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
-  const token = request.headers.get("Authorization")?.replace("Bearer ", "");
-  return token === adminPassword;
+  const token = request.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+  try {
+    return timingSafeEqual(Buffer.from(token), Buffer.from(adminPassword));
+  } catch {
+    return false;
+  }
 }
 
 export async function GET(request: Request) {
