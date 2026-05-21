@@ -230,7 +230,7 @@ export default function ModuleOverviewPage() {
                     const allStepIds = mod.lessons.flatMap((l) =>
                       l.steps.map((s) => s.id)
                     );
-                    resetModule(allStepIds, 10);
+                    resetModule(allStepIds, 10, mod.id);
                     setShowResetConfirm(false);
                   }}
                   className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-red-500/80 hover:bg-red-500 transition-colors"

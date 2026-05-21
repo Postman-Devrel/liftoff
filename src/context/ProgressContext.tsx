@@ -88,7 +88,7 @@ interface ProgressContextValue extends ProgressState {
   ) => void;
   isStepCompleted: (stepId: string) => boolean;
   resetProgress: () => void;
-  resetModule: (stepIds: string[], pointsPerStep: number) => void;
+  resetModule: (stepIds: string[], pointsPerStep: number, moduleId?: string) => void;
   importLocalProgress: () => Promise<void>;
 }
 
@@ -227,10 +227,24 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   }, [isRegistered, supabaseUser]);
 
   const resetModule = useCallback(
-    async (stepIds: string[], pointsPerStep: number) => {
+    async (stepIds: string[], pointsPerStep: number, moduleId?: string) => {
       const pointsToRemove =
         stepIds.filter((id) => state.completedSteps[id]).length * pointsPerStep;
       dispatch({ type: "RESET_MODULE", stepIds, pointsToRemove });
+
+      try {
+        const raw = localStorage.getItem("liftoff_celebrated");
+        if (raw) {
+          const celebrated = JSON.parse(raw);
+          if (moduleId && Array.isArray(celebrated.modules)) {
+            celebrated.modules = celebrated.modules.filter((id: string) => id !== moduleId);
+          }
+          if (Array.isArray(celebrated.ranks)) {
+            celebrated.ranks = [];
+          }
+          localStorage.setItem("liftoff_celebrated", JSON.stringify(celebrated));
+        }
+      } catch {}
 
       if (isRegistered && supabaseUser) {
         const supabase = createClient();
