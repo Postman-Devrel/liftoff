@@ -212,6 +212,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const resetProgress = useCallback(async () => {
     dispatch({ type: "RESET" });
+    localStorage.removeItem("liftoff_celebrated");
 
     if (isRegistered && supabaseUser) {
       const supabase = createClient();
