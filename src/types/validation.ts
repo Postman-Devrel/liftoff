@@ -12,6 +12,7 @@ export interface ValidationContext {
   artemisEnvironmentId?: string;
   apiBasicsWorkspaceId?: string;
   apiBasicsEnvironmentId?: string;
+  apiBasicsCollectionUid?: string;
   bankingWorkspaceId?: string;
   bankingEnvironmentId?: string;
   bankingCollectionUid?: string;

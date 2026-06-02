@@ -34,6 +34,22 @@
           "description": "Create a new environment in your workspace called **Local** and add a variable called **baseURL** with the initial value `https://api.sampleapis.com`.\n\n**Important:** After setting the value, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.",
           "points": 10,
           "validatorId": "validate-api-basics-create-environment"
+        },
+        {
+          "id": "api-basics-step-4-use-base-url",
+          "stepNumber": 4,
+          "title": "Use Your Environment Variable",
+          "description": "1. Open the GET request in **My First Collection** (from Step 2).\n2. Replace the full URL with: `{{baseURL}}/coffee/hot`\n3. In the environment dropdown (top-right), select **Local**.\n4. Save the request (Ctrl/Cmd+S).",
+          "points": 10,
+          "validatorId": "validate-api-basics-use-base-url"
+        },
+        {
+          "id": "api-basics-step-5-send-and-test",
+          "stepNumber": 5,
+          "title": "Send Your Request and Add a Test",
+          "description": "1. With **Local** still selected, click **Send**.\n2. Expect **200 OK** and a JSON array of coffee objects (`title`, `description`, etc.).\n3. Open **Scripts** → **Post-response** and add:\n\n```javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n```\n\n4. Click **Send** again and confirm the test passes in **Test Results**.",
+          "points": 10,
+          "validatorId": "validate-api-basics-send-and-test"
         }
       ]
     }

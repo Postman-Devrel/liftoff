@@ -52,6 +52,10 @@ export const validateApiBasicsCreateEnvironment: ValidatorFn = async (
     message:
       'Environment "Local" found with baseURL set to "https://api.sampleapis.com"!',
     pointsAwarded: 10,
-    context: { ...context, environmentId: localEnv.uid },
+    context: {
+      ...context,
+      environmentId: localEnv.uid,
+      apiBasicsEnvironmentId: localEnv.uid,
+    },
   };
 };
