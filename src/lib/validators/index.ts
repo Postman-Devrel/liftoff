@@ -16,6 +16,8 @@ import { validateTestEnvironment } from "./artemis-mission-control/step14-test-e
 import { validateApiBasicsCreateWorkspace } from "./api-basics/validate-api-basics-create-workspace";
 import { validateApiBasicsCreateCollection } from "./api-basics/validate-api-basics-create-collection";
 import { validateApiBasicsCreateEnvironment } from "./api-basics/validate-api-basics-create-environment";
+import { validateApiBasicsUseBaseUrl } from "./api-basics/validate-api-basics-use-base-url";
+import { validateApiBasicsSendAndTest } from "./api-basics/validate-api-basics-send-and-test";
 import { validateBankingCreateWorkspace } from "./banking-ai-mcp-bootcamp/validate-banking-create-workspace";
 import { validateBankingForkCollection } from "./banking-ai-mcp-bootcamp/validate-banking-fork-collection";
 import { validateBankingCreateEnvironment } from "./banking-ai-mcp-bootcamp/validate-banking-create-environment";
@@ -51,6 +53,8 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-api-basics-create-workspace": validateApiBasicsCreateWorkspace,
   "validate-api-basics-create-collection": validateApiBasicsCreateCollection,
   "validate-api-basics-create-environment": validateApiBasicsCreateEnvironment,
+  "validate-api-basics-use-base-url": validateApiBasicsUseBaseUrl,
+  "validate-api-basics-send-and-test": validateApiBasicsSendAndTest,
   "validate-banking-create-workspace": validateBankingCreateWorkspace,
   "validate-banking-fork-collection": validateBankingForkCollection,
   "validate-banking-create-environment": validateBankingCreateEnvironment,

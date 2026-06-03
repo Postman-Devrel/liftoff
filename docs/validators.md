@@ -317,8 +317,10 @@ export const validateApiCall: ValidatorFn = async (apiKey, context) => {
 | Validator ID | File | What it checks |
 |-------------|------|---------------|
 | `validate-api-basics-create-workspace` | `api-basics/validate-api-basics-create-workspace.ts` | Workspace named "API Basics - [name]" exists, owned by current user |
-| `validate-api-basics-create-collection` | `api-basics/validate-api-basics-create-collection.ts` | Collection named "My First Collection" in the workspace |
+| `validate-api-basics-create-collection` | `api-basics/validate-api-basics-create-collection.ts` | Collection "My First Collection" with a GET request to `/coffee/hot` |
 | `validate-api-basics-create-environment` | `api-basics/validate-api-basics-create-environment.ts` | Environment "Local" with `baseURL` = `https://api.sampleapis.com` |
+| `validate-api-basics-use-base-url` | `api-basics/validate-api-basics-use-base-url.ts` | Coffee GET request URL uses `{{baseURL}}/coffee/hot`; Local env has correct `baseURL` |
+| `validate-api-basics-send-and-test` | `api-basics/validate-api-basics-send-and-test.ts` | Coffee request has `pm.test` status check; sample coffee API returns 200 |
 
 ### artemis-mission-control
 
