@@ -15,7 +15,7 @@
           "id": "step-1-create-workspace",
           "stepNumber": 1,
           "title": "Create a Blank Workspace",
-          "description": "1. Open [postman.com](https://postman.com) and sign in\n2. Click **Workspaces** in the top nav → **Create Workspace**\n3. Choose **Blank workspace**\n4. Name it: **Artemis II - [your name]** (e.g. *Artemis II - Alex*)\n5. Set visibility to **Personal** and click **Create**",
+          "description": "1. Open [postman.com](https://postman.com) and sign in\n2. Click **Workspaces** in the top nav → **Create Workspace**\n3. Choose **Blank workspace**\n4. Name it: **Artemis II - [your name]** (e.g. *Artemis II - Alex*)\n5. Set the workspace type to **Internal** and leave 'who can access' as *Only you and invited people*. Click **Create Workspace**",
           "points": 10,
           "validatorId": "validate-workspace"
         },
@@ -23,7 +23,7 @@
           "id": "step-2-import-openapi",
           "stepNumber": 2,
           "title": "Import the OpenAPI Spec",
-          "description": "1. Click the **+** icon and select **Import**\n2. Paste this URL:\n\n```\nhttps://raw.githubusercontent.com/mishra-aanchal/artemis-mission-control-api-workshop/refs/heads/main/openapi.yaml\n```\n\n3. Confirm the import\n\nPostman auto-generates a collection from the spec with all the Artemis API endpoints ready to use.",
+          "description": "1. Click the **ellipsis icon** (three dots) on the top right of the left navigation bar and select **Import**\n2. Paste this URL:\n\n```\nhttps://raw.githubusercontent.com/mishra-aanchal/artemis-mission-control-api-workshop/refs/heads/main/openapi.yaml\n```\n\n3. You will see a prompt. Select the 'OpenAPI 3.1 Specification with a Postman Collection' option and click **Import** \n\nPostman auto-generates a collection from the spec with all the Artemis API endpoints ready to use.",
           "points": 10,
           "validatorId": "validate-collection"
         },
