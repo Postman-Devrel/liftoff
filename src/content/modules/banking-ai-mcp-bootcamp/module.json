@@ -23,7 +23,7 @@
           "id": "banking-step-2-fork-collection",
           "stepNumber": 2,
           "title": "Fork the Banking API Collection",
-          "description": "Fork the **[Do It Yourself] Intergalactic Bank API** collection from the public bootcamp workspace into your newly created workspace:\n[https://www.postman.com/devrel/ai-powered-api-mcp-bootcamp/overview](https://www.postman.com/devrel/ai-powered-api-mcp-bootcamp/overview)\n\n> **Note:** You may need to download the Postman Desktop Agent. Navigate to the bottom right corner of the screen, locate the Desktop Agent icon, and toggle on **Auto Select** and **Desktop Agent**.",
+          "description": "Fork the **[Do It Yourself] Intergalactic Bank API Reference Documentation** collection from the public bootcamp workspace into your newly created workspace:\n[https://www.postman.com/devrel/ai-powered-api-mcp-bootcamp/overview](https://www.postman.com/devrel/ai-powered-api-mcp-bootcamp/overview)\n\n> **Note:** You may need to download the Postman Desktop Agent. Navigate to the bottom right corner of the screen, locate the Desktop Agent icon, and toggle on **Auto Select** and **Desktop Agent**.",
           "points": 10,
           "validatorId": "validate-banking-fork-collection"
         }
@@ -39,7 +39,7 @@
           "id": "banking-step-3-create-environment",
           "stepNumber": 1,
           "title": "Set Up Agent Mode and Create Environment File",
-          "description": "Set up Agent Mode by selecting **Claude Sonnet 4.6** as your model and configuring Agent Mode to **Auto Run**.\n\nYou can set Agent Mode context in one of two ways:\n- Click on the element you want to use as context, such as a collection name or request.\n- Use the **@** command and select your desired context.\n\nUse **Agent Mode** to create an Environment file called **Banking.local** — set the collection as context and send this prompt:\n\n> **Agent Mode Prompt:** `Create an Environment Variable file called Banking.local`\n\nSwitch to your new environment using the **Environment Selector** dropdown in the top right corner.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.",
+          "description": "Set up Agent Mode by selecting **Claude Sonnet 4.6** as your model and configuring Agent Mode to **Auto Run**.\n\nYou can set Agent Mode context in one of two ways:\n- Click on the element you want to use as context, such as a collection name or request.\n- Use the **@** command and select your desired context.\n\nUse **Agent Mode** to create an Environment file called **Banking.local** — set the collection as context and send this prompt:\n\n> **Agent Mode Prompt:** `Create an Environment Variable file called Banking.local`\n\nSwitch to your new environment using the **Environment Selector** dropdown in the top right corner.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared values — not local session values.",
           "points": 10,
           "validatorId": "validate-banking-create-environment"
         },
@@ -47,7 +47,7 @@
           "id": "banking-step-4-set-base-url",
           "stepNumber": 2,
           "title": "Set the Base URL as a Collection Variable",
-          "description": "Use **Agent Mode** to replace all hardcoded localhost URLs with a reusable collection variable. Ensure the **Collection** is set as the context before running.\n\nSet the collection as context and send this prompt:\n\n> **Agent Mode Prompt:** `For all the requests in this collection, add https://template.postman-echo.com as an environment variable called baseUrl and update all the URLs in the collection to use {{baseUrl}}.`\n\nVerify that the `baseUrl` variable has been automatically populated in the **Variables** tab.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.",
+          "description": "Use **Agent Mode** to replace all hardcoded URLs with a reusable collection variable. Ensure the **Collection** is set as the context before running.\n\nSet the collection as context and send this prompt:\n\n> **Agent Mode Prompt:** `For all the requests in this collection, add https://template.postman-echo.com as an environment variable called baseUrl and update all the URLs in the collection to use {{baseUrl}}.`\n\nVerify that the `baseUrl` variable has been automatically populated in the **Variables** tab.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared values — not local session values.",
           "points": 10,
           "validatorId": "validate-banking-set-base-url"
         },
@@ -55,7 +55,7 @@
           "id": "banking-step-5-set-api-key",
           "stepNumber": 3,
           "title": "Generate and Set the API Key",
-          "description": "Send the **Generate API Key** GET request, then verify that the environment variable has been set in the **Environment** tab next to the AI Panel on the top right corner.\n\n> **Note:** Go to your Environments on the side panel and set the `apiKey` value to **sensitive**.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.",
+          "description": "Send the **Generate API Key** GET request, then verify that the environment variable has been set in the **Environment** tab next to the AI Panel on the top right corner.\n\n> **Note:** Go to your Environments on the side panel and set the `apiKey` value to **sensitive**.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared values — not local session values.",
           "points": 10,
           "validatorId": "validate-banking-set-api-key"
         },
@@ -63,7 +63,7 @@
           "id": "banking-step-6-from-account",
           "stepNumber": 4,
           "title": "Add Post-Request Script for fromAccount",
-          "description": "Set the **fromAccount** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the accountId field, and saves its value as an environment variable called fromAccount in the Banking.local environment.`\n\nSend the **fromAccount** request and verify that the variable appears in the **Variables** tab.",
+          "description": "Set the **fromAccount** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the account.id property, and saves its value as an environment variable called fromAccount in the Banking.local environment.`\n\nSend the **fromAccount** request and verify that the variable appears in the **Variables** tab.",
           "points": 10,
           "validatorId": "validate-banking-from-account"
         },
@@ -71,7 +71,7 @@
           "id": "banking-step-7-to-account",
           "stepNumber": 5,
           "title": "Add Post-Request Script for toAccount",
-          "description": "Set the **toAccount** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the accountId field, and saves its value as an environment variable called toAccount in the Banking.local environment.`\n\nVerify the variables are populated by sending both requests, then send the **GET List All Accounts** request to view the randomly generated accounts.",
+          "description": "Set the **toAccount** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the account.id property, and saves its value as an environment variable called toAccount in the Banking.local environment.`\n\nVerify the variables are populated by sending both requests, then send the **GET List All Accounts** request to view the randomly generated accounts.",
           "points": 10,
           "validatorId": "validate-banking-to-account"
         },
@@ -79,7 +79,7 @@
           "id": "banking-step-8-transaction-id",
           "stepNumber": 6,
           "title": "Add Post-Request Script for New Transaction",
-          "description": "Set the **Create new transaction** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the transactionId field, and saves its value as an environment variable called transactionId in the Banking.local environment.`\n\nSend the request to see the ID populated. Now, if you send the **GET Transaction by ID** request, you should see a **200 OK** response.",
+          "description": "Set the **Create new transaction** request as context and send this prompt:\n\n> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the transaction.id property, and saves its value as an environment variable called transactionId in the Banking.local environment.`\n\nSend the request to see the ID populated. Now, if you send the **GET Transaction by ID** request, you should see a **200 OK** response.",
           "points": 10,
           "validatorId": "validate-banking-transaction-id"
         }
@@ -119,7 +119,7 @@
           "id": "banking-step-11-generate-api-key",
           "stepNumber": 1,
           "title": "Generate Your Postman API Key",
-          "description": "In Postman, click your **user icon** in the top right, go to **Settings**, then navigate to **API Keys**. Generate a new key and give it an appropriate name (e.g. **Workshop**). Copy the key and store it somewhere accessible — you will not be able to view it again.",
+          "description": "In Postman, click your **cog icon** in the top right, go to **Account Settings**, then navigate to **API keys**. Generate a new key and give it an appropriate name (e.g. **Workshop**). Copy the key and store it somewhere accessible — you will not be able to view it again.",
           "points": 10,
           "validatorId": "validate-banking-generate-api-key",
           "manual": true
@@ -128,7 +128,7 @@
           "id": "banking-step-12-create-mcp-request",
           "stepNumber": 2,
           "title": "Create an MCP Request",
-          "description": "Return to your **Your Name – Intergalactic Banking** workspace and select **MCP Request**. Set the transport type to **HTTP** and use the following MCP Server URL:\n\n```\nhttps://mcp.postman.com/mcp\n```\n\nSet the authentication type to **Bearer Token** and enter the API key you generated. You can find additional guidance in the Learning Center.",
+          "description": "Return to your **Your Name – Intergalactic Banking** workspace and select **MCP Request**. Set the transport type to **HTTP** and use the following MCP Server URL:\n\n```\nhttps://mcp.postman.com/mcp\n```\n\nSet the authentication type to **Bearer Token** and enter the API key you generated. You can find additional guidance in the Postman Docs.",
           "points": 10,
           "validatorId": "validate-banking-create-mcp-request",
           "manual": true
@@ -137,7 +137,7 @@
           "id": "banking-step-13-query-mcp",
           "stepNumber": 3,
           "title": "Query Collections via MCP Server",
-          "description": "Navigate to **Tool 49 – getCollection** and run the request using your **Workspace ID**.\n\nYou can find your **Workspace ID** in the **Overview** tab.",
+          "description": "Navigate to the **getCollections** tool and run the request using your **Workspace ID**.\n\nYou can find your **Workspace ID** by hovering over the active Workspace name in the **Workspace** switcher.",
           "points": 10,
           "validatorId": "validate-banking-query-mcp",
           "manual": true
@@ -172,7 +172,7 @@
           "id": "banking-step-16-add-tests-mcp",
           "stepNumber": 3,
           "title": "Add Tests via the MCP Server",
-          "description": "Use the MCP server to locate your workshop workspace ID and then add tests to the collection.\n\nGet the workspace ID:\n\n> **Claude Prompt:** `Get the workspace ID for \"[WORKSHOP-WORKSPACE-NAME]\".`\n\nAdd tests to the collection:\n\n> **Claude Prompt:**\n> ```\n> Using the Postman MCP server, add tests to [workshop collection name].\n> For each request:\n>   1. Add a status code check (200 OK)\n>   2. Validate the response has a 'success' property set to true\n> ```\n\nRun the tests:\n\n> **Claude Prompt:** `Run the \"[workshop collection name]\" collection and show me the test results.`",
+          "description": "Use the MCP server to locate your workspace ID and then add tests to the collection.\n\nGet the workspace ID:\n\n> **Claude Prompt:** `Get the workspace ID for \"[WORKSPACE-NAME]\".`\n\nAdd tests to the collection:\n\n> **Claude Prompt:**\n> ```\n> Using the Postman MCP server, add tests to [COLLECTION-NAME].\n> For each request:\n>   1. Add a status code check (200 OK)\n>   2. Validate the response has a 'success' property set to true\n> ```\n\nRun the tests:\n\n> **Claude Prompt:** `Run the \"[COLLECTION-NAME]\" collection and show me the test results.`",
           "points": 10,
           "validatorId": "validate-banking-add-tests-mcp",
           "manual": true

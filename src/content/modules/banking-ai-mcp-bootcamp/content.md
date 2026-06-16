@@ -74,7 +74,7 @@ Send the **Generate API Key** GET request, then verify that the environment vari
 
 Set the **fromAccount** request as context and send this prompt:
 
-> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the accountId field, and saves its value as an environment variable called fromAccount in the Banking.local environment.`
+> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the id field, and saves its value as an environment variable called fromAccount in the Banking.local environment.`
 
 Send the **fromAccount** request and verify that the variable appears in the **Variables** tab.
 
@@ -84,7 +84,7 @@ Send the **fromAccount** request and verify that the variable appears in the **V
 
 Set the **toAccount** request as context and send this prompt:
 
-> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the accountId field, and saves its value as an environment variable called toAccount in the Banking.local environment.`
+> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the id field, and saves its value as an environment variable called toAccount in the Banking.local environment.`
 
 Verify the variables are populated by sending both requests, then send the **GET List All Accounts** request to view the randomly generated accounts.
 
@@ -94,7 +94,7 @@ Verify the variables are populated by sending both requests, then send the **GET
 
 Set the **Create new transaction** request as context and send this prompt:
 
-> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the transactionId field, and saves its value as an environment variable called transactionId in the Banking.local environment.`
+> **Agent Mode Prompt:** `Programmatically add a post-response script that parses the response body, reads the id field, and saves its value as an environment variable called transactionId in the Banking.local environment.`
 
 Send the request to see the ID populated. Now, if you send the **GET Transaction by ID** request, you should see a **200 OK** response.
 
@@ -128,7 +128,7 @@ Generate a Postman API key and connect to the MCP server to query your collectio
 
 ### Step 1: Generate Your Postman API Key
 
-In Postman, click your **user icon** in the top right, go to **Settings**, then navigate to **API Keys**. Generate a new key and give it an appropriate name (e.g. **Workshop**). Copy the key and store it somewhere accessible — you will not be able to view it again.
+In Postman, click your **cog icon** in the top right, go to **Account Settings**, then navigate to **API keys**. Generate a new key and give it an appropriate name (e.g. **Workshop**). Copy the key and store it somewhere accessible — you will not be able to view it again.
 
 **Validation:** [MANUAL] Learner should verify they have generated and saved a Postman API key.
 
@@ -146,7 +146,7 @@ Set the authentication type to **Bearer Token** and enter the API key you genera
 
 ### Step 3: Query Collections via MCP Server
 
-Navigate to **Tool 49 – getCollection** and run the request using your **Workspace ID**.
+Navigate to the **getCollections** tool and run the request using your **Workspace ID**.
 
 You can find your **Workspace ID** in the **Overview** tab.
 
