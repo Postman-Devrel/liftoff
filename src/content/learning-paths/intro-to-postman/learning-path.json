@@ -1,0 +1,9 @@
+{
+  "id": "intro-to-postman",
+  "title": "Introduction to Postman",
+  "description": "Start your API journey here. Learn the core Postman features: workspaces, collections, environments, and your first real API requests.",
+  "icon": "🛸",
+  "color": "#8B5CF6",
+  "moduleIds": ["api-basics", "artemis-mission-control"],
+  "private": false
+}

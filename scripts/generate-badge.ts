@@ -17,20 +17,17 @@ function loadApiKey(): string {
   );
 }
 
-async function generateBadge(moduleId: string, prompt: string) {
+async function generateBadge(id: string, prompt: string, type: "module" | "learning-path" = "module") {
   const apiKey = loadApiKey();
-  const modulePath = join(
-    process.cwd(),
-    "src/content/modules",
-    moduleId
-  );
-  const outputPath = join(modulePath, "badge.png");
+  const contentDir = type === "learning-path" ? "src/content/learning-paths" : "src/content/modules";
+  const contentPath = join(process.cwd(), contentDir, id);
+  const outputPath = join(contentPath, "badge.png");
 
-  if (!existsSync(modulePath)) {
-    throw new Error(`Module directory not found: ${modulePath}`);
+  if (!existsSync(contentPath)) {
+    throw new Error(`Directory not found: ${contentPath}`);
   }
 
-  console.log(`Generating badge for module "${moduleId}"...`);
+  console.log(`Generating badge for ${type} "${id}"...`);
   console.log(`Prompt: ${prompt}`);
 
   const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
@@ -70,15 +67,20 @@ async function generateBadge(moduleId: string, prompt: string) {
   console.log(`Badge saved to ${outputPath} (${imageBuffer.length} bytes)`);
 }
 
-const [moduleId, ...promptParts] = process.argv.slice(2);
-if (!moduleId || promptParts.length === 0) {
+const args = process.argv.slice(2);
+const typeFlag = args.indexOf("--learning-path");
+const type: "module" | "learning-path" = typeFlag !== -1 ? "learning-path" : "module";
+const filteredArgs = args.filter((a) => a !== "--learning-path");
+const [id, ...promptParts] = filteredArgs;
+
+if (!id || promptParts.length === 0) {
   console.error(
-    'Usage: npx tsx scripts/generate-badge.ts <module-id> "<prompt>"'
+    'Usage: npx tsx scripts/generate-badge.ts <id> "<prompt>" [--learning-path]'
   );
   process.exit(1);
 }
 
-generateBadge(moduleId, promptParts.join(" ")).catch((err) => {
+generateBadge(id, promptParts.join(" "), type).catch((err) => {
   console.error(`Error: ${err.message}`);
   process.exit(1);
 });

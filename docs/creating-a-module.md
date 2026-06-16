@@ -62,6 +62,23 @@ More instructions...
 
 Then run `/liftoff-module create your-markdown.md` and point Claude to your file.
 
+### Making a Module Private
+
+To create a private module (hidden from all listings, accessible only via direct URL), add `**PRIVATE**` on its own line at the very top of your markdown file — before or after the title:
+
+```markdown
+**PRIVATE**
+# Module Title
+
+A short description...
+```
+
+When you run `/liftoff-module create`, the skill will detect this marker and set `"private": true` in the generated `module.json`. The marker line is stripped before the content is parsed — it won't appear in the module title or description.
+
+To publish a private module later, remove the `**PRIVATE**` line from `content.md` and run `/liftoff-module update`.
+
+> **Note:** `/liftoff-module create` will also ask whether the module should be public or private during the creation flow — the `**PRIVATE**` marker is an alternative for authors who prefer to declare it in the file itself.
+
 ### Content Guidelines
 
 - Each **Part** (`## Part N`) becomes a **Lesson** (a groupable section)
@@ -137,6 +154,10 @@ Claude diffs the markdown against the current `module.json` and applies all chan
 | `/liftoff-module update --badge` | Update and generate a badge if one doesn't exist |
 | `/liftoff-module badge` | Generate or regenerate a badge for an existing module |
 | `/liftoff-module sync` | Regenerate missing validators and verify the build |
+
+Once you've created a module, add it to a learning path to surface it on the home page:
+
+**[Creating a Learning Path →](creating-a-learning-path.md)**
 
 ## Validation Types
 
@@ -267,9 +288,111 @@ Postman lets you write test scripts that run automatically after every request. 
 **Validation:** The "List All Coffees" request has a post-response script containing at least one `pm.test` call, and sending the request returns a 200 status.
 ```
 
+## Private Modules
+
+Add `**PRIVATE**` on its own line anywhere in the first few lines of your markdown file (before or after the title) to mark the module as private when creating or updating:
+
+```markdown
+**PRIVATE**
+# My Secret Module
+
+A short description...
+```
+
+The `/liftoff-module create` and `/liftoff-module update` skills detect this marker and set `"private": true` in `module.json` automatically. Remove the line and re-run `/liftoff-module update` to make it public again.
+
+You can also set it directly in `module.json`:
+
+```json
+{
+  "id": "my-module",
+  "private": true,
+  ...
+}
+```
+
+Private modules: Private modules:
+
+- Do **not** appear on the home page (even in "All Modules" view)
+- Do **not** appear in learning paths
+- Do **not** count toward learning path completion badges
+- **Are** still accessible via their direct URL: `/modules/<module-id>`
+- **Are** still accessible to users who know the URL (no auth gate)
+
+This is useful for beta content, event-exclusive modules, or work-in-progress modules being tested before a public launch.
+
+```json
+{
+  "id": "my-module",
+  "title": "Secret Module",
+  "private": true,
+  ...
+}
+```
+
+To make a module public again, remove the `"private"` field or set it to `false`.
+
+---
+
+## Learning Paths
+
+Learning paths group modules into curated tracks. Once you've created modules, add them to learning paths to surface them on the home page.
+
+Use the `/liftoff-learningpath` skill to manage paths:
+
+```
+/liftoff-learningpath create   → scaffold a new learning path with badge
+/liftoff-learningpath edit     → add/remove modules from a path
+/liftoff-learningpath delete   → remove a learning path
+/liftoff-learningpath list     → list all learning paths
+```
+
+### Learning Path Structure
+
+Learning paths live at `src/content/learning-paths/<path-id>/`:
+
+```
+src/content/learning-paths/<path-id>/
+├── learning-path.json    # Path metadata and module list
+└── badge.png             # Path completion badge (512x512 PNG, optional)
+```
+
+**`learning-path.json` fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | string | Yes | Unique slug (matches directory name) |
+| `title` | string | Yes | Display name |
+| `description` | string | Yes | Short description shown on the path card |
+| `icon` | string | Yes | Emoji icon (fallback when no badge image) |
+| `color` | string | Yes | Hex color for the card accent and progress bar |
+| `moduleIds` | string[] | Yes | Ordered list of module IDs in this path |
+| `private` | boolean | No | If true, hidden from all listings (default: false) |
+
+**Example:**
+
+```json
+{
+  "id": "apis",
+  "title": "APIs",
+  "description": "Go deeper on API-first development.",
+  "icon": "🌐",
+  "color": "#FF6C37",
+  "moduleIds": ["api-basics", "artemis-mission-control"],
+  "private": false
+}
+```
+
+### Path Completion Badges
+
+A path completion badge is shown in the learner's profile when they complete **all modules** in a path. Place a `badge.png` (512x512 PNG) in the path directory. If no badge is present, the path's emoji icon is used as a fallback.
+
+---
+
 ## Tips
 
 - Keep steps small and focused — one action per step
 - Include screenshots or links to Postman docs where helpful
 - Test the validation logic yourself before publishing
 - Each step awards 10 points — design your module so completing it feels rewarding
+- Add new modules to a learning path with `/liftoff-learningpath edit` after creation

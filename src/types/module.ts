@@ -5,6 +5,7 @@ export interface Module {
   color: string;
   icon: string;
   lessons: Lesson[];
+  private?: boolean;
 }
 
 export interface Lesson {

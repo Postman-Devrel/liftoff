@@ -1,0 +1,9 @@
+{
+  "id": "ai",
+  "title": "Build with AI",
+  "description": "Build AI-powered API workflows with MCP, agents, and LLM integration. Hands-on bootcamp covering the full AI-API stack.",
+  "icon": "🤖",
+  "color": "#06B6D4",
+  "moduleIds": ["banking-ai-mcp-bootcamp"],
+  "private": false
+}

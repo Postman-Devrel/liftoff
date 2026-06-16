@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/context/ProgressContext";
-import { getAllModules } from "@/lib/content-loader";
+import { getAllModules, getAllLearningPaths, getModulesForLearningPath } from "@/lib/content-loader";
 import { calculateRank, getNextRank } from "@/lib/scoring";
 import RankBadge from "@/components/scoring/RankBadge";
 import NavMenu from "@/components/NavMenu";
+import { LearningPath } from "@/types/learning-path";
+import { Module } from "@/types/module";
 
 const BADGE_VERSION = "1";
 
@@ -35,7 +37,7 @@ function ProfileSection() {
           Sign in with Discord
         </button>
         <p className="text-xs text-[var(--text-tertiary)] mt-4">
-          Or browse modules below — connect Postman when you&apos;re ready to validate.
+          Or browse learning paths below — connect Postman when you&apos;re ready to validate.
         </p>
       </div>
     );
@@ -187,10 +189,11 @@ function BadgeRow({ points }: { points: number }) {
 
 function EarnedBadges() {
   const modules = getAllModules();
+  const learningPaths = getAllLearningPaths();
   const { isStepCompleted } = useProgress();
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
-  const earned = modules.filter((mod) => {
+  const earnedModules = modules.filter((mod) => {
     const total = mod.lessons.reduce((a, l) => a + l.steps.length, 0);
     const done = mod.lessons.reduce(
       (a, l) => a + l.steps.filter((s) => isStepCompleted(s.id)).length,
@@ -199,7 +202,20 @@ function EarnedBadges() {
     return done === total && total > 0;
   });
 
-  if (earned.length === 0) return null;
+  const earnedPaths = learningPaths.filter((path) => {
+    const pathModules = getModulesForLearningPath(path.id);
+    if (pathModules.length === 0) return false;
+    return pathModules.every((mod) => {
+      const total = mod.lessons.reduce((a, l) => a + l.steps.length, 0);
+      const done = mod.lessons.reduce(
+        (a, l) => a + l.steps.filter((s) => isStepCompleted(s.id)).length,
+        0
+      );
+      return done === total && total > 0;
+    });
+  });
+
+  if (earnedModules.length === 0 && earnedPaths.length === 0) return null;
 
   return (
     <div className="mt-6 pt-5 border-t border-white/5">
@@ -207,7 +223,35 @@ function EarnedBadges() {
         Earned Badges
       </p>
       <div className="flex gap-3 flex-wrap">
-        {earned.map((mod) => (
+        {earnedPaths.map((path) => (
+          <Link
+            key={`path-${path.id}`}
+            href={`/learning-paths/${path.id}`}
+            className="group relative"
+            title={`${path.title} Path`}
+          >
+            {!imgErrors[`path-${path.id}`] ? (
+              <img
+                src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+                alt={`${path.title} path badge`}
+                width={56}
+                height={56}
+                className="w-14 h-14 rounded-xl transition-transform group-hover:scale-110"
+                style={{ boxShadow: `0 0 16px ${path.color}30` }}
+                onError={() => setImgErrors((prev) => ({ ...prev, [`path-${path.id}`]: true }))}
+              />
+            ) : (
+              <div
+                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl transition-transform group-hover:scale-110"
+                style={{
+                  background: `linear-gradient(135deg, ${path.color}40, ${path.color}15)`,
+                  border: `2px solid ${path.color}60`,
+                }}
+              >🛸</div>
+            )}
+          </Link>
+        ))}
+        {earnedModules.map((mod) => (
           <Link
             key={mod.id}
             href={`/modules/${mod.id}`}
@@ -228,12 +272,10 @@ function EarnedBadges() {
               <div
                 className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl transition-transform group-hover:scale-110"
                 style={{
-                  background: `linear-gradient(135deg, ${mod.color}30, ${mod.color}10)`,
+                  background: `linear-gradient(135deg, ${mod.color}40, ${mod.color}15)`,
                   border: `2px solid ${mod.color}60`,
                 }}
-              >
-                {mod.icon}
-              </div>
+              >🛸</div>
             )}
           </Link>
         ))}
@@ -242,11 +284,103 @@ function EarnedBadges() {
   );
 }
 
-function ModuleCard({
-  module,
-}: {
-  module: { id: string; title: string; description: string; color: string; icon: string; lessons: { slug: string; steps: { id: string }[] }[] };
-}) {
+function LearningPathCard({ path }: { path: LearningPath }) {
+  const { isStepCompleted } = useProgress();
+  const [imgError, setImgError] = useState(false);
+  const pathModules = getModulesForLearningPath(path.id);
+
+  const totalSteps = pathModules.reduce(
+    (a, mod) => a + mod.lessons.reduce((b, l) => b + l.steps.length, 0),
+    0
+  );
+  const completedSteps = pathModules.reduce(
+    (a, mod) =>
+      a + mod.lessons.reduce(
+        (b, l) => b + l.steps.filter((s) => isStepCompleted(s.id)).length,
+        0
+      ),
+    0
+  );
+  const percentage = totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
+
+  return (
+    <Link
+      href={`/learning-paths/${path.id}`}
+      className="glass-card p-6 block hover:translate-y-[-2px] transition-all group"
+      style={{ borderLeftWidth: "4px", borderLeftColor: path.color }}
+    >
+      <div className="flex items-start gap-4">
+        {!imgError ? (
+          <img
+            src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+            alt={`${path.title} badge`}
+            width={56}
+            height={56}
+            className="w-14 h-14 rounded-2xl flex-shrink-0"
+            style={{ boxShadow: `0 0 20px ${path.color}30` }}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: `linear-gradient(135deg, ${path.color}30, ${path.color}10)`, border: `1px solid ${path.color}30` }}
+          >🛸</div>
+        )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className="text-[10px] font-mono uppercase tracking-widest font-semibold"
+              style={{ color: path.color }}
+            >
+              {pathModules.length} {pathModules.length === 1 ? "module" : "modules"} · {totalSteps} steps
+            </span>
+          </div>
+          <h3 className="text-lg font-bold text-white group-hover:text-[var(--text-primary)] mb-1.5">
+            {path.title}
+          </h3>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+            {path.description}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-5">
+        <div className="flex justify-between text-xs mb-1.5">
+          <span className="text-[var(--text-tertiary)]">
+            {completedSteps}/{totalSteps} steps completed
+          </span>
+          <span className="font-mono" style={{ color: path.color }}>
+            {Math.round(percentage)}%
+          </span>
+        </div>
+        <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${percentage}%`, background: path.color }}
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 flex gap-2 flex-wrap">
+        {pathModules.map((mod) => (
+          <span
+            key={mod.id}
+            className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+            style={{
+              background: `${mod.color}15`,
+              color: mod.color,
+              border: `1px solid ${mod.color}30`,
+            }}
+          >
+            {mod.icon} {mod.title}
+          </span>
+        ))}
+      </div>
+    </Link>
+  );
+}
+
+function ModuleCard({ module }: { module: Module }) {
   const { isStepCompleted } = useProgress();
   const [imgError, setImgError] = useState(false);
   const totalSteps = module.lessons.reduce((a, l) => a + l.steps.length, 0);
@@ -255,7 +389,6 @@ function ModuleCard({
     0
   );
   const percentage = totalSteps > 0 ? (completed / totalSteps) * 100 : 0;
-  const allDone = completed === totalSteps && totalSteps > 0;
 
   return (
     <Link
@@ -277,10 +410,8 @@ function ModuleCard({
         ) : (
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-            style={{ background: `${module.color}15`, border: `1px solid ${module.color}30` }}
-          >
-            {module.icon}
-          </div>
+            style={{ background: `linear-gradient(135deg, ${module.color}30, ${module.color}10)`, border: `1px solid ${module.color}30` }}
+          >🛸</div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -321,7 +452,24 @@ function ModuleCard({
 }
 
 export default function Home() {
-  const modules = getAllModules();
+  const learningPaths = getAllLearningPaths();
+  const allModules = getAllModules();
+  const [filter, setFilter] = useState<string>("paths");
+
+  const filterOptions = [
+    { id: "paths", label: "Learning Paths" },
+    { id: "all", label: "All Modules" },
+    ...learningPaths.map((p) => ({ id: p.id, label: p.title })),
+  ];
+
+  const displayedModules =
+    filter === "all"
+      ? allModules
+      : filter === "paths"
+      ? []
+      : getModulesForLearningPath(filter);
+
+  const showPaths = filter === "paths";
 
   return (
     <div className="min-h-screen">
@@ -364,23 +512,44 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className="text-2xl font-bold text-white">Modules</h2>
-              <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white/5 text-[var(--text-tertiary)]">
-                {modules.length}
-              </span>
-            </div>
-            <div className="flex flex-col gap-4">
-              {modules.map((mod) => (
-                <ModuleCard key={mod.id} module={mod} />
-              ))}
+            <div className="mb-6 flex items-center gap-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] flex-shrink-0">Filter</span>
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg text-sm font-mono bg-white/5 border border-white/10 text-white focus:outline-none focus:border-white/25 cursor-pointer"
+              >
+                {filterOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id} className="bg-[#0d0d0d] text-white">
+                    {opt.label}{opt.id === "paths" ? ` (${learningPaths.length})` : opt.id === "all" ? ` (${allModules.length})` : ""}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {modules.length === 1 && (
-              <div className="glass-card p-6 mt-4 text-center border-dashed">
-                <p className="text-[var(--text-tertiary)] text-sm">
-                  More modules coming soon.
-                </p>
+            {showPaths && (
+              <div className="flex flex-col gap-4">
+                {learningPaths.map((path) => (
+                  <LearningPathCard key={path.id} path={path} />
+                ))}
+                {learningPaths.length === 0 && (
+                  <div className="glass-card p-6 text-center border-dashed">
+                    <p className="text-[var(--text-tertiary)] text-sm">No learning paths available yet.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!showPaths && (
+              <div className="flex flex-col gap-4">
+                {displayedModules.map((mod) => (
+                  <ModuleCard key={mod.id} module={mod} />
+                ))}
+                {displayedModules.length === 0 && (
+                  <div className="glass-card p-6 text-center border-dashed">
+                    <p className="text-[var(--text-tertiary)] text-sm">No modules in this path yet.</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

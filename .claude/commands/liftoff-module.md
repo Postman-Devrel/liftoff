@@ -25,8 +25,12 @@ Create a brand new module from a content markdown file.
    - Each H2 (`## Part N: ...`) becomes a **lesson**
    - Each H3 (`### Step N: ...`) within a Part becomes a **step**
    - The `**Validation:**` block in each step describes what the validator should check
+   - If `**PRIVATE**` appears anywhere in the first 5 lines of the file (before or after the H1), the module is private — skip the prompt below and remove that line before parsing the rest of the content
+   - **If no `**PRIVATE**` marker is found**, ask the user: "Should this module be public or private? (public = visible on the home page and learning paths; private = accessible only via direct URL)" — default to public
 
-3. Generate a `module.json` with this schema:
+3. Set `"private": true` in `module.json` if the `**PRIVATE**` marker was found OR if the user chose private in the prompt above. Omit the field entirely for public modules.
+
+4. Generate a `module.json` with this schema:
 
 ```json
 {
@@ -35,6 +39,7 @@ Create a brand new module from a content markdown file.
   "description": "<Module description>",
   "color": "<hex color — pick from: #FF6C37, #8B5CF6, #06B6D4, #F59E0B, #10B981, #EC4899>",
   "icon": "<single emoji representing the module>",
+  "private": true,  // ONLY include if module is private — omit this field for public modules
   "lessons": [
     {
       "id": "lesson-<N>-<kebab-slug>",
@@ -57,11 +62,11 @@ Create a brand new module from a content markdown file.
 }
 ```
 
-4. Save to `src/content/modules/<module-id>/module.json`
-5. Copy the original markdown to `src/content/modules/<module-id>/content.md`
-6. Add the new module import to `src/lib/content-loader.ts` in the `modules` array
-7. If the `--badge` flag was passed, run **Badge Generation** (see section below)
-8. **Automatically run the `sync` subcommand** (below) to generate validators and verify the build — do not ask the user to run it separately
+5. Save to `src/content/modules/<module-id>/module.json`
+6. Copy the original markdown to `src/content/modules/<module-id>/content.md`
+7. Add the new module import to `src/lib/content-loader.ts` in the `modules` array
+8. If the `--badge` flag was passed, run **Badge Generation** (see section below)
+9. **Automatically run the `sync` subcommand** (below) to generate validators and verify the build — do not ask the user to run it separately
 
 ### Rules:
 - Module IDs must be kebab-case and unique across existing modules
@@ -95,7 +100,7 @@ Sync `module.json` to match the current `content.md`. The markdown file is the *
 1. List modules in `src/content/modules/` and ask which one to update (or accept a module ID).
 2. The content source is the module's own `content.md` (at `src/content/modules/<module-id>/content.md`). Do NOT ask the user for a separate markdown file — always read from `content.md` directly.
 3. Read the existing `module.json` to understand what already exists.
-4. Read `content.md` and parse it the same way as `create`.
+4. Read `content.md` and parse it the same way as `create`. Check for the `**PRIVATE**` marker in the first 5 lines and sync the `private` field in `module.json` accordingly — add `"private": true` if the marker is present, remove it if the marker is absent.
 5. Diff the parsed content against `module.json` and apply **all** changes:
    - **New lessons/steps** in `content.md` → add to `module.json`, generate validators
    - **Removed lessons/steps** (in `module.json` but not `content.md`) → remove from `module.json`, delete the validator file, remove the import and registry entry from `src/lib/validators/index.ts`, and remove any now-unused helper functions from `src/lib/postman-api.ts`
