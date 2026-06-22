@@ -4,7 +4,7 @@ const PERSIST_HINT =
   "The Postman API can only read **shared values**. In your Postman environment editor, make sure the value appears in the **Shared value** column (not just the local **Value** column), then try again.";
 
 export function resolveEnvVar(
-  values: { key: string; value: string; current_value?: string }[],
+  values: { key: string; value: unknown; current_value?: unknown }[],
   varName: string,
   missingMessage?: string
 ): string | ValidationResult {
@@ -20,12 +20,18 @@ export function resolveEnvVar(
       pointsAwarded: 0,
     };
   }
-  if (!entry.value) {
+  const resolvedValue = entry.value ?? entry.current_value;
+
+  if (
+    resolvedValue === undefined ||
+    resolvedValue === null ||
+    (typeof resolvedValue === "string" && resolvedValue.trim() === "")
+  ) {
     return {
       success: false,
       message: `Your \`${varName}\` variable exists but its initial value is empty. ${PERSIST_HINT}`,
       pointsAwarded: 0,
     };
   }
-  return entry.value;
+  return String(resolvedValue);
 }
