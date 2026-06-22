@@ -454,22 +454,7 @@ function ModuleCard({ module }: { module: Module }) {
 export default function Home() {
   const learningPaths = getAllLearningPaths();
   const allModules = getAllModules();
-  const [filter, setFilter] = useState<string>("paths");
-
-  const filterOptions = [
-    { id: "paths", label: "Learning Paths" },
-    { id: "all", label: "All Modules" },
-    ...learningPaths.map((p) => ({ id: p.id, label: p.title })),
-  ];
-
-  const displayedModules =
-    filter === "all"
-      ? allModules
-      : filter === "paths"
-      ? []
-      : getModulesForLearningPath(filter);
-
-  const showPaths = filter === "paths";
+  const [view, setView] = useState<"paths" | "modules">("paths");
 
   return (
     <div className="min-h-screen">
@@ -512,22 +497,36 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="mb-6 flex items-center gap-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] flex-shrink-0">Filter</span>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-lg text-sm font-mono bg-white/5 border border-white/10 text-white focus:outline-none focus:border-white/25 cursor-pointer"
+            <div className="mb-6 flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit">
+              <button
+                onClick={() => setView("paths")}
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                  view === "paths"
+                    ? "bg-white/10 text-white shadow-sm"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
               >
-                {filterOptions.map((opt) => (
-                  <option key={opt.id} value={opt.id} className="bg-[#0d0d0d] text-white">
-                    {opt.label}{opt.id === "paths" ? ` (${learningPaths.length})` : opt.id === "all" ? ` (${allModules.length})` : ""}
-                  </option>
-                ))}
-              </select>
+                Learning Paths
+                <span className={`ml-2 text-xs font-mono ${view === "paths" ? "text-[var(--orange)]" : "text-[var(--text-tertiary)]"}`}>
+                  {learningPaths.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setView("modules")}
+                className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                  view === "modules"
+                    ? "bg-white/10 text-white shadow-sm"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                Modules
+                <span className={`ml-2 text-xs font-mono ${view === "modules" ? "text-[var(--orange)]" : "text-[var(--text-tertiary)]"}`}>
+                  {allModules.length}
+                </span>
+              </button>
             </div>
 
-            {showPaths && (
+            {view === "paths" && (
               <div className="flex flex-col gap-4">
                 {learningPaths.map((path) => (
                   <LearningPathCard key={path.id} path={path} />
@@ -540,14 +539,14 @@ export default function Home() {
               </div>
             )}
 
-            {!showPaths && (
+            {view === "modules" && (
               <div className="flex flex-col gap-4">
-                {displayedModules.map((mod) => (
+                {allModules.map((mod) => (
                   <ModuleCard key={mod.id} module={mod} />
                 ))}
-                {displayedModules.length === 0 && (
+                {allModules.length === 0 && (
                   <div className="glass-card p-6 text-center border-dashed">
-                    <p className="text-[var(--text-tertiary)] text-sm">No modules in this path yet.</p>
+                    <p className="text-[var(--text-tertiary)] text-sm">No modules available yet.</p>
                   </div>
                 )}
               </div>
