@@ -78,6 +78,23 @@ Set `"private": true` in a module's `module.json` to hide it from all listings (
 
 ---
 
+## API
+
+LiftOff exposes a REST API for programmatic access to content and admin data.
+
+| Namespace | Auth | Description |
+|-----------|------|-------------|
+| `GET /api/content/learning-paths` | None | List learning paths (filter by `?q=` or `?moduleId=`) |
+| `GET /api/content/learning-paths/:id` | None | Single learning path with modules |
+| `GET /api/content/modules` | None | List modules (filter by `?q=` or `?pathId=`) |
+| `GET /api/content/modules/:id` | None | Single module with lessons and steps |
+| `GET /api/admin/dashboard` | Bearer token | Platform stats, activity, leaderboard |
+| `GET /api/admin/users/:id` | Bearer token | Per-user profile, progress, and activity |
+
+**[Full API reference →](docs/api.md)**
+
+---
+
 ## Learning Paths
 
 Learning paths group modules into curated tracks (e.g. Build with AI, Introduction to Postman). The home page lists learning paths by default, with a dropdown filter to switch between paths or browse all modules directly.
