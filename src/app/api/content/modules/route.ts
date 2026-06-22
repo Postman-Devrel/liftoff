@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const base = new URL(request.url).origin;
+
   const data = modules.map((m) => {
     const stepCount = m.lessons.reduce((a, l) => a + l.steps.length, 0);
     const totalPoints = m.lessons.reduce(
@@ -27,6 +29,7 @@ export async function GET(request: NextRequest) {
       title: m.title,
       description: m.description,
       icon: m.icon,
+      badgeUrl: `${base}/api/modules/${m.id}/badge`,
       color: m.color,
       lessonCount: m.lessons.length,
       stepCount,

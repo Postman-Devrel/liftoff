@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getLearningPath, getModulesForLearningPath } from "@/lib/content-loader";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -13,12 +13,14 @@ export async function GET(
   }
 
   const modules = getModulesForLearningPath(path.id);
+  const base = new URL(request.url).origin;
 
   const data = {
     id: path.id,
     title: path.title,
     description: path.description,
     icon: path.icon,
+    badgeUrl: `${base}/api/learning-paths/${path.id}/badge`,
     color: path.color,
     modules: modules.map((m) => {
       const stepCount = m.lessons.reduce((a, l) => a + l.steps.length, 0);
@@ -31,6 +33,7 @@ export async function GET(
         title: m.title,
         description: m.description,
         icon: m.icon,
+        badgeUrl: `${base}/api/modules/${m.id}/badge`,
         color: m.color,
         lessonCount: m.lessons.length,
         stepCount,

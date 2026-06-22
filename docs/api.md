@@ -42,6 +42,7 @@ GET /api/content/learning-paths?moduleId=api-basics
       "title": "Introduction to Postman",
       "description": "...",
       "icon": "🚀",
+      "badgeUrl": "https://your-app.vercel.app/api/learning-paths/intro-to-postman/badge",
       "color": "#FF6C37",
       "moduleCount": 2,
       "stepCount": 24,
@@ -83,6 +84,7 @@ Returns a single learning path with a summary of each module it contains.
       "title": "API Basics",
       "description": "...",
       "icon": "📡",
+      "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
       "color": "#06B6D4",
       "lessonCount": 3,
       "stepCount": 12,
@@ -133,6 +135,7 @@ GET /api/content/modules?pathId=intro-to-postman
       "title": "API Basics",
       "description": "...",
       "icon": "📡",
+      "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
       "color": "#06B6D4",
       "lessonCount": 3,
       "stepCount": 12,
@@ -167,6 +170,7 @@ Returns a single module with its full lesson and step structure.
   "title": "API Basics",
   "description": "...",
   "icon": "📡",
+  "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
   "color": "#06B6D4",
   "lessons": [
     {

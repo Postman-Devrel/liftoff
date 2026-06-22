@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getAllModules } from "@/lib/content-loader";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
@@ -12,11 +12,14 @@ export async function GET(
     return Response.json({ error: "Module not found" }, { status: 404 });
   }
 
+  const base = new URL(request.url).origin;
+
   const data = {
     id: module.id,
     title: module.title,
     description: module.description,
     icon: module.icon,
+    badgeUrl: `${base}/api/modules/${module.id}/badge`,
     color: module.color,
     lessons: module.lessons.map((l) => ({
       id: l.id,

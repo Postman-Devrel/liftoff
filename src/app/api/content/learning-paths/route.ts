@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const base = new URL(request.url).origin;
+
   const data = paths.map((p) => {
     const modules = getModulesForLearningPath(p.id);
     const stepCount = modules.reduce(
@@ -40,6 +42,7 @@ export async function GET(request: NextRequest) {
       title: p.title,
       description: p.description,
       icon: p.icon,
+      badgeUrl: `${base}/api/learning-paths/${p.id}/badge`,
       color: p.color,
       moduleCount: modules.length,
       stepCount,
