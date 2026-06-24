@@ -1,12 +1,18 @@
 import artemisModule from "@/content/modules/artemis-mission-control/module.json";
 import apiBasicsModule from "@/content/modules/api-basics/module.json";
 import bankingModule from "@/content/modules/banking-ai-mcp-bootcamp/module.json";
+import worldExplorerModule from "@/content/modules/world-explorer/module.json";
 import introToPostmanPath from "@/content/learning-paths/intro-to-postman/learning-path.json";
 import aiPath from "@/content/learning-paths/ai/learning-path.json";
 import { Module, Lesson } from "@/types/module";
 import { LearningPath } from "@/types/learning-path";
 
-const allModules: Module[] = [artemisModule as Module, apiBasicsModule as Module, bankingModule as Module];
+const allModules: Module[] = [
+  artemisModule as Module,
+  apiBasicsModule as Module,
+  bankingModule as Module,
+  worldExplorerModule as Module,
+];
 const allLearningPaths: LearningPath[] = [
   introToPostmanPath as LearningPath,
   aiPath as LearningPath,

@@ -34,6 +34,16 @@ import { validateBankingQueryMcp } from "./banking-ai-mcp-bootcamp/validate-bank
 import { validateBankingAddMcpClaude } from "./banking-ai-mcp-bootcamp/validate-banking-add-mcp-claude";
 import { validateBankingVerifyConnection } from "./banking-ai-mcp-bootcamp/validate-banking-verify-connection";
 import { validateBankingAddTestsMcp } from "./banking-ai-mcp-bootcamp/validate-banking-add-tests-mcp";
+import { validateWorldExplorerCreateWorkspace } from "./world-explorer/validate-world-explorer-create-workspace";
+import { validateWorldExplorerCreateCollection } from "./world-explorer/validate-world-explorer-create-collection";
+import { validateWorldExplorerAddLookup } from "./world-explorer/validate-world-explorer-add-lookup";
+import { validateWorldExplorerPickDestination } from "./world-explorer/validate-world-explorer-pick-destination";
+import { validateWorldExplorerStoreVariable } from "./world-explorer/validate-world-explorer-store-variable";
+import { validateWorldExplorerAgentModeTest } from "./world-explorer/validate-world-explorer-agent-mode-test";
+import { validateWorldExplorerStampPassport } from "./world-explorer/validate-world-explorer-stamp-passport";
+import { validateWorldExplorerVisualization } from "./world-explorer/validate-world-explorer-visualization";
+import { validateWorldExplorerVerifyJourney } from "./world-explorer/validate-world-explorer-verify-journey";
+import { validateWorldExplorerSurpriseDestination } from "./world-explorer/validate-world-explorer-surprise-destination";
 
 export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-workspace": validateWorkspace,
@@ -71,4 +81,14 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-banking-add-mcp-claude": validateBankingAddMcpClaude,
   "validate-banking-verify-connection": validateBankingVerifyConnection,
   "validate-banking-add-tests-mcp": validateBankingAddTestsMcp,
+  "validate-world-explorer-create-workspace": validateWorldExplorerCreateWorkspace,
+  "validate-world-explorer-create-collection": validateWorldExplorerCreateCollection,
+  "validate-world-explorer-add-lookup": validateWorldExplorerAddLookup,
+  "validate-world-explorer-pick-destination": validateWorldExplorerPickDestination,
+  "validate-world-explorer-store-variable": validateWorldExplorerStoreVariable,
+  "validate-world-explorer-agent-mode-test": validateWorldExplorerAgentModeTest,
+  "validate-world-explorer-stamp-passport": validateWorldExplorerStampPassport,
+  "validate-world-explorer-visualization": validateWorldExplorerVisualization,
+  "validate-world-explorer-verify-journey": validateWorldExplorerVerifyJourney,
+  "validate-world-explorer-surprise-destination": validateWorldExplorerSurpriseDestination,
 };
