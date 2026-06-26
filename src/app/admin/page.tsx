@@ -970,7 +970,19 @@ function Dashboard({ password }: { password: string }) {
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [activityDays, setActivityDays] = useState<string>("30");
-  const [tab, setTab] = useState<"analytics" | "private">("analytics");
+  const [tab, setTab] = useState<"analytics" | "private">(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("tab") === "private"
+        ? "private"
+        : "analytics";
+    }
+    return "analytics";
+  });
+
+  function handleTabChange(newTab: "analytics" | "private") {
+    setTab(newTab);
+    window.history.replaceState(null, "", `/admin?tab=${newTab}`);
+  }
 
   const fetchData = useCallback((daysOverride?: string) => {
     setLoading(true);
@@ -1058,7 +1070,7 @@ function Dashboard({ password }: { password: string }) {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
               <button
-                onClick={() => setTab("analytics")}
+                onClick={() => handleTabChange("analytics")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   tab === "analytics"
                     ? "bg-[var(--purple)] text-white"
@@ -1068,7 +1080,7 @@ function Dashboard({ password }: { password: string }) {
                 Analytics
               </button>
               <button
-                onClick={() => setTab("private")}
+                onClick={() => handleTabChange("private")}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   tab === "private"
                     ? "bg-[var(--purple)] text-white"
@@ -1249,7 +1261,14 @@ function PrivatePreview() {
                   style={{ borderLeftColor: mod.color, borderLeftWidth: 3 }}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl">{mod.icon}</span>
+                    <img
+                      src={`/api/modules/${mod.id}/badge`}
+                      alt=""
+                      className="w-12 h-12 rounded-lg object-cover shrink-0"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="text-sm font-semibold text-white group-hover:text-[var(--purple)] transition-colors truncate">
