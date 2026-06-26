@@ -1,0 +1,114 @@
+{
+  "id": "world-explorer",
+  "title": "World Explorer",
+  "description": "Travel the world without leaving Postman. Spin up a workspace, look up real country data, work with collection variables, let Agent Mode build you a custom visualization, and write tests powered by the LiftOff Countries API.",
+  "color": "#10B981",
+  "icon": "🌍",
+  "private": true,
+  "lessons": [
+    {
+      "id": "lesson-1-plot-your-route",
+      "slug": "plot-your-route",
+      "title": "Plot Your Route",
+      "partNumber": 1,
+      "steps": [
+        {
+          "id": "world-explorer-step-1-create-workspace",
+          "stepNumber": 1,
+          "title": "Create a Workspace",
+          "description": "Sign in to Postman and create a new **internal** workspace.\nName it: **[Your name] - World Explorer**",
+          "points": 10,
+          "validatorId": "validate-world-explorer-create-workspace"
+        },
+        {
+          "id": "world-explorer-step-2-create-collection",
+          "stepNumber": 2,
+          "title": "Create a Collection",
+          "description": "Inside your new workspace, create a collection called **Country Dossier**.\n\n> This lesson uses **collection variables** (scoped to the collection) rather than an environment, so you'll see a different way of storing reusable values than in *API Basics*.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-create-collection"
+        },
+        {
+          "id": "world-explorer-step-3-add-lookup",
+          "stepNumber": 3,
+          "title": "Add Your First Lookup",
+          "description": "Inside **Country Dossier**, add a **GET** request named **Get Country** pointing at:\n\n```\nhttps://liftoff-101.mock.postman.postman.dev/countries\n```\n\nClick **Send**. You should get **200 OK** and a JSON array of country objects. Have a quick scroll — each entry has `name`, `capital`, `currency`, `population`, and a `media` block with image links.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-add-lookup"
+        },
+        {
+          "id": "world-explorer-step-4-pick-destination",
+          "stepNumber": 4,
+          "title": "Pick a Destination",
+          "description": "Time to filter. Open **Get Country** and add a **query parameter**:\n\n| Key    | Value                       |\n| ------ | --------------------------- |\n| `name` | *your home country*, e.g. `Bangladesh` |\n\nYour URL should now end with `?name=Bangladesh` (or wherever you're headed). **Send** again and confirm the array now contains just your country.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-pick-destination"
+        }
+      ]
+    },
+    {
+      "id": "lesson-2-travel-smarter",
+      "slug": "travel-smarter",
+      "title": "Travel Smarter",
+      "partNumber": 2,
+      "steps": [
+        {
+          "id": "world-explorer-step-5-store-variable",
+          "stepNumber": 1,
+          "title": "Store Your Destination in a Variable",
+          "description": "Hard-coding a country is fine for one trip, but variables make your request reusable.\n\n1. Open the **Country Dossier** collection, go to the **Variables** tab.\n2. Add a variable named `country`. In the **Shared Value** column, enter your country (e.g. `Bangladesh`).\n3. Back in **Get Country**, change the `name` query parameter value to `{{country}}`.\n4. Save the request (Ctrl/Cmd+S).\n\n**Important:** Enter your country in the **Shared Value** column, not just **Value**. The plain **Value** stays local to you and isn't synced to the cloud. LiftOff validates through the Postman API, which can only read **Shared Values** — never your local **Value**.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-store-variable"
+        },
+        {
+          "id": "world-explorer-step-6-agent-mode-test",
+          "stepNumber": 2,
+          "title": "Let Agent Mode Be Your Guide",
+          "description": "Instead of writing tests by hand, ask **Agent Mode** to do it for you.\n\n1. Open **Agent Mode** in Postman.\n2. Give it a prompt like:\n\n   > *In my \"Get Country\" request, add a post-response test that checks the status is 200 and that the first result's `name` matches my `country` collection variable.*\n\n3. Review what Agent Mode proposes. You should end up with a post-response script similar to:\n\n```javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Found my country\", function () {\n    const data = pm.response.json();\n    pm.expect(data[0].name).to.eql(pm.collectionVariables.get(\"country\"));\n});\n```\n\n4. Accept the change and **save** the request.\n\n> No Agent Mode available? Open **Scripts → Post-response** and paste the script above yourself.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-agent-mode-test"
+        },
+        {
+          "id": "world-explorer-step-7-stamp-passport",
+          "stepNumber": 3,
+          "title": "Stamp Your Passport",
+          "description": "Now capture some data from the response so you can reuse it later. Add this to the **bottom** of your post-response script (**Scripts → Post-response**):\n\n```javascript\nconst country = pm.response.json()[0];\n\npm.collectionVariables.set(\"capital\", country.capital);\npm.collectionVariables.set(\"currency\", country.currency);\n\nconsole.log(`Welcome to ${country.capital}! Don't forget some ${country.currency}.`);\n```\n\nSave the request.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-stamp-passport"
+        },
+        {
+          "id": "world-explorer-step-8-visualization",
+          "stepNumber": 4,
+          "title": "Turn Your Stamp Into a Visualization",
+          "description": "Your passport stamp is just text in the console right now — let's make it look the part. Ask **Agent Mode** to build a **Postman Visualizer** view from the country data.\n\n1. Open **Agent Mode** again.\n2. Give it a prompt like:\n\n   > *In my \"Get Country\" request, add a post-response visualization using `pm.visualizer.set`. Render a passport-stamp style card for the first result showing the flag image (`media.flag`), the country name, capital, currency, and population.*\n\n3. Review the proposed script. It should call `pm.visualizer.set` with an HTML template, similar to:\n\n```javascript\nconst country = pm.response.json()[0];\n\nconst template = `\n  <div style=\"font-family: sans-serif; border: 3px dashed #444; border-radius: 12px; padding: 16px; max-width: 320px;\">\n    <img src=\"{{flag}}\" alt=\"flag\" style=\"width: 100%; border-radius: 6px;\" />\n    <h2 style=\"margin: 12px 0 4px;\">{{name}}</h2>\n    <p style=\"margin: 2px 0;\">Capital: <b>{{capital}}</b></p>\n    <p style=\"margin: 2px 0;\">Currency: <b>{{currency}}</b></p>\n    <p style=\"margin: 2px 0;\">Population: <b>{{population}}</b></p>\n  </div>\n`;\n\npm.visualizer.set(template, {\n    name: country.name,\n    capital: country.capital,\n    currency: country.currency,\n    population: country.population,\n    flag: country.media.flag\n});\n```\n\n4. Accept the change and **save** the request.\n\n> No Agent Mode available? Paste the script above at the bottom of your **Post-response** script yourself.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-visualization"
+        },
+        {
+          "id": "world-explorer-step-9-verify-journey",
+          "stepNumber": 5,
+          "title": "Verify the Journey",
+          "description": "Confirm everything works end to end.\n\n1. Click **Send**.\n2. Check **Test Results** — both tests should pass.\n3. Open the response's **Body → Visualization** tab to see your passport-stamp card, flag and all.\n4. Open the **Postman Console** (bottom-left, or View → Show Postman Console) and find your `Welcome to ...` message.\n5. Pop back to the collection's **Variables** tab and confirm `capital` and `currency` now hold values from the response.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-verify-journey"
+        }
+      ]
+    },
+    {
+      "id": "lesson-3-surprise-destination",
+      "slug": "surprise-destination",
+      "title": "Bonus: Surprise Destination",
+      "partNumber": 3,
+      "steps": [
+        {
+          "id": "world-explorer-step-10-surprise-destination",
+          "stepNumber": 1,
+          "title": "Surprise Destination",
+          "description": "Feeling adventurous? Add a **pre-request** script that picks a random country every time you hit Send.\n\nOpen **Get Country → Scripts → Pre-request** and add:\n\n```javascript\nconst destinations = [\"Bangladesh\", \"Japan\", \"Brazil\", \"Kenya\", \"Norway\", \"Peru\"];\nconst pick = destinations[Math.floor(Math.random() * destinations.length)];\n\npm.collectionVariables.set(\"country\", pick);\nconsole.log(`Today's destination: ${pick}`);\n```\n\nSave, then **Send** a few times and watch the response — and your visualization — change. Since your `name` parameter already uses `{{country}}`, no other edits are needed.",
+          "points": 10,
+          "validatorId": "validate-world-explorer-surprise-destination"
+        }
+      ]
+    }
+  ]
+}
