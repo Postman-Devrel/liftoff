@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
+import {
+  getAllModulesIncludingPrivate,
+  getAllLearningPathsIncludingPrivate,
+} from "@/lib/content-loader";
 import {
   AreaChart,
   Area,
@@ -965,6 +970,7 @@ function Dashboard({ password }: { password: string }) {
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [activityDays, setActivityDays] = useState<string>("30");
+  const [tab, setTab] = useState<"analytics" | "private">("analytics");
 
   const fetchData = useCallback((daysOverride?: string) => {
     setLoading(true);
@@ -1050,6 +1056,28 @@ function Dashboard({ password }: { password: string }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+              <button
+                onClick={() => setTab("analytics")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  tab === "analytics"
+                    ? "bg-[var(--purple)] text-white"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => setTab("private")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  tab === "private"
+                    ? "bg-[var(--purple)] text-white"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                Private
+              </button>
+            </div>
             <button
               onClick={handleRefresh}
               className="btn-ghost !py-2 !px-4 text-xs flex items-center gap-2"
@@ -1080,7 +1108,9 @@ function Dashboard({ password }: { password: string }) {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      {tab === "private" && <PrivatePreview />}
+
+      {tab === "analytics" && <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
@@ -1130,7 +1160,7 @@ function Dashboard({ password }: { password: string }) {
           users={data.leaderboard}
           onSelect={setSelectedUser}
         />
-      </main>
+      </main>}
 
       {/* User Detail */}
       {selectedUser && (
@@ -1139,6 +1169,115 @@ function Dashboard({ password }: { password: string }) {
           password={password}
           onClose={() => setSelectedUser(null)}
         />
+      )}
+    </div>
+  );
+}
+
+// ─── Private Preview ─────────────────────────────────────
+
+function PrivatePreview() {
+  const privateModules = getAllModulesIncludingPrivate().filter((m) => m.private);
+  const privatePaths = getAllLearningPathsIncludingPrivate().filter((p) => p.private);
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mb-2">
+        <h2 className="text-lg font-bold text-white">Private Content</h2>
+        <p className="text-sm text-[var(--text-tertiary)] mt-1">
+          Hidden from public users. Click any item to test it.
+        </p>
+      </div>
+
+      {privatePaths.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+            Learning Paths ({privatePaths.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {privatePaths.map((path) => (
+              <Link
+                key={path.id}
+                href={`/learning-paths/${path.id}`}
+                className="glass-card p-5 hover:border-[var(--purple)]/50 transition-all group block"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">{path.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-semibold text-white group-hover:text-[var(--purple)] transition-colors truncate">
+                        {path.title}
+                      </h4>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-400 border border-yellow-500/20 shrink-0">
+                        PRIVATE
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">
+                      {path.description}
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-2">
+                      {path.moduleIds.length} module{path.moduleIds.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {privateModules.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+            Modules ({privateModules.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {privateModules.map((mod) => {
+              const totalSteps = mod.lessons.reduce(
+                (sum, l) => sum + l.steps.length,
+                0
+              );
+              const firstSlug = mod.lessons[0]?.slug;
+              const href = firstSlug
+                ? `/modules/${mod.id}/${firstSlug}`
+                : `/modules/${mod.id}`;
+              return (
+                <Link
+                  key={mod.id}
+                  href={href}
+                  className="glass-card p-5 hover:border-[var(--purple)]/50 transition-all group block"
+                  style={{ borderLeftColor: mod.color, borderLeftWidth: 3 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{mod.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-semibold text-white group-hover:text-[var(--purple)] transition-colors truncate">
+                          {mod.title}
+                        </h4>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-400 border border-yellow-500/20 shrink-0">
+                          PRIVATE
+                        </span>
+                      </div>
+                      <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">
+                        {mod.description}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-2">
+                        {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""} · {totalSteps} step{totalSteps !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {privateModules.length === 0 && privatePaths.length === 0 && (
+        <div className="mt-16 text-center text-[var(--text-tertiary)] text-sm">
+          No private content found.
+        </div>
       )}
     </div>
   );
