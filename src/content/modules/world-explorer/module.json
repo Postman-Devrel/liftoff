@@ -16,7 +16,7 @@
           "id": "world-explorer-step-1-create-workspace",
           "stepNumber": 1,
           "title": "Create a Workspace",
-          "description": "Sign in to Postman and create a new **internal** workspace.\nName it: **[Your name] - World Explorer**",
+          "description": "> **New to Postman?** You'll create three building blocks in this part: a **workspace** (your project folder), a **collection** (a group of related requests), and a **request** (a single API call). Each step below walks you through where to click.\n\n1. Open [postman.com](https://postman.com) and sign in (or create a free account).\n2. Click **Workspaces** in the top navigation → **Create Workspace**.\n3. Choose **Blank workspace**.\n4. Name it: **[Your name] - World Explorer** (e.g. *Alex - World Explorer*).\n5. Set visibility to **Internal**, leave access as *Only you and invited people*, then click **Create Workspace**.\n\n> A **workspace** is where your Postman work lives — collections, requests, and variables all belong to one.",
           "points": 10,
           "validatorId": "validate-world-explorer-create-workspace"
         },
@@ -24,7 +24,7 @@
           "id": "world-explorer-step-2-create-collection",
           "stepNumber": 2,
           "title": "Create a Collection",
-          "description": "Inside your new workspace, create a collection called **Country Dossier**.\n\n> This lesson uses **collection variables** (scoped to the collection) rather than an environment, so you'll see a different way of storing reusable values than in *API Basics*.",
+          "description": "1. Confirm you're in your new workspace (check the name in the top-left).\n2. In the left sidebar, click **+** → **Collection**.\n3. Name it **Country Dossier** and save.\n\n> A **collection** groups related requests together — think of it as a dossier for all your country lookups. This lesson uses **collection variables** (scoped to the collection) rather than an environment, so you'll see a different way of storing reusable values than in *API Basics*.",
           "points": 10,
           "validatorId": "validate-world-explorer-create-collection"
         },
@@ -32,7 +32,7 @@
           "id": "world-explorer-step-3-add-lookup",
           "stepNumber": 3,
           "title": "Add Your First Lookup",
-          "description": "Inside **Country Dossier**, add a **GET** request named **Get Country** pointing at:\n\n```\nhttps://liftoff-101.mock.postman.postman.dev/countries\n```\n\nClick **Send**. You should get **200 OK** and a JSON array of country objects. Have a quick scroll — each entry has `name`, `capital`, `currency`, `population`, and a `media` block with image links.",
+          "description": "1. In the left sidebar, expand **Country Dossier** and click **Add request** (or open the collection's **⋯** menu → **Add request**).\n2. Name the request **Get Country**.\n3. Leave the method as **GET** and paste this URL into the address bar:\n\n```\nhttps://liftoff-101.mock.postman.postman.dev/countries\n```\n\n4. Click **Save** (Ctrl/Cmd+S) — choose **Country Dossier** as the destination if prompted.\n5. Click **Send**. You should get **200 OK** and a JSON array of country objects. Have a quick scroll — each entry has `name`, `capital`, `currency`, `population`, and a `media` block with image links.\n\n> A **request** is a single call to an API. **GET** means you're asking the server for data; the URL tells it *what* to return.",
           "points": 10,
           "validatorId": "validate-world-explorer-add-lookup"
         },
@@ -40,7 +40,7 @@
           "id": "world-explorer-step-4-pick-destination",
           "stepNumber": 4,
           "title": "Pick a Destination",
-          "description": "Time to filter. Open **Get Country** and add a **query parameter**:\n\n| Key    | Value                       |\n| ------ | --------------------------- |\n| `name` | *your home country*, e.g. `Bangladesh` |\n\nYour URL should now end with `?name=Bangladesh` (or wherever you're headed). **Send** again and confirm the array now contains just your country.",
+          "description": "Time to filter down to one country.\n\n1. Open **Get Country** from your collection.\n2. Click the **Params** tab (directly below the URL bar).\n3. In the **Query Params** table, add a row:\n\n| Key    | Value                       |\n| ------ | --------------------------- |\n| `name` | *your home country*, e.g. `Bangladesh` |\n\n4. Make sure the checkbox next to `name` is checked — that enables the parameter.\n5. Your URL should now end with `?name=Bangladesh` (or wherever you're headed). Click **Send** again and confirm the array now contains just your country.",
           "points": 10,
           "validatorId": "validate-world-explorer-pick-destination"
         }
@@ -56,7 +56,7 @@
           "id": "world-explorer-step-5-store-variable",
           "stepNumber": 1,
           "title": "Store Your Destination in a Variable",
-          "description": "Hard-coding a country is fine for one trip, but variables make your request reusable.\n\n1. Open the **Country Dossier** collection, go to the **Variables** tab.\n2. Add a variable named `country`. In the **Shared Value** column, enter your country (e.g. `Bangladesh`).\n3. Back in **Get Country**, change the `name` query parameter value to `{{country}}`.\n4. Save the request (Ctrl/Cmd+S).\n\n**Important:** Enter your country in the **Shared Value** column, not just **Value**. The plain **Value** stays local to you and isn't synced to the cloud. LiftOff validates through the Postman API, which can only read **Shared Values** — never your local **Value**.",
+          "description": "Hard-coding a country is fine for one trip, but variables make your request reusable.\n\n1. In the left sidebar, click **Country Dossier** (the collection name itself, not a request inside it).\n2. In the panel that opens on the right, select the **Variables** tab.\n3. Add a variable named `country`. In the **Shared Value** column, enter your country (e.g. `Bangladesh`).\n4. Back in **Get Country**, open the **Params** tab and change the `name` query parameter value to `{{country}}`.\n5. Save the request (Ctrl/Cmd+S).\n\n**Important:** Enter your country in the **Shared Value** column, not just **Value**. The plain **Value** stays local to you and isn't synced to the cloud. LiftOff validates through the Postman API, which can only read **Shared Values** — never your local **Value**.",
           "points": 10,
           "validatorId": "validate-world-explorer-store-variable"
         },
@@ -64,7 +64,7 @@
           "id": "world-explorer-step-6-agent-mode-test",
           "stepNumber": 2,
           "title": "Let Agent Mode Be Your Guide",
-          "description": "Instead of writing tests by hand, ask **Agent Mode** to do it for you.\n\n1. Open **Agent Mode** in Postman.\n2. Give it a prompt like:\n\n   > *In my \"Get Country\" request, add a post-response test that checks the status is 200 and that the first result's `name` matches my `country` collection variable.*\n\n3. Review what Agent Mode proposes. You should end up with a post-response script similar to:\n\n```javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Found my country\", function () {\n    const data = pm.response.json();\n    pm.expect(data[0].name).to.eql(pm.collectionVariables.get(\"country\"));\n});\n```\n\n4. Accept the change and **save** the request.\n\n> No Agent Mode available? Open **Scripts → Post-response** and paste the script above yourself.",
+          "description": "Instead of writing tests by hand, ask **Agent Mode** to do it for you.\n\n1. Open **Agent Mode** from the command palette: click the **omni search bar** at the top, type `>` to switch to commands, then type **Open Agent Mode** and select it.\n2. Give it a prompt like:\n\n   > *In my \"Get Country\" request, add a post-response test that checks the status is 200 and that the first result's `name` matches my `country` collection variable.*\n\n3. Review what Agent Mode proposes. You should end up with a post-response script similar to:\n\n```javascript\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Found my country\", function () {\n    const data = pm.response.json();\n    pm.expect(data[0].name).to.eql(pm.collectionVariables.get(\"country\"));\n});\n```\n\n4. Accept the change and **save** the request.\n\n> No Agent Mode available? Open **Get Country**, go to the **Scripts** tab → **Post-response**, and paste the script above yourself.",
           "points": 10,
           "validatorId": "validate-world-explorer-agent-mode-test"
         },
@@ -72,7 +72,7 @@
           "id": "world-explorer-step-7-stamp-passport",
           "stepNumber": 3,
           "title": "Stamp Your Passport",
-          "description": "Now capture some data from the response so you can reuse it later. Add this to the **bottom** of your post-response script (**Scripts → Post-response**):\n\n```javascript\nconst country = pm.response.json()[0];\n\npm.collectionVariables.set(\"capital\", country.capital);\npm.collectionVariables.set(\"currency\", country.currency);\n\nconsole.log(`Welcome to ${country.capital}! Don't forget some ${country.currency}.`);\n```\n\nSave the request.",
+          "description": "Now capture some data from the response so you can reuse it later. Open **Get Country → Scripts → Post-response** and add this to the **bottom** of your existing script:\n\n```javascript\nconst country = pm.response.json()[0];\n\npm.collectionVariables.set(\"capital\", country.capital);\npm.collectionVariables.set(\"currency\", country.currency);\n\nconsole.log(`Welcome to ${country.capital}! Don't forget some ${country.currency}.`);\n```\n\nSave the request.",
           "points": 10,
           "validatorId": "validate-world-explorer-stamp-passport"
         },
@@ -88,7 +88,7 @@
           "id": "world-explorer-step-9-verify-journey",
           "stepNumber": 5,
           "title": "Verify the Journey",
-          "description": "Confirm everything works end to end.\n\n1. Click **Send**.\n2. Check **Test Results** — both tests should pass.\n3. Open the response's **Body → Visualization** tab to see your passport-stamp card, flag and all.\n4. Open the **Postman Console** (bottom-left, or View → Show Postman Console) and find your `Welcome to ...` message.\n5. Pop back to the collection's **Variables** tab and confirm `capital` and `currency` now hold values from the response.",
+          "description": "Confirm everything works end to end.\n\n1. Click **Send**.\n2. Check **Test Results** — both tests should pass.\n3. Open the response's **Visualize** tab to see your passport-stamp card, flag and all.\n4. Open the **Postman Console** (bottom-left, or View → Show Postman Console) and find your `Welcome to ...` message.\n5. Pop back to the collection's **Variables** tab and confirm `capital` and `currency` now hold values from the response.",
           "points": 10,
           "validatorId": "validate-world-explorer-verify-journey"
         }
@@ -104,7 +104,7 @@
           "id": "world-explorer-step-10-surprise-destination",
           "stepNumber": 1,
           "title": "Surprise Destination",
-          "description": "Feeling adventurous? Add a **pre-request** script that picks a random country every time you hit Send.\n\nOpen **Get Country → Scripts → Pre-request** and add:\n\n```javascript\nconst destinations = [\"Bangladesh\", \"Japan\", \"Brazil\", \"Kenya\", \"Norway\", \"Peru\"];\nconst pick = destinations[Math.floor(Math.random() * destinations.length)];\n\npm.collectionVariables.set(\"country\", pick);\nconsole.log(`Today's destination: ${pick}`);\n```\n\nSave, then **Send** a few times and watch the response — and your visualization — change. Since your `name` parameter already uses `{{country}}`, no other edits are needed.",
+          "description": "Feeling adventurous? Add a **pre-request** script that picks a random country every time you hit Send.\n\n1. Open **Get Country** and select the **Scripts** tab.\n2. Click **Pre-request** and add:\n\n```javascript\nconst destinations = [\"Bangladesh\", \"Japan\", \"Brazil\", \"Kenya\", \"Norway\", \"Peru\"];\nconst pick = destinations[Math.floor(Math.random() * destinations.length)];\n\npm.collectionVariables.set(\"country\", pick);\nconsole.log(`Today's destination: ${pick}`);\n```\n\n3. Save, then **Send** a few times and watch the response — and your visualization — change. Since your `name` parameter already uses `{{country}}`, no other edits are needed.",
           "points": 10,
           "validatorId": "validate-world-explorer-surprise-destination"
         }
