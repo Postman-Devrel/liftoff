@@ -15,7 +15,7 @@ User clicks shared link           LiftOff records attribution
                                   first_seen_at: <timestamp>
 ```
 
-**First-visit only.** Attribution is recorded once per user per content item. If the same user later visits the same page without UTM params — or with different ones — the original attribution is preserved. This means the data reflects where someone *started* a module, not their most recent visit.
+**First-visit only.** Attribution is recorded once per user per content item. If the same user later visits the same page without UTM params — or with different ones — the original attribution is preserved. This means the data reflects where someone *started* a module, not their most recent visit. If a user clicks your Discord onboarding link on Monday, then returns and earns the badge on Thursday via the plain URL, the badge completion is still attributed to the Discord campaign.
 
 **Registered users only.** Attribution requires a Discord sign-in. Anonymous visitors are not tracked.
 
