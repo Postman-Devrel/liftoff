@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | (read -r f; if [ -z \"$f\" ]; then exit 0; fi; case \"$f\" in *src/content/modules/*|*src/content/learning-paths/*|*/docs/*|docs/*) exit 0 ;; esac; printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"This change may need a docs update - check docs/ for anything it affects (skip if this was just adding module/learning-path content).\"}}')"
+          }
+        ]
+      }
+    ]
+  }
+}
