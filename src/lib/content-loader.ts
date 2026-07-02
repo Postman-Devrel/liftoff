@@ -3,6 +3,7 @@ import apiBasicsModule from "@/content/modules/api-basics/module.json";
 import bankingModule from "@/content/modules/banking-ai-mcp-bootcamp/module.json";
 import worldExplorerModule from "@/content/modules/world-explorer/module.json";
 import introToPostmanPath from "@/content/learning-paths/intro-to-postman/learning-path.json";
+import postman101Path from "@/content/learning-paths/postman-101/learning-path.json";
 import aiPath from "@/content/learning-paths/ai/learning-path.json";
 import { Module, Lesson } from "@/types/module";
 import { LearningPath } from "@/types/learning-path";
@@ -14,6 +15,7 @@ const allModules: Module[] = [
   worldExplorerModule as Module,
 ];
 const allLearningPaths: LearningPath[] = [
+  postman101Path as LearningPath,
   introToPostmanPath as LearningPath,
   aiPath as LearningPath,
 ];

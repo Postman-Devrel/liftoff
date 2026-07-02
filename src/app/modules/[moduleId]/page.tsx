@@ -9,6 +9,7 @@ import AuthGuard from "@/components/auth/AuthGuard";
 import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
 import ModuleBadge from "@/components/scoring/ModuleBadge";
+import ModuleGettingStarted from "@/components/module/ModuleGettingStarted";
 import ShareDebug from "@/components/ShareDebug";
 import ShareButtons from "@/components/ShareButtons";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
@@ -73,6 +74,10 @@ export default function ModuleOverviewPage() {
           <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
             {mod.description}
           </p>
+
+          {mod.gettingStarted && (
+            <ModuleGettingStarted content={mod.gettingStarted} color={mod.color} />
+          )}
 
           <div className="mb-8">
             <div className="flex justify-between text-sm mb-2">

@@ -2,11 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { getLesson, getModule } from "@/lib/content-loader";
 import AuthGuard from "@/components/auth/AuthGuard";
 import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import StepCard from "@/components/lesson/StepCard";
 import ProgressBar from "@/components/lesson/ProgressBar";
+import { CopyableBlockquote, CopyableCode, CopyableCodeBlock } from "@/components/lesson/CopyableBlock";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
 import { useProgress } from "@/context/ProgressContext";
 import Link from "next/link";
@@ -91,7 +94,22 @@ export default function LessonPage() {
 
           <ProgressBar steps={lesson.steps} />
 
-          <div className="mt-8 flex flex-col gap-5">
+          {lesson.description && (
+            <div className="mt-8 text-sm text-[var(--text-secondary)] leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-2 prose-strong:text-white prose-a:text-[var(--orange)] prose-a:no-underline hover:prose-a:underline">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  pre: CopyableCodeBlock,
+                  code: CopyableCode,
+                  blockquote: CopyableBlockquote,
+                }}
+              >
+                {lesson.description}
+              </ReactMarkdown>
+            </div>
+          )}
+
+          <div className={`flex flex-col gap-5 ${lesson.description ? "mt-6" : "mt-8"}`}>
             {lesson.steps.map((step) => (
               <StepCard key={step.id} step={step} moduleTitle={mod.title} moduleColor={mod.color} />
             ))}
