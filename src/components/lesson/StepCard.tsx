@@ -8,6 +8,7 @@ import ValidateButton from "./ValidateButton";
 import DiscordHelpButton from "./DiscordHelpButton";
 import { Step } from "@/types/module";
 import {
+  CopyableCode,
   CopyableCodeBlock,
   CopyableBlockquote,
 } from "./CopyableBlock";
@@ -66,6 +67,7 @@ export default function StepCard({ step, moduleTitle, moduleColor = "#FF6C37" }:
               remarkPlugins={[remarkGfm]}
               components={{
                 pre: CopyableCodeBlock,
+                code: CopyableCode,
                 blockquote: CopyableBlockquote,
               }}
             >{step.description}</ReactMarkdown>
