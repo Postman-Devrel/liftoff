@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAllModules } from "@/lib/content-loader";
+import { getAllModules, getAllLearningPaths } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
+import { attributeUserRank, attributeUserCompletions } from "@/lib/achievement-attribution";
 
 function verifyAdmin(request: Request): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -25,14 +26,16 @@ export async function GET(
   const { id } = await params;
   const supabase = createAdminClient();
   const modules = getAllModules();
+  const learningPaths = getAllLearningPaths();
 
-  const [profileRes, progressRes] = await Promise.all([
+  const [profileRes, progressRes, utmRes] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", id).single(),
     supabase
       .from("progress")
       .select("*")
       .eq("user_id", id)
       .order("completed_at", { ascending: false }),
+    supabase.from("utm_attribution").select("*").eq("user_id", id),
   ]);
 
   if (profileRes.error || !profileRes.data) {
@@ -41,9 +44,18 @@ export async function GET(
 
   const profile = profileRes.data;
   const userProgress = progressRes.data || [];
+  const userUtmRows = utmRes.data || [];
   const completedStepIds = new Set(userProgress.map((p) => p.step_id));
   const completedStepMap = new Map(
     userProgress.map((p) => [p.step_id, p])
+  );
+
+  const rankAttribution = attributeUserRank(userProgress, userUtmRows, modules);
+  const completionAttribution = attributeUserCompletions(
+    completedStepIds,
+    userUtmRows,
+    modules,
+    learningPaths
   );
 
   const totalPoints = userProgress.reduce(
@@ -120,5 +132,9 @@ export async function GET(
     },
     modules: moduleProgress,
     recentActivity,
+    attribution: {
+      rank: rankAttribution,
+      completions: completionAttribution,
+    },
   });
 }

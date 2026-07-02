@@ -93,6 +93,26 @@ interface UtmStats {
   recentAttributions: UtmAttribution[];
 }
 
+interface CompletionAttribution {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  usersCompleted: number;
+}
+
+interface RankAttribution {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  rankTitle: string;
+  rankBadge: string;
+  usersReached: number;
+  attributionType: "crossing_module" | "acquisition_fallback";
+}
+
 interface DashboardData {
   stats: DashboardStats;
   activity: ActivityPoint[];
@@ -100,6 +120,8 @@ interface DashboardData {
   rankDistribution: RankDist[];
   leaderboard: LeaderboardUser[];
   utmStats: UtmStats;
+  completionAttribution: CompletionAttribution[];
+  rankAttribution: RankAttribution[];
 }
 
 interface UserDetailStep {
@@ -119,6 +141,26 @@ interface UserDetailModule {
   totalSteps: number;
   completedSteps: number;
   steps: UserDetailStep[];
+}
+
+interface UserRankAttribution {
+  rankTitle: string;
+  rankBadge: string;
+  crossingModuleId: string | null;
+  crossingModuleTitle: string | null;
+  utmSource: string;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  attributionType: "crossing_module" | "acquisition_fallback";
+}
+
+interface UserCompletionAttribution {
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  utmSource: string;
+  utmMedium: string | null;
+  utmCampaign: string | null;
 }
 
 interface UserDetailData {
@@ -144,6 +186,10 @@ interface UserDetailData {
     completedAt: string;
     points: number;
   }[];
+  attribution: {
+    rank: UserRankAttribution | null;
+    completions: UserCompletionAttribution[];
+  };
 }
 
 // ─── Login Gate ──────────────────────────────────────────
@@ -838,6 +884,34 @@ function UserDetailPanel({
               </div>
             </div>
 
+            {/* Attribution */}
+            {(data.attribution.rank || data.attribution.completions.length > 0) && (
+              <div className="glass-card p-4 space-y-2">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+                  Attribution
+                </h4>
+                {data.attribution.rank && (
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Reached <span className="text-white">{data.attribution.rank.rankTitle}</span> via{" "}
+                    <span className="text-[var(--orange)]">{data.attribution.rank.utmSource}</span>
+                    {data.attribution.rank.utmCampaign && ` / ${data.attribution.rank.utmCampaign}`}
+                    {data.attribution.rank.attributionType === "crossing_module" ? (
+                      <> ({data.attribution.rank.crossingModuleTitle})</>
+                    ) : (
+                      <span className="text-[var(--text-tertiary)]"> — acquisition channel, not a direct link</span>
+                    )}
+                  </p>
+                )}
+                {data.attribution.completions.map((c) => (
+                  <p key={c.contentId} className="text-xs text-[var(--text-secondary)]">
+                    Completed <span className="text-white">{c.contentTitle}</span> via{" "}
+                    <span className="text-[var(--orange)]">{c.utmSource}</span>
+                    {c.utmCampaign && ` / ${c.utmCampaign}`}
+                  </p>
+                ))}
+              </div>
+            )}
+
             {/* Module Progress */}
             <div>
               <h4 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-3">
@@ -1151,6 +1225,174 @@ function UtmPanel({ data }: { data: UtmStats }) {
   );
 }
 
+// ─── Achievement Attribution ─────────────────────────────
+
+function AchievementAttributionPanel({
+  completions,
+  ranks,
+}: {
+  completions: CompletionAttribution[];
+  ranks: RankAttribution[];
+}) {
+  const [view, setView] = useState<"completions" | "ranks">("completions");
+
+  if (completions.length === 0 && ranks.length === 0) {
+    return (
+      <div className="glass-card p-6">
+        <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+          Achievement Attribution
+        </h3>
+        <p className="text-center text-[var(--text-tertiary)] text-sm py-8 max-w-xl mx-auto">
+          No campaign is linked to a completed module, path, or rank yet. This
+          needs a user to both arrive via a tracked UTM link <em>and</em>{" "}
+          finish the content or cross a rank threshold — not just visit.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="glass-card p-6">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+            Achievement Attribution
+          </h3>
+          <p className="text-xs text-[var(--text-tertiary)] mt-1">
+            Which campaigns drove completions and ranks, not just visits
+          </p>
+        </div>
+        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+          <button
+            onClick={() => setView("completions")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "completions"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Completions
+          </button>
+          <button
+            onClick={() => setView("ranks")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "ranks"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Ranks
+          </button>
+        </div>
+      </div>
+
+      {view === "completions" && (
+        <div className="overflow-x-auto">
+          {completions.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No campaign has a directly attributed module or path completion yet.
+            </p>
+          ) : (
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] font-mono uppercase tracking-wider text-[10px]">
+                  <th className="text-left py-2 px-2">Source</th>
+                  <th className="text-left py-2 px-2">Medium</th>
+                  <th className="text-left py-2 px-2">Campaign</th>
+                  <th className="text-left py-2 px-2">Content</th>
+                  <th className="text-right py-2 px-2">Completed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {completions.map((c, i) => (
+                  <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 px-2">
+                      <span className="text-[var(--orange)] font-medium">{c.source}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {c.medium || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {c.campaign || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2">
+                      <div>
+                        <span className="text-white">{c.contentTitle}</span>
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[var(--text-tertiary)] font-mono">
+                          {c.contentType === "learning_path" ? "path" : "module"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-2 text-right">
+                      <span className="font-mono font-bold text-[var(--cyan)]">{c.usersCompleted}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {view === "ranks" && (
+        <div className="overflow-x-auto">
+          {ranks.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No campaign has a directly attributed rank yet.
+            </p>
+          ) : (
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] font-mono uppercase tracking-wider text-[10px]">
+                  <th className="text-left py-2 px-2">Source</th>
+                  <th className="text-left py-2 px-2">Medium</th>
+                  <th className="text-left py-2 px-2">Campaign</th>
+                  <th className="text-left py-2 px-2">Rank</th>
+                  <th className="text-right py-2 px-2">Users</th>
+                  <th className="text-right py-2 px-2 hidden sm:table-cell">Attribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranks.map((r, i) => (
+                  <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 px-2">
+                      <span className="text-[var(--orange)] font-medium">{r.source}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {r.medium || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {r.campaign || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2">
+                      <span className="mr-1">{r.rankBadge}</span>
+                      <span className="text-white">{r.rankTitle}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-right">
+                      <span className="font-mono font-bold text-[var(--cyan)]">{r.usersReached}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-right hidden sm:table-cell">
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                          r.attributionType === "crossing_module"
+                            ? "bg-[var(--green)]/10 text-[var(--green)]"
+                            : "bg-white/5 text-[var(--text-tertiary)]"
+                        }`}
+                      >
+                        {r.attributionType === "crossing_module" ? "via module" : "acquisition"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Dashboard ───────────────────────────────────────────
 
 function Dashboard({ password }: { password: string }) {
@@ -1359,6 +1601,14 @@ function Dashboard({ password }: { password: string }) {
         {/* UTM Attribution */}
         <div className="mb-8">
           <UtmPanel data={data.utmStats} />
+        </div>
+
+        {/* Achievement Attribution */}
+        <div className="mb-8">
+          <AchievementAttributionPanel
+            completions={data.completionAttribution}
+            ranks={data.rankAttribution}
+          />
         </div>
 
         {/* Leaderboard */}

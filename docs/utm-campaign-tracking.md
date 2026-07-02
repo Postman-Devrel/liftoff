@@ -1,6 +1,6 @@
 # UTM Campaign Tracking
 
-LiftOff captures UTM parameters when a registered user first visits a module or learning path via a tracked link. This lets you measure how many people started content because of a specific campaign — a Discord onboarding post, a newsletter, a social share — versus discovering it organically.
+LiftOff captures UTM parameters when a registered user first visits a module or learning path via a tracked link. This lets you measure how many people started content because of a specific campaign — a Discord onboarding post, a newsletter, a social share — versus discovering it organically, and how many went on to actually complete content or earn a rank because of it (see [Reading Badge & Rank Attribution](#reading-badge--rank-attribution)).
 
 ## How It Works
 
@@ -94,6 +94,40 @@ Sort order is by user count descending, so your highest-performing campaigns app
 ### Recent tab
 
 A chronological feed of the 50 most recent attributions, showing source / medium / campaign, the content item, and the date. Useful for spot-checking that tracking is working after you post a new link.
+
+## Reading Badge & Rank Attribution
+
+Below the UTM Attribution section, a second panel — **Achievement Attribution** — answers a different question: not just "who visited from this campaign," but "did this campaign actually drive someone to *finish* something or *level up*."
+
+### Completions tab
+
+A table grouped by `source / medium / campaign / content`, but filtered to users who fully completed that module or learning path — not just started it:
+
+| Column | What it tells you |
+|---|---|
+| Source / Medium / Campaign | Same as UTM Attribution |
+| Content | The module or path they completed |
+| Completed | Number of users who completed it, attributed to that campaign |
+
+A completion only shows up here if the user's first-ever visit to that specific module/path came from a tracked link. Per the immutability rule above, it doesn't matter whether they finished it that same day or weeks later.
+
+### Ranks tab
+
+Ranks (Space Cadet through Mass Relay) are earned from cumulative points across potentially many modules, so there's no single content item to attribute a rank to. Each row shows which campaign is credited, and how confidently:
+
+| Column | What it tells you |
+|---|---|
+| Source / Medium / Campaign | Same as UTM Attribution |
+| Rank | The rank tier reached |
+| Users | Number of users who reached it, attributed to that campaign |
+| Attribution | `via module` or `acquisition` — see below |
+
+- **`via module`** — the step that pushed the user's point total over the rank threshold belongs to a module the user reached via this campaign's tracked link. This is the more direct, causal read.
+- **`acquisition`** — no tracked link exists for the specific module that triggered the rank-up, so the campaign shown is whichever tracked link first brought this user to *any* content. Treat this as "how we first met this user," not "what caused this rank" — it's a fallback signal, not a direct one.
+
+**This is a heuristic, not ground truth.** A user who did most of their learning in a module from campaign A but happened to cross a rank threshold on a stray step from module B will show `via module` credit to B. Use it directionally, not as an exact causal claim.
+
+**No backfill.** Only activity from users who visited with UTM params *after* this tracking existed will show up here. Completions and ranks earned before that (or by users who never clicked a tracked link) simply won't appear — that's expected, not a bug.
 
 ## Tips
 

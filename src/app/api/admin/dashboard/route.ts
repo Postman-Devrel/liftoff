@@ -2,6 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAllModules, getAllLearningPaths } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
+import { attributeCompletions, attributeRanks } from "@/lib/achievement-attribution";
 
 function verifyAdmin(request: Request): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -206,6 +207,9 @@ export async function GET(request: Request) {
     })),
   };
 
+  const completionAttribution = attributeCompletions(progress, utmRows, modules, learningPaths);
+  const rankAttribution = attributeRanks(progress, utmRows, modules);
+
   const leaderboard = profiles
     .map((p) => {
       const up = pointsMap.get(p.id);
@@ -238,5 +242,7 @@ export async function GET(request: Request) {
     rankDistribution,
     leaderboard,
     utmStats,
+    completionAttribution,
+    rankAttribution,
   });
 }
