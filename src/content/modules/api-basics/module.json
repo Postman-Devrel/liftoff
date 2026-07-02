@@ -10,6 +10,7 @@
       "slug": "your-first-request",
       "title": "Your First Request",
       "partNumber": 1,
+      "description": "Set up your workspace and make your first API call.",
       "steps": [
         {
           "id": "api-basics-step-1-create-workspace",

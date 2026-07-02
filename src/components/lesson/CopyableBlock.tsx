@@ -21,14 +21,41 @@ export function CopyButton({ text }: { text: string }) {
   );
 }
 
+function extractText(node: ReactNode): string {
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node && typeof node === "object" && "props" in node) {
+    const el = node as React.ReactElement<{ children?: ReactNode }>;
+    return extractText(el.props.children);
+  }
+  return "";
+}
+
+export function normalizeCopyText(text: string): string {
+  return text.trim().replace(/\r?\n+$/, "");
+}
+
+export function CopyableCode({
+  children,
+  className,
+  ...props
+}: { children?: ReactNode; className?: string } & React.HTMLAttributes<HTMLElement>) {
+  const raw = extractText(children);
+  const isBlock = Boolean(className) || /\r?\n/.test(raw);
+  const text = isBlock ? normalizeCopyText(raw) : raw;
+
+  return (
+    <code className={className} {...props}>
+      {text}
+    </code>
+  );
+}
+
 export function CopyableCodeBlock({
   children,
   ...props
 }: { children?: ReactNode } & React.HTMLAttributes<HTMLPreElement>) {
-  const text =
-    typeof children === "string"
-      ? children
-      : extractText(children);
+  const text = normalizeCopyText(extractText(children));
 
   return (
     <div className="relative group">
@@ -43,7 +70,9 @@ export function CopyableBlockquote({
   ...props
 }: { children?: ReactNode } & React.HTMLAttributes<HTMLQuoteElement>) {
   const raw = extractText(children);
-  const text = raw.replace(/^\s*(?:Agent Mode Prompt|Claude Prompt|Prompt):\s*/i, "");
+  const text = normalizeCopyText(
+    raw.replace(/^\s*(?:Agent Mode Prompt|Claude Prompt|Prompt):\s*/i, "")
+  );
 
   return (
     <div className="relative group">
@@ -64,14 +93,4 @@ export function CopyableBlockquote({
       <blockquote {...props}>{children}</blockquote>
     </div>
   );
-}
-
-function extractText(node: ReactNode): string {
-  if (typeof node === "string") return node;
-  if (Array.isArray(node)) return node.map(extractText).join("");
-  if (node && typeof node === "object" && "props" in node) {
-    const el = node as React.ReactElement<{ children?: ReactNode }>;
-    return extractText(el.props.children);
-  }
-  return "";
 }

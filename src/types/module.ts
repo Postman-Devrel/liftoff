@@ -2,6 +2,7 @@ export interface Module {
   id: string;
   title: string;
   description: string;
+  gettingStarted?: string;
   color: string;
   icon: string;
   lessons: Lesson[];
@@ -13,6 +14,7 @@ export interface Lesson {
   slug: string;
   title: string;
   partNumber: number;
+  description?: string;
   steps: Step[];
 }
 
