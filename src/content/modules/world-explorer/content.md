@@ -23,13 +23,13 @@ Each country comes back with its capital, currency, population, dialing code, an
 
 ## Part 1: Plot Your Route
 
-> **New to Postman?** You'll create three building blocks in this part: a **workspace** (your project folder), a **collection** (a group of related requests), and a **request** (a single API call). Each step below walks you through where to click.
+**New to Postman?** You'll create three building blocks in this part: a **workspace** (your project folder), a **collection** (a group of related requests), and a **request** (a single API call). Each step below walks you through where to click.
 
 Learn more: [Workspaces](https://learning.postman.com/docs/collaborating-in-postman/using-workspaces/overview/), [Send an API request](https://learning.postman.com/docs/getting-started/quick-start/#send-an-api-request)
 
 ### Step 1: Create a Workspace
 
-> A **workspace** is your home base in Postman — collections, requests, and variables all belong to one.
+A **workspace** is your home base in Postman — collections, requests, and variables all belong to one.
 
 1. Open the **Postman desktop app**. If you don't have it yet, [download Postman](https://www.postman.com/downloads/) and sign in — if you're already signed in, you're good to go.
 2. Click **Workspaces** in the top navigation → **Create**.
@@ -43,7 +43,7 @@ Learn more: [Workspaces](https://learning.postman.com/docs/collaborating-in-post
 
 ### Step 2: Create a Collection
 
-> A **collection** groups related requests together — like a folder for your country lookups.
+A **collection** groups related requests together — like a folder for your country lookups.
 
 1. Confirm you're in your new workspace (check the name in the top-left).
 2. In the left sidebar, click **Collections** → **+** (or **Create Collection**).
@@ -53,7 +53,7 @@ Learn more: [Workspaces](https://learning.postman.com/docs/collaborating-in-post
 
 ### Step 3: Add Your First Lookup
 
-> A **request** is a single call to an API. **GET** means you're asking the server for data; the URL tells it *what* to return. This is your first API call — don't worry about the JSON yet, just look for a green **200 OK**.
+A **request** is a single call to an API. **GET** means you're asking the server for data; the URL tells it *what* to return. This is your first API call — don't worry about the JSON yet, just look for a green **200 OK**.
 
 1. In the left sidebar under **Country Dossier**, click **Add request**.
 2. Name the request **Get Country**.
@@ -70,7 +70,7 @@ https://liftoff-101.mock.postman.postman.dev/countries
 
 ### Step 4: Pick a Destination
 
-> **Query params** filter what the API returns — like adding `?name=Bangladesh` to narrow the list down to one country.
+**Query params** filter what the API returns — like adding `?name=Bangladesh` to narrow the list down to one country.
 
 1. Open **Get Country** from your collection.
 2. Click the **Params** tab (directly below the URL bar).
@@ -95,7 +95,7 @@ Learn more: [Variables](https://learning.postman.com/docs/sending-requests/varia
 
 ### Step 5: Store Your Destination in a Variable
 
-> Right now your country is hard-coded in the request. A **variable** lets you change the destination without editing the request each time. This lesson uses **collection variables** (scoped to the collection) rather than an environment — a different approach than in *API Basics*.
+Right now your country is hard-coded in the request. A **variable** lets you change the destination without editing the request each time. This lesson uses **collection variables** (scoped to the collection) rather than an environment — a different approach than in *API Basics*.
 
 1. In the left sidebar, click **Country Dossier** (the collection name itself, not a request inside it) — it opens in a tab.
 2. In that tab, select **Variables**.
@@ -110,7 +110,7 @@ Learn more: [Variables](https://learning.postman.com/docs/sending-requests/varia
 
 ### Step 6: Let Agent Mode Be Your Guide
 
-> **Tests** automatically check the response when you hit Send. **Agent Mode** can write them for you — you review and accept.
+**Tests** automatically check the response when you hit Send. **Agent Mode** can write them for you — you review and accept.
 
 1. Open **Agent Mode** from the command palette: click the **universal search bar** at the top, type `>` to switch to commands, then type **Open Agent Mode** and select it.
 2. Give it a prompt like:
@@ -132,13 +132,13 @@ pm.test("Found my country", function () {
 
 4. Accept the change and **save** the request.
 
-> No Agent Mode available? Open **Get Country**, go to the **Scripts** tab → **Post-response**, and paste the script above yourself.
+No Agent Mode available? Open **Get Country**, go to the **Scripts** tab → **Post-response**, and paste the script above yourself.
 
 **Validation:** The "Get Country" request has a post-response script containing `pm.test`.
 
 ### Step 7: Stamp Your Passport
 
-> **Post-response scripts** run automatically after you hit Send. This one reads the response and saves the capital and currency for later. You don't need to understand every line — paste it at the bottom of your existing script.
+**Post-response scripts** run automatically after you hit Send. This one reads the response and saves the capital and currency for later. You don't need to understand every line — paste it at the bottom of your existing script.
 
 Open **Get Country → Scripts → Post-response** and add this to the **bottom** of your existing script:
 
@@ -157,7 +157,7 @@ Save the request.
 
 ### Step 8: Turn Your Stamp Into a Visualization
 
-> Postman can render a custom view of your response in the **Visualization** tab. **Agent Mode** will build a simple card — you don't need to write or understand the script yourself. See [Postman Visualizer](https://learning.postman.com/docs/use/send-requests/response-data/visualizer) if you want to dig deeper.
+Postman can render a custom view of your response in the **Visualization** tab. **Agent Mode** will build a simple card — you don't need to write or understand the script yourself. See [Postman Visualizer](https://learning.postman.com/docs/use/send-requests/response-data/visualizer) if you want to dig deeper.
 
 1. Open **Agent Mode** again (same as Step 6).
 2. Give it a prompt like:
@@ -190,13 +190,13 @@ pm.visualizer.set(template, {
 
 4. Accept the change and **save** the request.
 
-> No Agent Mode available? Paste the script above at the bottom of your **Post-response** script yourself.
+No Agent Mode available? Paste the script above at the bottom of your **Post-response** script yourself.
 
 **Validation:** The "Get Country" request has a post-response script that calls `pm.visualizer.set`.
 
 ### Step 9: Verify the Journey
 
-> Quick end-to-end check — one **Send** should pass tests, show your card, and fill in your variables.
+Quick end-to-end check — one **Send** should pass tests, show your card, and fill in your variables.
 
 1. Click **Send**.
 2. Check **Test Results** — both tests should pass.
