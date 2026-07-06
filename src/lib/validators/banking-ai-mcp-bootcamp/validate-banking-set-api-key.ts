@@ -47,7 +47,7 @@ export const validateBankingSetApiKey: ValidatorFn = async (apiKey, context) => 
     };
   }
 
-  if (apiKeyVar.type !== "secret" && apiKeyVar.secret !== true) {
+  if (apiKeyVar.secret !== true) {
     return {
       success: false,
       message: 'Variable "apiKey" is set but not marked as sensitive. Go to Environments, click on the apiKey value, and set its type to "secret".',
