@@ -1,70 +1,109 @@
 import { ValidatorFn } from "@/types/validation";
-import { resolveWorkspace } from "@/lib/validators/resolve-workspace";
+import { getWorkspace, getCollection } from "@/lib/postman-api";
 
-type WorkspaceApi = {
+type WorkspaceCollection = {
   id: string;
   name: string;
+  uid: string;
 };
+
+type CollectionResponse = {
+  name?: string;
+  body?: string;
+};
+
+type CollectionItem = {
+  name?: string;
+  item?: CollectionItem[];
+  request?: unknown;
+  response?: CollectionResponse[];
+};
+
+function findRequestByName(
+  items: CollectionItem[] | undefined,
+  target: string
+): CollectionItem | undefined {
+  if (!items) return undefined;
+  const lower = target.toLowerCase();
+  for (const item of items) {
+    if (
+      item.request &&
+      typeof item.name === "string" &&
+      item.name.trim().toLowerCase() === lower
+    ) {
+      return item;
+    }
+    if (item.item) {
+      const found = findRequestByName(item.item, target);
+      if (found) return found;
+    }
+  }
+  return undefined;
+}
 
 export const validateAiEngineerDownstreamRenameSchemaField: ValidatorFn = async (
   apiKey,
   context
 ) => {
-  const ws = await resolveWorkspace(
-    apiKey,
-    context,
-    context.aiEngineerWorkspaceId,
-    /^Downstream\s+Demo\s*-\s*.+$/i,
-    "Downstream Demo - [your name]"
-  );
-  if ("error" in ws) return ws.error;
-
-  const workspace = ws.detail as Record<string, unknown>;
-  const apis = (workspace.apis as WorkspaceApi[]) || [];
-
-  const usersApi = apis.find((a) => a.name.trim().toLowerCase() === "users api");
-  if (!usersApi) {
-    const apiNames = apis.map((a) => a.name).join(", ");
+  const workspaceId = context.workspaceId || context.aiEngineerWorkspaceId;
+  if (!workspaceId) {
     return {
       success: false,
-      message: apiNames
-        ? `Found APIs in your workspace (${apiNames}) but none named "Users API". Create an API named "Users API" with the spec from the step.`
-        : 'No APIs found in your workspace. Click **APIs** → **+**, name it "Users API", and paste the OpenAPI spec from the step.',
+      message:
+        "Please complete Part 1, Step 1 first (create the workspace).",
       pointsAwarded: 0,
     };
   }
 
-  const res = await fetch(`https://api.getpostman.com/apis/${usersApi.id}`, {
-    headers: {
-      "x-api-key": apiKey,
-      "User-Agent": "LiftOff/1.0 (quickstarts.postman.com)",
-    },
+  const workspace = await getWorkspace(apiKey, workspaceId);
+  const collections =
+    (workspace.collections as WorkspaceCollection[]) || [];
+  const erpCollection = collections.find(
+    (c) => c.name.trim().toLowerCase() === "enterprise resource planning"
+  );
+
+  if (!erpCollection) {
+    return {
+      success: false,
+      message:
+        'No "Enterprise Resource Planning" collection found in your workspace. Complete Part 1, Step 1 first.',
+      pointsAwarded: 0,
+    };
+  }
+
+  const collectionDetail = await getCollection(apiKey, erpCollection.uid);
+  const items = (collectionDetail?.item as CollectionItem[]) || [];
+  const createEmployee = findRequestByName(items, "Create Employee");
+
+  if (!createEmployee) {
+    return {
+      success: false,
+      message:
+        'The "Enterprise Resource Planning" collection is missing a "Create Employee" request.',
+      pointsAwarded: 0,
+    };
+  }
+
+  const responses = createEmployee.response || [];
+  if (responses.length === 0) {
+    return {
+      success: false,
+      message:
+        'The "Create Employee" request has no saved responses yet. In Postman, send the request and save the response as an example, then re-validate.',
+      pointsAwarded: 0,
+    };
+  }
+
+  const hasEmployeeIdResponse = responses.some((r) => {
+    const body = typeof r.body === "string" ? r.body : JSON.stringify(r.body ?? "");
+    return body.includes('"employee-id"');
   });
 
-  if (!res.ok) {
-    return {
-      success: false,
-      message: `Found "Users API" but the Postman API returned ${res.status} when fetching its spec. Try saving the spec again.`,
-      pointsAwarded: 0,
-    };
-  }
-
-  const body = await res.text();
-
-  if (/\buser_id\b/.test(body)) {
+  if (!hasEmployeeIdResponse) {
     return {
       success: false,
       message:
-        'The "Users API" spec still contains `user_id`. Rename it to `userId` in every response schema, then save the spec.',
-      pointsAwarded: 0,
-    };
-  }
-
-  if (!/\buserId\b/.test(body)) {
-    return {
-      success: false,
-      message:
-        'The "Users API" spec does not contain `userId`. Paste the OpenAPI spec from the step (with `userId` in the response schema) and save.',
+        'None of the saved responses on "Create Employee" contain the `employee-id` field. Ask Agent Mode to rename `id` to `employee-id` on the Create Employee response schema, then save an updated example.',
       pointsAwarded: 0,
     };
   }
@@ -72,8 +111,12 @@ export const validateAiEngineerDownstreamRenameSchemaField: ValidatorFn = async 
   return {
     success: true,
     message:
-      'Spec updated — `userId` is present in the "Users API" response schema and `user_id` is gone.',
+      'Verified — a saved "Create Employee" response contains the `employee-id` field.',
     pointsAwarded: 10,
-    context: { ...context, aiEngineerWorkspaceId: ws.id },
+    context: {
+      ...context,
+      workspaceId,
+      aiEngineerWorkspaceId: workspaceId,
+    },
   };
 };

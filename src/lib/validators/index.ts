@@ -34,11 +34,14 @@ import { validateBankingQueryMcp } from "./banking-ai-mcp-bootcamp/validate-bank
 import { validateBankingAddMcpClaude } from "./banking-ai-mcp-bootcamp/validate-banking-add-mcp-claude";
 import { validateBankingVerifyConnection } from "./banking-ai-mcp-bootcamp/validate-banking-verify-connection";
 import { validateBankingAddTestsMcp } from "./banking-ai-mcp-bootcamp/validate-banking-add-tests-mcp";
-import { validateAiEngineerDownstreamCreateWorkspace } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace";
-import { validateAiEngineerDownstreamConfigureEnvironment } from "./ai-engineer-downstream/validate-ai-engineer-downstream-configure-environment";
+import { validateAiEngineerDownstreamForkRepoCreateWorkspace } from "./ai-engineer-downstream/validate-ai-engineer-downstream-fork-repo-create-workspace";
 import { validateAiEngineerDownstreamRenameSchemaField } from "./ai-engineer-downstream/validate-ai-engineer-downstream-rename-schema-field";
-import { validateAiEngineerDownstreamAskAiEngineer } from "./ai-engineer-downstream/validate-ai-engineer-downstream-ask-ai-engineer";
+import { validateAiEngineerDownstreamMergeToMain } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-to-main";
+import { validateAiEngineerDownstreamGitPull } from "./ai-engineer-downstream/validate-ai-engineer-downstream-git-pull";
+import { validateAiEngineerDownstreamRunCreateEmployeeRequest } from "./ai-engineer-downstream/validate-ai-engineer-downstream-run-create-employee-request";
+import { validateAiEngineerDownstreamAiEngineerOpensPr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-ai-engineer-opens-pr";
 import { validateAiEngineerDownstreamMergePr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-pr";
+import { validateAiEngineerDownstreamConsumersUseEmployeeId } from "./ai-engineer-downstream/validate-ai-engineer-downstream-consumers-use-employee-id";
 
 export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-workspace": validateWorkspace,
@@ -76,9 +79,12 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-banking-add-mcp-claude": validateBankingAddMcpClaude,
   "validate-banking-verify-connection": validateBankingVerifyConnection,
   "validate-banking-add-tests-mcp": validateBankingAddTestsMcp,
-  "validate-ai-engineer-downstream-create-workspace": validateAiEngineerDownstreamCreateWorkspace,
-  "validate-ai-engineer-downstream-configure-environment": validateAiEngineerDownstreamConfigureEnvironment,
+  "validate-ai-engineer-downstream-fork-repo-create-workspace": validateAiEngineerDownstreamForkRepoCreateWorkspace,
   "validate-ai-engineer-downstream-rename-schema-field": validateAiEngineerDownstreamRenameSchemaField,
-  "validate-ai-engineer-downstream-ask-ai-engineer": validateAiEngineerDownstreamAskAiEngineer,
+  "validate-ai-engineer-downstream-merge-to-main": validateAiEngineerDownstreamMergeToMain,
+  "validate-ai-engineer-downstream-git-pull": validateAiEngineerDownstreamGitPull,
+  "validate-ai-engineer-downstream-run-create-employee-request": validateAiEngineerDownstreamRunCreateEmployeeRequest,
+  "validate-ai-engineer-downstream-ai-engineer-opens-pr": validateAiEngineerDownstreamAiEngineerOpensPr,
   "validate-ai-engineer-downstream-merge-pr": validateAiEngineerDownstreamMergePr,
+  "validate-ai-engineer-downstream-consumers-use-employee-id": validateAiEngineerDownstreamConsumersUseEmployeeId,
 };

@@ -34,9 +34,13 @@ You're about to rename `id` to `employee-id` on the **Create Employee** response
 1. Review the diff Agent Mode produced against the ERP spec.
 2. Merge the schema change to `main` in your fork.
 
+**Validation:** [MANUAL] Mark this step complete after you have merged the schema change to `main`.
+
 ### Step 3: Git Pull
 
 1. Pull the latest `main` locally so your working copy reflects the merged schema change.
+
+**Validation:** [MANUAL] Mark this step complete after your local `main` is up to date with the merged schema change.
 
 ### Step 4: Run the Create Employee Request
 

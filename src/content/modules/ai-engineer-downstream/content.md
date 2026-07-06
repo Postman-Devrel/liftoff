@@ -2,113 +2,80 @@
 
 Most coding agents can rename a field in seconds — but they routinely break things because they don't understand how that code connects to everything else. In this module, you'll use the **Postman AI Engineer** to do what senior engineers do *before* they touch the code: walk the dependency graph, find every downstream consumer, and ship a safe change.
 
-You'll rename a field in a response schema, ask the AI Engineer to surface every Postman Collection that consumes it, and merge the PR it opens — without paging the iOS team at 2 a.m.
+You'll rename a field in the **Create Employee** response schema, ask the AI Engineer to surface every downstream consumer of that field, and merge the PR it opens — without paging the iOS team at 2 a.m.
 
 ## Part 1: Set Up Your Workspace
 
-### Step 1: Create a Workspace
+### Step 1: Fork the ERP Repo and Create a Workspace
 
-1. Open Postman and click **Workspaces** in the top nav, then **Create Workspace**.
-2. Choose **Blank workspace**.
-3. Name it exactly: **Downstream Demo - [your name]** (for example, *Downstream Demo - Alex*).
-4. Set visibility to **Personal** and click **Create**.
+1. Fork the Enterprise Resource Planning repo: [https://github.com/buildwithtalia/enterprise-resource-planning](https://github.com/buildwithtalia/enterprise-resource-planning).
+2. Open Postman and create a new workspace from the forked repo. Name it exactly: **Enterprise Resource Planning - [your name]** (for example, *Enterprise Resource Planning - Alex*). The workspace will import the ERP API spec and the **Enterprise Resource Planning** collection, including the **Create Employee** request.
 
-This workspace will hold the Users API spec you're about to change and the consumer collections the AI Engineer will discover.
+**Validation:**
 
-**Validation:** A workspace whose name starts with "Downstream Demo -" exists and was created by the current user.
+- **[Workspace]** A workspace whose name starts with "Enterprise Resource Planning -" exists and was created by the current user.
+- **[Collection]** The **Enterprise Resource Planning** collection exists in that workspace and contains a **Create Employee** request.
 
-### Step 2: Configure Your Environment
+## Part 2: Update the Create Employee Response Schema
 
-The AI Engineer needs a base URL to call the Users API and a GitHub token to open and merge the PR.
+You're about to rename `id` to `employee-id` on the **Create Employee** response. In a normal repo, this is a one-line change. In Postman, the spec is the source of truth — updating it here is what the AI Engineer will diff against to find consumers.
 
-1. Inside your **Downstream Demo** workspace, click **Environments** in the left sidebar, then **+** to create a new environment.
-2. Name it: **Downstream Demo Env**.
-3. Add the following variables:
+### Step 1: Ask Agent Mode to Rename the Field
 
-  | Variable      | Initial Value                   | Type       |
-  | ------------- | ------------------------------- | ---------- |
-  | `baseUrl`     | `https://demo.postman-echo.com` | default    |
-  | `githubRepo`  | `postman-demo/users-api`        | default    |
-  | `githubToken` | *your GitHub PAT*               | **secret** |
+1. Open **Agent Mode** in Postman.
+2. Enter the prompt exactly:
+  > Update Create Employee response schema to include "employee-id" instead of "id"
+3. Let the agent apply the change to the ERP spec.
 
-4. Click **Save**, then activate the environment by selecting it from the environment dropdown in the top right.
+**Validation:** **[Collection Request]** The **Create Employee** request in the **Enterprise Resource Planning** collection has a saved response (or response example) whose body contains a top-level `employee-id` field. The legacy `id` field must be absent.
 
-> If you get a 401 from GitHub later, double-check that `githubToken` is marked as **secret** and has `repo` scope.
+### Step 2: Merge Changes to Main
 
-**Validation:** An environment named "Downstream Demo Env" exists in the workspace with `baseUrl = https://demo.postman-echo.com`, `githubRepo = postman-demo/users-api`, and a non-empty `githubToken` value.
+1. Review the diff Agent Mode produced against the ERP spec.
+2. Merge the schema change to `main` in your fork.
 
-## Part 2: Update the Response Schema
+**Validation:** [MANUAL] Mark this step complete after you have merged the schema change to `main`.
 
-You're about to rename `user_id` to `userId` on the `/users/:id` endpoint. In a normal repo, this is a one-line change. In Postman, the spec is the source of truth — updating it here is what the AI Engineer will diff against to find consumers.
+### Step 3: Git Pull
 
-### Step 1: Rename the Field in the Users API Spec
+1. Pull the latest `main` locally so your working copy reflects the merged schema change.
 
-1. In your workspace, click **APIs** in the left sidebar, then **+** to add a new API.
-2. Name it: **Users API**.
-3. Paste the following OpenAPI 3.0 spec into the editor:
-  ```yaml
-   openapi: 3.0.3
-   info:
-     title: Users API
-     version: 1.1.0
-   paths:
-     /users/{id}:
-       get:
-         summary: Get a user by ID
-         parameters:
-           - in: path
-             name: id
-             required: true
-             schema: { type: string }
-         responses:
-           '200':
-             description: A user
-             content:
-               application/json:
-                 schema:
-                   type: object
-                   properties:
-                     userId: { type: string }
-                     name:   { type: string }
-                     email:  { type: string }
-  ```
-4. Click **Save**. Notice that `userId` replaces what used to be `user_id` — this is the breaking change.
-5. Publish the spec by clicking **Deploy** → **Deploy to a server**, and verify the response from `GET {{baseUrl}}/users/u_42` returns a body containing the `userId` field (and not `user_id`).
+**Validation:** [MANUAL] Mark this step complete after your local `main` is up to date with the merged schema change.
 
-Expect a `200 OK` with a JSON body where `userId` is present at the top level.
+### Step 4: Run the Create Employee Request
 
-**Validation:** [Api Response] A `GET` request to `{{baseUrl}}/users/u_42` returns status `200` and the response body contains a top-level `userId` field. The legacy `user_id` field must be absent.
+1. Back in Postman, open the **Create Employee** request in the **Enterprise Resource Planning** collection.
+2. Send the request.
 
-## Part 3: Discover Downstream Dependencies with the AI Engineer
+**Validation:** **[Api Response]** A `POST` to the Create Employee endpoint returns status `200` (or `201`) and the response body contains a top-level `employee-id` field. The legacy `id` field must be absent.
 
-This is the moment that separates confident-locality from organizational context. Instead of grepping your repo, you'll ask the AI Engineer to walk the Context Graph and surface every Postman Collection in your workspace that consumes the field you just renamed.
+## Part 3: Update Downstream Dependencies
 
-### Step 1: Ask the AI Engineer for the Blast Radius
+This is the moment that separates confident-locality from organizational context. Instead of grepping your repos, you'll ask the AI Engineer to walk the dependency graph and update every downstream consumer of the field you just renamed.
 
-1. In your **Downstream Demo** workspace, click the **Agent Mode** icon (top-right of the Postman window) to open the AI Engineer panel.
-2. Paste the following prompt exactly:
-  > Walk the Context Graph for the `Users API` spec in this workspace. For the `GET /users/{id}` endpoint, find every Postman Collection that consumes the response and parses the `user_id` field. Create a new collection called **Downstream Consumers** in this workspace, and for each consumer, add one request named after the consumer (for example, `Mobile App Tests`, `Web Dashboard QA`, `Partner Integration Suite`) that points at `{{baseUrl}}/users/u_42`.
-3. Click **Run**. The AI Engineer will query the API Catalog, identify consumers, and write the results back into your workspace.
-4. When it finishes, open the new **Downstream Consumers** collection and confirm you see three requests — one per consumer the AI Engineer identified.
+### Step 1: Ask Agent Tasks to Update Downstream Dependencies
 
-Three downstream consumers, all surfaced before you write a single character of the rename PR.
+1. Open **Agent Tasks** in Postman.
+2. Ask the agent to update all downstream dependencies from the response schema update you just merged.
+3. The AI Engineer walks the Context Graph, identifies every consumer of the old `id` field, and opens a pull request with the updates wired in.
 
-**Validation:** [Collection Requests] A collection named "Downstream Consumers" exists in the workspace and contains requests named `Mobile App Tests`, `Web Dashboard QA`, and `Partner Integration Suite`.
+**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=open` returns status `200` and the response body contains at least one PR opened by the AI Engineer that touches the downstream consumers of `employee-id`.
 
-## Part 4: Merge the PR the AI Engineer Created
+## Part 4: Merge the PR
 
-The AI Engineer doesn't just identify consumers — it opens a PR against the Users API repo with the schema change and the consumer-test updates wired in. Your last job is to review and merge it.
+The AI Engineer doesn't just identify consumers — it opens a PR with the consumer-test updates ready to go. Your last job is to review and merge it, then pull the changes locally.
 
-### Step 1: Merge the AI Engineer's PR
+### Step 1: Merge the PR
 
-1. Back in **Agent Mode**, send this follow-up prompt:
-  > Open a pull request against `{{githubRepo}}` titled `rename user_id to userId` that applies the schema change from the Users API spec. Use `{{githubToken}}` for auth. After the PR passes CI, merge it with a squash commit and report back the PR number.
-2. The AI Engineer will respond with a PR number — note it (for example, `#128`).
-3. In the AI Engineer panel, click **View PR** to inspect the diff in GitHub. Confirm the schema rename and the updated consumer fixtures look correct.
-4. Once CI is green, send one more prompt:
-  > Merge PR `#<number>` on `{{githubRepo}}` using squash. Confirm `merged: true` from the GitHub API.
-5. Expect a confirmation message in Agent Mode like `PR #128 merged ✓`.
+1. Open the PR the AI Engineer created against your ERP fork.
+2. Review the diff to confirm the downstream updates look correct.
+3. Merge the PR into `main`.
 
-> If the merge fails with `405 Method Not Allowed`, CI hasn't finished yet — wait 60 seconds and re-run the merge prompt.
+**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=closed` returns status `200`, and the response body contains at least one PR with `"merged": true` whose diff renames `id` to `employee-id` in the downstream consumers.
 
-**Validation:** [Api Response] A `GET` request to `https://api.github.com/repos/{{githubRepo}}/pulls?state=closed&head=ai-engineer:rename-user-id` returns status `200`, and the response body contains at least one PR with `"merged": true` and a title matching `rename user_id to userId`.
+### Step 2: Git Pull in the Postman Terminal
+
+1. Open the terminal in Postman.
+2. Run `git pull` to bring the merged downstream updates into your local working copy.
+
+**Validation:** **[Collection Request]** After the pull, the downstream consumer requests in the **Enterprise Resource Planning** collection reference `employee-id` (not `id`) in their URLs, request bodies, or test scripts.
