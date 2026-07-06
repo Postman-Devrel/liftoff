@@ -64,9 +64,9 @@ Verify that the `baseUrl` variable has been automatically populated in the **Var
 
 Send the **Generate API Key** GET request, then verify that the environment variable has been set in the **Environment** tab next to the AI Panel on the top right corner.
 
-> **Note:** Go to your Environments on the side panel and set the `apiKey` value to **sensitive**.
+> **Note:** Go to your Environments on the side panel and set the `apiKey` as **secured**.
 
-**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.
+**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values. Secured variables are shared through an online vault. On the Postman Free plan, only the local vault is accessible — but that's not an issue for completing this module.
 
 **Validation:** The environment "Banking.local" contains a variable named "apiKey" with a non-empty value.
 
