@@ -1,0 +1,81 @@
+{
+  "id": "ai-engineer-downstream",
+  "title": "Managing Downstream Dependencies with the AI Engineer",
+  "description": "Use the Postman AI Engineer to do what senior engineers do before they touch the code: walk the dependency graph, find every downstream consumer, and ship a safe change. You'll rename a field in a response schema, ask the AI Engineer to surface every Postman Collection that consumes it, and merge the PR it opens.",
+  "color": "#10B981",
+  "icon": "🕸️",
+  "lessons": [
+    {
+      "id": "lesson-1-set-up-your-workspace",
+      "slug": "set-up-your-workspace",
+      "title": "Set Up Your Workspace",
+      "partNumber": 1,
+      "steps": [
+        {
+          "id": "ai-engineer-downstream-step-1-create-workspace",
+          "stepNumber": 1,
+          "title": "Create a Workspace",
+          "description": "1. Open Postman and click **Workspaces** in the top nav, then **Create Workspace**.\n2. Choose **Blank workspace**.\n3. Name it exactly: **Downstream Demo - [your name]** (for example, *Downstream Demo - Alex*).\n4. Set visibility to **Personal** and click **Create**.\n\nThis workspace will hold the Users API spec you're about to change and the consumer collections the AI Engineer will discover.",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-create-workspace"
+        },
+        {
+          "id": "ai-engineer-downstream-step-2-configure-environment",
+          "stepNumber": 2,
+          "title": "Configure Your Environment",
+          "description": "The AI Engineer needs a base URL to call the Users API and a GitHub token to open and merge the PR.\n\n1. Inside your **Downstream Demo** workspace, click **Environments** in the left sidebar, then **+** to create a new environment.\n2. Name it: **Downstream Demo Env**.\n3. Add the following variables:\n\n| Variable | Initial Value | Type |\n|----------|---------------|------|\n| `baseUrl` | `https://demo.postman-echo.com` | default |\n| `githubRepo` | `postman-demo/users-api` | default |\n| `githubToken` | *your GitHub PAT* | **secret** |\n\n4. Click **Save**, then activate the environment by selecting it from the environment dropdown in the top right.\n\n> If you get a 401 from GitHub later, double-check that `githubToken` is marked as **secret** and has `repo` scope.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values.",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-configure-environment"
+        }
+      ]
+    },
+    {
+      "id": "lesson-2-update-the-response-schema",
+      "slug": "update-the-response-schema",
+      "title": "Update the Response Schema",
+      "partNumber": 2,
+      "steps": [
+        {
+          "id": "ai-engineer-downstream-step-3-rename-schema-field",
+          "stepNumber": 1,
+          "title": "Rename the Field in the Users API Spec",
+          "description": "You're about to rename `user_id` to `userId` on the `/users/:id` endpoint. In a normal repo, this is a one-line change. In Postman, the spec is the source of truth — updating it here is what the AI Engineer will diff against to find consumers.\n\n1. In your workspace, click **APIs** in the left sidebar, then **+** to add a new API.\n2. Name it: **Users API**.\n3. Paste the following OpenAPI 3.0 spec into the editor:\n\n```yaml\nopenapi: 3.0.3\ninfo:\n  title: Users API\n  version: 1.1.0\npaths:\n  /users/{id}:\n    get:\n      summary: Get a user by ID\n      parameters:\n        - in: path\n          name: id\n          required: true\n          schema: { type: string }\n      responses:\n        '200':\n          description: A user\n          content:\n            application/json:\n              schema:\n                type: object\n                properties:\n                  userId: { type: string }\n                  name:   { type: string }\n                  email:  { type: string }\n```\n\n4. Click **Save**. Notice that `userId` replaces what used to be `user_id` — this is the breaking change.\n5. Expect a `200 OK` from the spec save with a JSON body where `userId` is present in the schema (and not `user_id`).",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-rename-schema-field"
+        }
+      ]
+    },
+    {
+      "id": "lesson-3-discover-downstream-dependencies",
+      "slug": "discover-downstream-dependencies",
+      "title": "Discover Downstream Dependencies with the AI Engineer",
+      "partNumber": 3,
+      "steps": [
+        {
+          "id": "ai-engineer-downstream-step-4-ask-ai-engineer",
+          "stepNumber": 1,
+          "title": "Ask the AI Engineer for the Blast Radius",
+          "description": "This is the moment that separates confident-locality from organizational context. Instead of grepping your repo, you'll ask the AI Engineer to walk the Context Graph and surface every Postman Collection in your workspace that consumes the field you just renamed.\n\n1. In your **Downstream Demo** workspace, click the **Agent Mode** icon (top-right of the Postman window) to open the AI Engineer panel.\n2. Paste the following prompt exactly:\n\n> Walk the Context Graph for the `Users API` spec in this workspace. For the `GET /users/{id}` endpoint, find every Postman Collection that consumes the response and parses the `user_id` field. Create a new collection called **Downstream Consumers** in this workspace, and for each consumer, add one request named after the consumer (for example, `Mobile App Tests`, `Web Dashboard QA`, `Partner Integration Suite`) that points at `{{baseUrl}}/users/u_42`.\n\n3. Click **Run**. The AI Engineer will query the API Catalog, identify consumers, and write the results back into your workspace.\n4. When it finishes, open the new **Downstream Consumers** collection and confirm you see three requests — one per consumer the AI Engineer identified: `Mobile App Tests`, `Web Dashboard QA`, and `Partner Integration Suite`.\n\nThree downstream consumers, all surfaced before you write a single character of the rename PR.",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-ask-ai-engineer"
+        }
+      ]
+    },
+    {
+      "id": "lesson-4-merge-the-pr",
+      "slug": "merge-the-pr",
+      "title": "Merge the PR the AI Engineer Created",
+      "partNumber": 4,
+      "steps": [
+        {
+          "id": "ai-engineer-downstream-step-5-merge-pr",
+          "stepNumber": 1,
+          "title": "Merge the AI Engineer's PR",
+          "description": "The AI Engineer doesn't just identify consumers — it opens a PR against the Users API repo with the schema change and the consumer-test updates wired in. Your last job is to review and merge it.\n\n1. Back in **Agent Mode**, send this follow-up prompt:\n\n> Open a pull request against `{{githubRepo}}` titled `rename user_id to userId` that applies the schema change from the Users API spec. Use `{{githubToken}}` for auth. After the PR passes CI, merge it with a squash commit and report back the PR number.\n\n2. The AI Engineer will respond with a PR number — note it (for example, `#128`).\n3. In the AI Engineer panel, click **View PR** to inspect the diff in GitHub. Confirm the schema rename and the updated consumer fixtures look correct.\n4. Once CI is green, send one more prompt:\n\n> Merge PR `#<number>` on `{{githubRepo}}` using squash. Confirm `merged: true` from the GitHub API.\n\n5. Expect a confirmation message in Agent Mode like `PR #128 merged ✓`.\n\n> If the merge fails with `405 Method Not Allowed`, CI hasn't finished yet — wait 60 seconds and re-run the merge prompt.\n\n**Validation note:** LiftOff confirms the merge by calling the GitHub Pulls API for your `{{githubRepo}}` and looking for at least one merged PR. Make sure `githubRepo` points to a real public repo you control (or use a public Postman demo repo) so the validator can see the merge.",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-merge-pr"
+        }
+      ]
+    }
+  ]
+}

@@ -34,6 +34,11 @@ import { validateBankingQueryMcp } from "./banking-ai-mcp-bootcamp/validate-bank
 import { validateBankingAddMcpClaude } from "./banking-ai-mcp-bootcamp/validate-banking-add-mcp-claude";
 import { validateBankingVerifyConnection } from "./banking-ai-mcp-bootcamp/validate-banking-verify-connection";
 import { validateBankingAddTestsMcp } from "./banking-ai-mcp-bootcamp/validate-banking-add-tests-mcp";
+import { validateAiEngineerDownstreamCreateWorkspace } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace";
+import { validateAiEngineerDownstreamConfigureEnvironment } from "./ai-engineer-downstream/validate-ai-engineer-downstream-configure-environment";
+import { validateAiEngineerDownstreamRenameSchemaField } from "./ai-engineer-downstream/validate-ai-engineer-downstream-rename-schema-field";
+import { validateAiEngineerDownstreamAskAiEngineer } from "./ai-engineer-downstream/validate-ai-engineer-downstream-ask-ai-engineer";
+import { validateAiEngineerDownstreamMergePr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-pr";
 
 export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-workspace": validateWorkspace,
@@ -71,4 +76,9 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-banking-add-mcp-claude": validateBankingAddMcpClaude,
   "validate-banking-verify-connection": validateBankingVerifyConnection,
   "validate-banking-add-tests-mcp": validateBankingAddTestsMcp,
+  "validate-ai-engineer-downstream-create-workspace": validateAiEngineerDownstreamCreateWorkspace,
+  "validate-ai-engineer-downstream-configure-environment": validateAiEngineerDownstreamConfigureEnvironment,
+  "validate-ai-engineer-downstream-rename-schema-field": validateAiEngineerDownstreamRenameSchemaField,
+  "validate-ai-engineer-downstream-ask-ai-engineer": validateAiEngineerDownstreamAskAiEngineer,
+  "validate-ai-engineer-downstream-merge-pr": validateAiEngineerDownstreamMergePr,
 };
