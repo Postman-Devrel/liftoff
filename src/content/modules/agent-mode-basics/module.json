@@ -1,0 +1,66 @@
+{
+  "id": "agent-mode-basics",
+  "title": "Getting Started with Agent Mode",
+  "description": "Learn how to use Postman's AI-powered Agent Mode to set up a workspace, build a collection, and write tests — all through natural-language prompts. You'll practice against the [Movies API](https://sampleapis.com/api-list/movies), a public CRUD API for browsing and managing movie data.",
+  "color": "#F59E0B",
+  "icon": "🤖",
+  "lessons": [
+    {
+      "id": "lesson-1-meet-agent-mode",
+      "slug": "meet-agent-mode",
+      "title": "Meet Agent Mode",
+      "partNumber": 1,
+      "steps": [
+        {
+          "id": "step-1-open-agent-mode",
+          "stepNumber": 1,
+          "title": "Open Agent Mode",
+          "description": "**Agent Mode** is an AI assistant built into Postman that completes API development tasks from natural-language prompts — creating workspaces and collections, writing tests, debugging errors, and more. It asks clarifying questions before taking action, and shows you what it's about to do before running it.\n\n1. Open Postman (desktop app or web).\n2. You can open Agent Mode two ways:\n   - **From the homepage:** type a request into the query box and click **Let's go** — this opens your most recent workspace with Agent Mode loaded.\n   - **From any workspace:** open the panel in the bottom-right corner and switch to the **AI** tab.\n3. Try typing `@` in the Agent Mode input — this lets you point Agent Mode at a specific collection, folder, request, environment, or API spec as context for your prompt. You'll use this in later steps.\n\nLearn more: [Agent Mode overview](https://learning.postman.com/docs/use/agent-mode/get-started)",
+          "points": 10,
+          "validatorId": "validate-agent-mode-basics-open-agent-mode",
+          "manual": true
+        },
+        {
+          "id": "step-2-create-workspace",
+          "stepNumber": 2,
+          "title": "Create Your Workspace with a Prompt",
+          "description": "Instead of clicking through the **Create Workspace** dialog yourself, describe what you want and let Agent Mode do it.\n\n1. In Agent Mode, write a prompt like:\n\n   > Create a new Internal workspace called \"[Your Name] - AI Basics\" that only I can access.\n\n2. Replace `[Your Name]` with your actual name (e.g. *Alex - AI Basics*).\n3. Review what Agent Mode proposes, then approve it.",
+          "points": 10,
+          "validatorId": "validate-agent-mode-basics-create-workspace"
+        },
+        {
+          "id": "step-3-create-collection",
+          "stepNumber": 3,
+          "title": "Build a Collection from the Movies API",
+          "description": "Now that you have a workspace, let Agent Mode do the tedious part — describing an entire API in plain English and letting it scaffold every request for you, instead of building each one by hand.\n\nThe [Movies API](https://sampleapis.com/api-list/movies) is a free, publicly hosted REST API with no authentication:\n\n| Method | Endpoint | Description |\n|--------|----------|--------------|\n| GET | `/movies/animation` | List all animated movies |\n| GET | `/movies/animation/:id` | Get one movie |\n| POST | `/movies/animation` | Create a movie |\n| PUT | `/movies/animation/:id` | Update a movie |\n| DELETE | `/movies/animation/:id` | Delete a movie |\n\nA movie has an `id` (number, required), `title` (string, required), `posterURL` (string, required), and `imdbId` (string, required).\n\n1. Make sure you're in your **[Your Name] - AI Basics** workspace from Step 2.\n2. In Agent Mode, write a prompt like:\n\n   > Create a collection called \"Movies API\" in this workspace. Add a request for each of these endpoints: GET /movies/animation, GET /movies/animation/:id, POST /movies/animation, PUT /movies/animation/:id, DELETE /movies/animation/:id. Use https://api.sampleapis.com as the base URL. For POST and PUT, include an example JSON body with id, title, posterURL, and imdbId.\n\n3. Review the requests Agent Mode creates, then approve it.",
+          "points": 10,
+          "validatorId": "validate-agent-mode-basics-create-collection"
+        }
+      ]
+    },
+    {
+      "id": "lesson-2-test-and-explore",
+      "slug": "test-and-explore",
+      "title": "Test and Explore with Agent Mode",
+      "partNumber": 2,
+      "steps": [
+        {
+          "id": "step-1-add-tests",
+          "stepNumber": 1,
+          "title": "Add Status-Code Tests with a Prompt",
+          "description": "Hand-writing the same assertion for every request is exactly the kind of repetitive work Agent Mode is built to take off your plate — describe the check once and let it apply the pattern across your whole collection.\n\n1. Open your **Movies API** collection from Part 1.\n2. In Agent Mode, write a prompt like:\n\n   > Add a post-response test to every request in my Movies API collection that checks the response status code is 200.\n\n3. Review the test scripts Agent Mode proposes, then approve it.",
+          "points": 10,
+          "validatorId": "validate-agent-mode-basics-add-tests"
+        },
+        {
+          "id": "step-2-run-template",
+          "stepNumber": 2,
+          "title": "Run the \"Auto-Generate Documentation for Endpoints\" Template",
+          "description": "Postman's [Agent Mode template gallery](https://www.postman.com/templates/agent-mode/) has ready-made prompts curated by role — including ones for API Product Owners who need clean documentation without writing it by hand.\n\n1. Make sure you're in your **[Your Name] - AI Basics** workspace, with your **Movies API** collection open.\n2. Open the [Agent Mode template gallery](https://www.postman.com/templates/agent-mode/).\n3. Click **View all API Product Owner prompts**.\n4. Under **Documentation**, find the template titled **\"Auto-generate documentation for endpoints\"** — its prompt reads:\n\n   > Generate documentation for each endpoint, including purpose, parameters, and example responses.\n\n5. Click **Run in Agent Mode**, and when prompted, point it at your **Movies API** collection.\n6. Review the documentation Agent Mode generates — it writes the description directly onto each request, in the **Docs** tab.",
+          "points": 10,
+          "validatorId": "validate-agent-mode-basics-run-template"
+        }
+      ]
+    }
+  ]
+}

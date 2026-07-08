@@ -8,6 +8,7 @@ import { getAllModules, getAllLearningPaths, getModulesForLearningPath } from "@
 import { calculateRank, getNextRank } from "@/lib/scoring";
 import RankBadge from "@/components/scoring/RankBadge";
 import NavMenu from "@/components/NavMenu";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import { LearningPath } from "@/types/learning-path";
 import { Module } from "@/types/module";
 
@@ -339,7 +340,7 @@ function LearningPathCard({ path }: { path: LearningPath }) {
             {path.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {path.description}
+            <InlineMarkdown>{path.description}</InlineMarkdown>
           </p>
         </div>
       </div>
@@ -426,7 +427,7 @@ function ModuleCard({ module }: { module: Module }) {
             {module.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {module.description}
+            <InlineMarkdown>{module.description}</InlineMarkdown>
           </p>
         </div>
       </div>

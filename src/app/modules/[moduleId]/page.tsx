@@ -13,6 +13,7 @@ import ModuleGettingStarted from "@/components/module/ModuleGettingStarted";
 import ShareDebug from "@/components/ShareDebug";
 import ShareButtons from "@/components/ShareButtons";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 
 export default function ModuleOverviewPage() {
   const params = useParams();
@@ -72,7 +73,7 @@ export default function ModuleOverviewPage() {
           </div>
 
           <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
-            {mod.description}
+            <InlineMarkdown>{mod.description}</InlineMarkdown>
           </p>
 
           {mod.gettingStarted && (

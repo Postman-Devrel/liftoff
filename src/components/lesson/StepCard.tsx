@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useProgress } from "@/context/ProgressContext";
@@ -69,6 +69,11 @@ export default function StepCard({ step, moduleTitle, moduleColor = "#FF6C37" }:
                 pre: CopyableCodeBlock,
                 code: CopyableCode,
                 blockquote: CopyableBlockquote,
+                a: ({ href, children }: { href?: string; children?: ReactNode }) => (
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {children}
+                  </a>
+                ),
               }}
             >{step.description}</ReactMarkdown>
           </div>

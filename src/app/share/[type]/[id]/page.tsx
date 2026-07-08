@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { getAllModules } from "@/lib/content-loader";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import { ranks } from "@/lib/scoring";
 
 async function getAppUrl() {
@@ -117,7 +118,7 @@ export default async function SharePage({ params }: Props) {
           </h1>
 
           <p className="text-[var(--text-secondary)] leading-relaxed mb-2">
-            {mod.description}
+            <InlineMarkdown>{mod.description}</InlineMarkdown>
           </p>
 
           <p className="text-sm text-[var(--text-tertiary)] mb-8">

@@ -6,6 +6,7 @@ import {
   getAllModulesIncludingPrivate,
   getAllLearningPathsIncludingPrivate,
 } from "@/lib/content-loader";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import {
   AreaChart,
   Area,
@@ -1723,7 +1724,7 @@ function PrivatePreview() {
                         </span>
                       </div>
                       <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">
-                        {mod.description}
+                        <InlineMarkdown>{mod.description}</InlineMarkdown>
                       </p>
                       <p className="text-xs text-[var(--text-secondary)] mt-2">
                         {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""} · {totalSteps} step{totalSteps !== 1 ? "s" : ""}

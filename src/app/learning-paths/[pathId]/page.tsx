@@ -8,6 +8,7 @@ import { getLearningPath, getModulesForLearningPath } from "@/lib/content-loader
 import NavMenu from "@/components/NavMenu";
 import { Module } from "@/types/module";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 
 const BADGE_VERSION = "1";
 
@@ -63,7 +64,7 @@ function ModuleCard({ module }: { module: Module }) {
             {module.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {module.description}
+            <InlineMarkdown>{module.description}</InlineMarkdown>
           </p>
         </div>
       </div>
@@ -164,7 +165,7 @@ export default function LearningPathPage({ params }: { params: Promise<{ pathId:
           </div>
 
           <p className="mt-4 text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-            {path.description}
+            <InlineMarkdown>{path.description}</InlineMarkdown>
           </p>
 
           <div className="mt-6 flex items-center gap-6">

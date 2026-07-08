@@ -40,6 +40,8 @@ Brief intro to this lesson.
 
 ### Step 1: Step Title
 
+A sentence or two on what this step accomplishes and why it matters — orient the learner before the instructions start.
+
 Detailed instructions for what the learner needs to do.
 
 - Bullet points for specific actions
@@ -94,6 +96,7 @@ Step descriptions are the ONLY thing the learner sees. They must be **self-conta
 
 | Element | When to include | Example |
 |---------|----------------|---------|
+| Preamble | Always, before the numbered instructions | 1–2 sentences on what this step accomplishes and why — never open cold with "1. Open..." |
 | Numbered instructions | Always | 1. Open the request 2. Set the body 3. Click Send |
 | JSON payloads | Any step with a request body | Full JSON in a fenced code block |
 | AI/Agent Mode prompts | Any step using Postman Agent Mode | Exact prompt in a blockquote |

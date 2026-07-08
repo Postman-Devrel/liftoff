@@ -44,6 +44,29 @@ import { validateWorldExplorerStampPassport } from "./world-explorer/validate-wo
 import { validateWorldExplorerVisualization } from "./world-explorer/validate-world-explorer-visualization";
 import { validateWorldExplorerVerifyJourney } from "./world-explorer/validate-world-explorer-verify-journey";
 import { validateWorldExplorerSurpriseDestination } from "./world-explorer/validate-world-explorer-surprise-destination";
+import { validateAgentModeBasicsOpenAgentMode } from "./agent-mode-basics/validate-agent-mode-basics-open-agent-mode";
+import { validateAgentModeBasicsCreateWorkspace } from "./agent-mode-basics/validate-agent-mode-basics-create-workspace";
+import { validateAgentModeBasicsCreateCollection } from "./agent-mode-basics/validate-agent-mode-basics-create-collection";
+import { validateAgentModeBasicsAddTests } from "./agent-mode-basics/validate-agent-mode-basics-add-tests";
+import { validateAgentModeBasicsRunTemplate } from "./agent-mode-basics/validate-agent-mode-basics-run-template";
+import { validatePostmanMcpGetApiKey } from "./postman-mcp/validate-postman-mcp-get-api-key";
+import { validatePostmanMcpAddMcpServer } from "./postman-mcp/validate-postman-mcp-add-mcp-server";
+import { validatePostmanMcpConnectWorkspace } from "./postman-mcp/validate-postman-mcp-connect-workspace";
+import { validatePostmanMcpReadCollection } from "./postman-mcp/validate-postman-mcp-read-collection";
+import { validatePostmanMcpExecuteEndpoint } from "./postman-mcp/validate-postman-mcp-execute-endpoint";
+import { validateClaudeCodePluginInstallAndConfigure } from "./claude-code-plugin/validate-claude-code-plugin-install-and-configure";
+import { validateClaudeCodePluginRunSetup } from "./claude-code-plugin/validate-claude-code-plugin-run-setup";
+import { validateClaudeCodePluginSearchWorkspace } from "./claude-code-plugin/validate-claude-code-plugin-search-workspace";
+import { validateClaudeCodePluginQueryMoviesApi } from "./claude-code-plugin/validate-claude-code-plugin-query-movies-api";
+import { validateClaudeCodePluginRunCollectionTests } from "./claude-code-plugin/validate-claude-code-plugin-run-collection-tests";
+import { validateAiEngineerDownstreamForkAndCloneErpRepo } from "./ai-engineer-downstream/validate-ai-engineer-downstream-fork-and-clone-erp-repo";
+import { validateAiEngineerDownstreamCreateWorkspaceAndPushToCloud } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace-and-push-to-cloud";
+import { validateAiEngineerDownstreamRenameSchemaField } from "./ai-engineer-downstream/validate-ai-engineer-downstream-rename-schema-field";
+import { validateAiEngineerDownstreamMergeToMain } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-to-main";
+import { validateAiEngineerDownstreamGitPull } from "./ai-engineer-downstream/validate-ai-engineer-downstream-git-pull";
+import { validateAiEngineerDownstreamAiEngineerOpensPr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-ai-engineer-opens-pr";
+import { validateAiEngineerDownstreamMergePr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-pr";
+import { validateAiEngineerDownstreamConsumersUseEmployeeId } from "./ai-engineer-downstream/validate-ai-engineer-downstream-consumers-use-employee-id";
 
 export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-workspace": validateWorkspace,
@@ -91,4 +114,27 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-world-explorer-visualization": validateWorldExplorerVisualization,
   "validate-world-explorer-verify-journey": validateWorldExplorerVerifyJourney,
   "validate-world-explorer-surprise-destination": validateWorldExplorerSurpriseDestination,
+  "validate-agent-mode-basics-open-agent-mode": validateAgentModeBasicsOpenAgentMode,
+  "validate-agent-mode-basics-create-workspace": validateAgentModeBasicsCreateWorkspace,
+  "validate-agent-mode-basics-create-collection": validateAgentModeBasicsCreateCollection,
+  "validate-agent-mode-basics-add-tests": validateAgentModeBasicsAddTests,
+  "validate-agent-mode-basics-run-template": validateAgentModeBasicsRunTemplate,
+  "validate-postman-mcp-get-api-key": validatePostmanMcpGetApiKey,
+  "validate-postman-mcp-add-mcp-server": validatePostmanMcpAddMcpServer,
+  "validate-postman-mcp-connect-workspace": validatePostmanMcpConnectWorkspace,
+  "validate-postman-mcp-read-collection": validatePostmanMcpReadCollection,
+  "validate-postman-mcp-execute-endpoint": validatePostmanMcpExecuteEndpoint,
+  "validate-claude-code-plugin-install-and-configure": validateClaudeCodePluginInstallAndConfigure,
+  "validate-claude-code-plugin-run-setup": validateClaudeCodePluginRunSetup,
+  "validate-claude-code-plugin-search-workspace": validateClaudeCodePluginSearchWorkspace,
+  "validate-claude-code-plugin-query-movies-api": validateClaudeCodePluginQueryMoviesApi,
+  "validate-claude-code-plugin-run-collection-tests": validateClaudeCodePluginRunCollectionTests,
+  "validate-ai-engineer-downstream-fork-and-clone-erp-repo": validateAiEngineerDownstreamForkAndCloneErpRepo,
+  "validate-ai-engineer-downstream-create-workspace-and-push-to-cloud": validateAiEngineerDownstreamCreateWorkspaceAndPushToCloud,
+  "validate-ai-engineer-downstream-rename-schema-field": validateAiEngineerDownstreamRenameSchemaField,
+  "validate-ai-engineer-downstream-merge-to-main": validateAiEngineerDownstreamMergeToMain,
+  "validate-ai-engineer-downstream-git-pull": validateAiEngineerDownstreamGitPull,
+  "validate-ai-engineer-downstream-ai-engineer-opens-pr": validateAiEngineerDownstreamAiEngineerOpensPr,
+  "validate-ai-engineer-downstream-merge-pr": validateAiEngineerDownstreamMergePr,
+  "validate-ai-engineer-downstream-consumers-use-employee-id": validateAiEngineerDownstreamConsumersUseEmployeeId,
 };
