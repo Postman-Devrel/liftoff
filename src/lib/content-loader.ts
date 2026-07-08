@@ -7,9 +7,9 @@ import postmanMcpModule from "@/content/modules/postman-mcp/module.json";
 import claudeCodePluginModule from "@/content/modules/claude-code-plugin/module.json";
 import aiEngineerDownstreamModule from "@/content/modules/ai-engineer-downstream/module.json";
 import introToPostmanPath from "@/content/learning-paths/intro-to-postman/learning-path.json";
-import postman101Path from "@/content/learning-paths/postman-101/learning-path.json";
 import aiPath from "@/content/learning-paths/ai/learning-path.json";
 import buildingWithAiPath from "@/content/learning-paths/building-with-ai/learning-path.json";
+import helpGetArtemisToTheMoonPath from "@/content/learning-paths/help-get-artemis-to-the-moon/learning-path.json";
 import { Module, Lesson } from "@/types/module";
 import { LearningPath } from "@/types/learning-path";
 
@@ -24,10 +24,10 @@ const allModules: Module[] = [
   aiEngineerDownstreamModule as Module,
 ];
 const allLearningPaths: LearningPath[] = [
-  postman101Path as LearningPath,
   introToPostmanPath as LearningPath,
   aiPath as LearningPath,
   buildingWithAiPath as LearningPath,
+  helpGetArtemisToTheMoonPath as LearningPath,
 ];
 
 export function getAllModules(): Module[] {

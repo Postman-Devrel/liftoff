@@ -1,9 +1,0 @@
-{
-  "id": "postman-101",
-  "title": "Postman 101",
-  "description": "Your first steps with Postman. Learn workspaces, collections, requests, variables, and Agent Mode through a hands-on world-travel adventure.",
-  "icon": "📮",
-  "color": "#FF6C37",
-  "moduleIds": ["world-explorer"],
-  "private": true
-}

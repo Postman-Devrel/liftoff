@@ -1,0 +1,9 @@
+{
+  "id": "help-get-artemis-to-the-moon",
+  "title": "Help Get Artemis to the Moon!",
+  "description": "Join Mission Control and guide the Artemis mission through workspace setup, environments, and mission logs using Postman.",
+  "icon": "🌕",
+  "color": "#FF6C37",
+  "moduleIds": ["artemis-mission-control"],
+  "private": false
+}
