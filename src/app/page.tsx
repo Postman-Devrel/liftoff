@@ -526,10 +526,10 @@ export default function Home() {
                   strokeLinecap="round"
                 />
                 <path
-                  d="M68 58 L78 64 L74 52"
+                  d="M73 55 L78 64 L68 62 Z"
+                  fill="var(--orange)"
                   stroke="var(--orange)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
+                  strokeWidth="1"
                   strokeLinejoin="round"
                 />
               </svg>
