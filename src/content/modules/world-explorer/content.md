@@ -1,4 +1,3 @@
-** PRIVATE **
 # World Explorer
 
 Set up Postman, send your first API request, and look up real country data — all inside the Postman app. You'll work with the LiftOff Countries API:
