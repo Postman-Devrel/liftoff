@@ -488,6 +488,10 @@ export default function Home() {
             <span className="text-white font-medium">real-time API validation</span>.
             Complete steps in Postman, validate your work, earn your rank.
           </p>
+          <p className="text-sm text-[var(--text-tertiary)] max-w-xl mx-auto mt-4 leading-relaxed">
+            <span className="text-white font-medium">Learning Paths</span> string modules together into a guided curriculum.{" "}
+            <span className="text-white font-medium">Modules</span> are standalone lessons you can jump into on their own — use the tabs below to switch between them.
+          </p>
         </div>
       </header>
 
@@ -498,7 +502,37 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="mb-6 flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit">
+            <div className="relative mb-6 flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit">
+              <svg
+                className="hidden sm:block absolute -top-16 left-2 w-40 h-16 pointer-events-none select-none"
+                viewBox="0 0 160 70"
+                fill="none"
+                aria-hidden="true"
+              >
+                <text
+                  x="2"
+                  y="22"
+                  fill="var(--orange)"
+                  fontSize="26"
+                  transform="rotate(-4 2 22)"
+                  style={{ fontFamily: "var(--font-caveat)" }}
+                >
+                  Start here!
+                </text>
+                <path
+                  d="M20 34 C 10 42, 40 46, 50 54 S 70 58, 78 64"
+                  stroke="var(--orange)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M68 58 L78 64 L74 52"
+                  stroke="var(--orange)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
               <button
                 onClick={() => setView("paths")}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
