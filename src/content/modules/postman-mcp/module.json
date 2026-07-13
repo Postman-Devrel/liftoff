@@ -4,7 +4,6 @@
   "description": "Connect your coding assistant to Postman using the Postman MCP Server, then read and run requests from the workspace and collection you built in *Getting Started with Agent Mode* — directly from your editor. These instructions use a code-editor MCP config as the example, but the same server works with almost any MCP-compatible IDE or agent (Claude Code, Cursor, VS Code Copilot, Windsurf, Gemini CLI, and more).",
   "color": "#EC4899",
   "icon": "🔌",
-  "private": true,
   "lessons": [
     {
       "id": "lesson-1-connect-the-server",

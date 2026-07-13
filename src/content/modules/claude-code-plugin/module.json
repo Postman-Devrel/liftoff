@@ -4,7 +4,6 @@
   "description": "Install the official [Postman plugin for Claude Code](https://github.com/Postman-Devrel/postman-claude-code-plugin), then use its natural-language commands to search your workspace, query the Movies API, and run your collection's tests — no manual MCP configuration required.",
   "color": "#06B6D4",
   "icon": "🧩",
-  "private": true,
   "lessons": [
     {
       "id": "lesson-1-install-the-plugin",
@@ -60,7 +59,7 @@
           "id": "step-3-run-collection-tests",
           "stepNumber": 3,
           "title": "Run Your Collection Tests",
-          "description": "This is the payoff of the tests you wrote back in *Getting Started with Agent Mode* — instead of opening Postman to run them, you can trigger the whole suite from your terminal.\n\n1. Ask Claude Code:\n\n   > Run the tests for my collection [Movies API from Module 1]\n\n2. This runs [`/postman:test`](https://github.com/Postman-Devrel/postman-claude-code-plugin), executing your **Movies API** collection, parsing the results, and diagnosing any failures.\n3. Review the pass/fail summary — if any of the status-code tests you wrote in *Getting Started with Agent Mode* fail, ask Claude Code to suggest a fix.",
+          "description": "This is the payoff of the tests you wrote back in *Getting Started with Agent Mode* — instead of opening Postman to run them, you can trigger the whole suite from your terminal.\n\n1. Ask Claude Code:\n\n   > Run the tests for my collection, Movies API\n\n2. This runs [`/postman:test`](https://github.com/Postman-Devrel/postman-claude-code-plugin), executing your **Movies API** collection, parsing the results, and diagnosing any failures.\n3. Review the pass/fail summary — if any of the status-code tests you wrote in *Getting Started with Agent Mode* fail, ask Claude Code to suggest a fix.",
           "points": 10,
           "validatorId": "validate-claude-code-plugin-run-collection-tests",
           "manual": true
