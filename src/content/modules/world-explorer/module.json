@@ -2,7 +2,7 @@
   "id": "world-explorer",
   "title": "World Explorer",
   "description": "Set up Postman, send your first API request, and look up real country data — all inside the Postman app.",
-  "gettingStarted": "**Already using Postman?** Open the desktop app — you should already be signed in. **New here?** [Download Postman](https://www.postman.com/downloads/) and sign in first.\n\n1. In the **Postman desktop app**, open the Browser Tool: **Tools → Browser** in the footer, or press `Cmd+Shift+B` (Mac) / `Ctrl+Shift+B` (Windows/Linux).\n2. Navigate to [liftoff.postman.com/modules/world-explorer](https://liftoff.postman.com/modules/world-explorer).\n3. Sign in with Discord and connect your Postman API key when you're ready to validate.\n\n[Learn more about the Browser Tool →](https://learning.postman.com/docs/use/capturing-request-data/browser-tool/inspect-traffic)",
+  "gettingStarted": "**Already using Postman?** Open the desktop app — you should already be signed in. **New here?** [Download Postman](https://www.postman.com/downloads/) and sign in first.\n\n1. In the **Postman desktop app**, open a workspace — the Browser Tool is only available from within a workspace.\n2. Open the Browser Tool: **Tools → Browser** in the footer, or press `Cmd+Shift+B` (Mac) / `Ctrl+Shift+B` (Windows/Linux).\n3. Navigate to [https://liftoff.postman.com/modules/world-explorer](https://liftoff.postman.com/modules/world-explorer).\n4. Sign in with Discord and connect your Postman API key when you're ready to validate.\n\n[Learn more about the Browser Tool →](https://learning.postman.com/docs/use/capturing-request-data/browser-tool/inspect-traffic)",
   "color": "#10B981",
   "icon": "🌍",
   "lessons": [
