@@ -14,7 +14,7 @@ Each country comes back with its capital, currency, population, dialing code, an
 
 1. In the **Postman desktop app**, open a workspace — the Browser Tool is only available from within a workspace.
 2. Open the Browser Tool: **Tools → Browser** in the footer, or press `Cmd+Shift+B` (Mac) / `Ctrl+Shift+B` (Windows/Linux).
-3. Navigate to [https://liftoff.postman.com/modules/world-explorer](https://liftoff.postman.com/modules/world-explorer).
+3. Navigate to [https://liftoff-sandy-three.vercel.app/modules/world-explorer](https://liftoff-sandy-three.vercel.app/modules/world-explorer).
 4. Sign in with Discord and connect your Postman API key when you're ready to validate.
 
 [Learn more about the Browser Tool →](https://learning.postman.com/docs/use/capturing-request-data/browser-tool/inspect-traffic)
