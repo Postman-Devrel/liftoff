@@ -21,6 +21,10 @@ A webhook request fires the moment a step completion (validated via `/api/postma
 
 Re-validating an already-completed step is a no-op and never re-fires an event.
 
+**Registered (Discord-signed-in) users only.** Webhooks never fire for anonymous visitors, even if they complete a module or rank up in the UI. The detection logic (`src/lib/completion-events.ts`) diffs before/after state from the `progress` table, which only exists for signed-in users — anonymous progress lives entirely in the browser's `localStorage` and the server never sees it. This is intentional, not a gap to fix: anonymous completions have no `discord_id` to report, and a client-only signal would be trivially spoofable (anyone could claim any module/rank was completed without a server-verified identity behind it).
+
+**No retroactive firing on sign-in, either.** When an anonymous user later signs in with Discord, `importLocalProgress` (`src/context/ProgressContext.tsx`) bulk-upserts their local steps straight into the `progress` table via a direct Supabase call — it doesn't go through `/api/postman/validate`, so no completion/rank-up diffing happens and no webhook fires for that import, even if the imported steps completed a module or crossed a rank. The user would need to complete a *new* step after signing in for the webhook to trigger again.
+
 ## Payload
 
 Each event is a single JSON object, one event per HTTP POST. A step that completes a module, its parent learning path, and a rank simultaneously fires three separate requests.
