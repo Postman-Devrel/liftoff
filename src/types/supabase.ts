@@ -12,6 +12,7 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
+          discord_id: string | null;
           discord_username: string | null;
           discord_avatar_url: string | null;
           display_name: string | null;
@@ -20,6 +21,7 @@ export interface Database {
         };
         Insert: {
           id: string;
+          discord_id?: string | null;
           discord_username?: string | null;
           discord_avatar_url?: string | null;
           display_name?: string | null;
@@ -28,6 +30,7 @@ export interface Database {
         };
         Update: {
           id?: string;
+          discord_id?: string | null;
           discord_username?: string | null;
           discord_avatar_url?: string | null;
           display_name?: string | null;
