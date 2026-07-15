@@ -65,6 +65,13 @@ interface LeaderboardUser {
   joinedAt: string;
 }
 
+interface AttributedUser {
+  userId: string;
+  displayName: string;
+  discordUsername: string;
+  avatarUrl: string;
+}
+
 interface UtmCampaign {
   source: string;
   medium: string | null;
@@ -74,6 +81,7 @@ interface UtmCampaign {
   contentTitle: string;
   count: number;
   firstSeen: string;
+  users: AttributedUser[];
 }
 
 interface UtmAttribution {
@@ -102,6 +110,7 @@ interface CompletionAttribution {
   contentId: string;
   contentTitle: string;
   usersCompleted: number;
+  users: AttributedUser[];
 }
 
 interface RankAttribution {
@@ -111,6 +120,7 @@ interface RankAttribution {
   rankTitle: string;
   rankBadge: string;
   usersReached: number;
+  users: AttributedUser[];
   attributionType: "crossing_module" | "acquisition_fallback";
 }
 
@@ -1067,10 +1077,95 @@ function UserDetailPanel({
   );
 }
 
+// ─── Users List Modal ────────────────────────────────────
+
+function UsersListModal({
+  title,
+  users,
+  onSelectUser,
+  onClose,
+}: {
+  title: string;
+  users: AttributedUser[];
+  onSelectUser: (userId: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <>
+      <div
+        className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="fixed right-0 top-0 bottom-0 w-full max-w-md z-50 overflow-y-auto bg-[var(--bg-surface)] border-l border-white/10 shadow-2xl animate-slide-in">
+        <div className="sticky top-0 z-10 bg-[var(--bg-surface)]/95 backdrop-blur-md border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-white">Users</h2>
+            <p className="text-xs text-[var(--text-tertiary)] mt-0.5 truncate">{title}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-[var(--text-tertiary)] hover:text-white transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="p-3">
+          {users.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No users
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {users.map((u) => (
+                <button
+                  key={u.userId}
+                  onClick={() => onSelectUser(u.userId)}
+                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                >
+                  {u.avatarUrl ? (
+                    <img
+                      src={u.avatarUrl}
+                      alt=""
+                      className="w-9 h-9 rounded-full border border-[#5865F2] flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-[#5865F2] flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                      {u.displayName[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm text-white truncate">{u.displayName}</p>
+                    {u.discordUsername && (
+                      <p className="text-xs text-[var(--text-tertiary)] truncate">
+                        @{u.discordUsername}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── UTM Attribution Panel ───────────────────────────────
 
-function UtmPanel({ data }: { data: UtmStats }) {
+function UtmPanel({
+  data,
+  onSelectUser,
+}: {
+  data: UtmStats;
+  onSelectUser: (userId: string) => void;
+}) {
   const [view, setView] = useState<"campaigns" | "recent">("campaigns");
+  const [usersModal, setUsersModal] = useState<{ title: string; users: AttributedUser[] } | null>(null);
+
+  const campaignLabel = (c: UtmCampaign) =>
+    [c.source, c.medium, c.campaign].filter(Boolean).join(" / ") + ` — ${c.contentTitle}`;
 
   if (data.totalAttributed === 0) {
     return (
@@ -1098,6 +1193,7 @@ function UtmPanel({ data }: { data: UtmStats }) {
   }
 
   return (
+    <>
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -1180,7 +1276,12 @@ function UtmPanel({ data }: { data: UtmStats }) {
                     </div>
                   </td>
                   <td className="py-2.5 px-2 text-right">
-                    <span className="font-mono font-bold text-[var(--cyan)]">{c.count}</span>
+                    <button
+                      onClick={() => setUsersModal({ title: campaignLabel(c), users: c.users })}
+                      className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                    >
+                      {c.count}
+                    </button>
                   </td>
                   <td className="py-2.5 px-2 text-right hidden sm:table-cell">
                     <span className="text-[var(--text-tertiary)] font-mono">
@@ -1223,6 +1324,18 @@ function UtmPanel({ data }: { data: UtmStats }) {
         </div>
       )}
     </div>
+    {usersModal && (
+      <UsersListModal
+        title={usersModal.title}
+        users={usersModal.users}
+        onSelectUser={(id) => {
+          setUsersModal(null);
+          onSelectUser(id);
+        }}
+        onClose={() => setUsersModal(null)}
+      />
+    )}
+    </>
   );
 }
 
@@ -1231,11 +1344,19 @@ function UtmPanel({ data }: { data: UtmStats }) {
 function AchievementAttributionPanel({
   completions,
   ranks,
+  onSelectUser,
 }: {
   completions: CompletionAttribution[];
   ranks: RankAttribution[];
+  onSelectUser: (userId: string) => void;
 }) {
   const [view, setView] = useState<"completions" | "ranks">("completions");
+  const [usersModal, setUsersModal] = useState<{ title: string; users: AttributedUser[] } | null>(null);
+
+  const completionLabel = (c: CompletionAttribution) =>
+    [c.source, c.medium, c.campaign].filter(Boolean).join(" / ") + ` — ${c.contentTitle}`;
+  const rankLabel = (r: RankAttribution) =>
+    [r.source, r.medium, r.campaign].filter(Boolean).join(" / ") + ` — ${r.rankTitle}`;
 
   if (completions.length === 0 && ranks.length === 0) {
     return (
@@ -1253,6 +1374,7 @@ function AchievementAttributionPanel({
   }
 
   return (
+    <>
     <div className="glass-card p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
@@ -1301,7 +1423,7 @@ function AchievementAttributionPanel({
                   <th className="text-left py-2 px-2">Medium</th>
                   <th className="text-left py-2 px-2">Campaign</th>
                   <th className="text-left py-2 px-2">Content</th>
-                  <th className="text-right py-2 px-2">Completed</th>
+                  <th className="text-right py-2 px-2">Users</th>
                 </tr>
               </thead>
               <tbody>
@@ -1325,7 +1447,12 @@ function AchievementAttributionPanel({
                       </div>
                     </td>
                     <td className="py-2.5 px-2 text-right">
-                      <span className="font-mono font-bold text-[var(--cyan)]">{c.usersCompleted}</span>
+                      <button
+                        onClick={() => setUsersModal({ title: completionLabel(c), users: c.users })}
+                        className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                      >
+                        {c.usersCompleted}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -1370,7 +1497,12 @@ function AchievementAttributionPanel({
                       <span className="text-white">{r.rankTitle}</span>
                     </td>
                     <td className="py-2.5 px-2 text-right">
-                      <span className="font-mono font-bold text-[var(--cyan)]">{r.usersReached}</span>
+                      <button
+                        onClick={() => setUsersModal({ title: rankLabel(r), users: r.users })}
+                        className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                      >
+                        {r.usersReached}
+                      </button>
                     </td>
                     <td className="py-2.5 px-2 text-right hidden sm:table-cell">
                       <span
@@ -1391,6 +1523,18 @@ function AchievementAttributionPanel({
         </div>
       )}
     </div>
+    {usersModal && (
+      <UsersListModal
+        title={usersModal.title}
+        users={usersModal.users}
+        onSelectUser={(id) => {
+          setUsersModal(null);
+          onSelectUser(id);
+        }}
+        onClose={() => setUsersModal(null)}
+      />
+    )}
+    </>
   );
 }
 
@@ -1601,7 +1745,7 @@ function Dashboard({ password }: { password: string }) {
 
         {/* UTM Attribution */}
         <div className="mb-8">
-          <UtmPanel data={data.utmStats} />
+          <UtmPanel data={data.utmStats} onSelectUser={setSelectedUser} />
         </div>
 
         {/* Achievement Attribution */}
@@ -1609,6 +1753,7 @@ function Dashboard({ password }: { password: string }) {
           <AchievementAttributionPanel
             completions={data.completionAttribution}
             ranks={data.rankAttribution}
+            onSelectUser={setSelectedUser}
           />
         </div>
 

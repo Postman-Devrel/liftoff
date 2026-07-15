@@ -17,6 +17,7 @@ export interface CompletionAttribution {
   contentId: string;
   contentTitle: string;
   usersCompleted: number;
+  userIds: string[];
 }
 
 export interface RankAttribution {
@@ -26,6 +27,7 @@ export interface RankAttribution {
   rankTitle: string;
   rankBadge: string;
   usersReached: number;
+  userIds: string[];
   attributionType: AttributionType;
 }
 
@@ -109,11 +111,18 @@ export function attributeCompletions(
   }
 
   const resultMap = new Map<string, CompletionAttribution>();
-  const record = (row: UtmRow, contentType: ContentType, contentId: string, contentTitle: string) => {
+  const record = (
+    row: UtmRow,
+    contentType: ContentType,
+    contentId: string,
+    contentTitle: string,
+    userId: string
+  ) => {
     const key = `${row.utm_source}|${row.utm_medium ?? ""}|${row.utm_campaign ?? ""}|${contentType}|${contentId}`;
     const existing = resultMap.get(key);
     if (existing) {
       existing.usersCompleted++;
+      existing.userIds.push(userId);
     } else {
       resultMap.set(key, {
         source: row.utm_source,
@@ -123,6 +132,7 @@ export function attributeCompletions(
         contentId,
         contentTitle,
         usersCompleted: 1,
+        userIds: [userId],
       });
     }
   };
@@ -131,12 +141,12 @@ export function attributeCompletions(
     for (const mod of modules) {
       if (!isModuleComplete(mod, completedStepIds)) continue;
       const utm = utmByUserContent.get(`${userId}|module|${mod.id}`);
-      if (utm) record(utm, "module", mod.id, mod.title);
+      if (utm) record(utm, "module", mod.id, mod.title, userId);
     }
     for (const path of learningPaths) {
       if (!isLearningPathComplete(path, modules, completedStepIds)) continue;
       const utm = utmByUserContent.get(`${userId}|learning_path|${path.id}`);
-      if (utm) record(utm, "learning_path", path.id, path.title);
+      if (utm) record(utm, "learning_path", path.id, path.title, userId);
     }
   }
 
@@ -169,11 +179,18 @@ export function attributeRanks(
   }
 
   const resultMap = new Map<string, RankAttribution>();
-  const record = (row: UtmRow, rankTitle: string, rankBadge: string, attributionType: AttributionType) => {
+  const record = (
+    row: UtmRow,
+    rankTitle: string,
+    rankBadge: string,
+    attributionType: AttributionType,
+    userId: string
+  ) => {
     const key = `${row.utm_source}|${row.utm_medium ?? ""}|${row.utm_campaign ?? ""}|${rankTitle}|${attributionType}`;
     const existing = resultMap.get(key);
     if (existing) {
       existing.usersReached++;
+      existing.userIds.push(userId);
     } else {
       resultMap.set(key, {
         source: row.utm_source,
@@ -182,6 +199,7 @@ export function attributeRanks(
         rankTitle,
         rankBadge,
         usersReached: 1,
+        userIds: [userId],
         attributionType,
       });
     }
@@ -194,12 +212,12 @@ export function attributeRanks(
         ? utmByUserModule.get(`${userId}|${crossing.crossingModuleId}`)
         : undefined;
       if (direct) {
-        record(direct, crossing.rankTitle, crossing.rankBadge, "crossing_module");
+        record(direct, crossing.rankTitle, crossing.rankBadge, "crossing_module", userId);
         continue;
       }
       const fallback = earliestUtmByUser.get(userId);
       if (fallback) {
-        record(fallback, crossing.rankTitle, crossing.rankBadge, "acquisition_fallback");
+        record(fallback, crossing.rankTitle, crossing.rankBadge, "acquisition_fallback", userId);
       }
     }
   }

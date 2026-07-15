@@ -166,13 +166,14 @@ export async function GET(request: Request) {
   const utmCampaignMap = new Map<string, {
     source: string; medium: string | null; campaign: string | null;
     contentType: string; contentId: string; contentTitle: string;
-    count: number; firstSeen: string;
+    count: number; firstSeen: string; userIds: string[];
   }>();
   for (const row of utmRows) {
     const key = `${row.utm_source}|${row.utm_medium ?? ""}|${row.utm_campaign ?? ""}|${row.content_type}|${row.content_id}`;
     const existing = utmCampaignMap.get(key);
     if (existing) {
       existing.count++;
+      existing.userIds.push(row.user_id);
       if (row.first_seen_at < existing.firstSeen) existing.firstSeen = row.first_seen_at;
     } else {
       utmCampaignMap.set(key, {
@@ -184,9 +185,26 @@ export async function GET(request: Request) {
         contentTitle: contentTitles[`${row.content_type}:${row.content_id}`] || row.content_id,
         count: 1,
         firstSeen: row.first_seen_at,
+        userIds: [row.user_id],
       });
     }
   }
+
+  const profileMap = new Map(
+    profiles.map((p) => [
+      p.id,
+      {
+        displayName: p.display_name || p.discord_username || "Unknown",
+        discordUsername: p.discord_username || "",
+        avatarUrl: p.discord_avatar_url || "",
+      },
+    ])
+  );
+  const toUserSummaries = (userIds: string[]) =>
+    userIds.map((userId) => ({
+      userId,
+      ...(profileMap.get(userId) ?? { displayName: "Unknown", discordUsername: "", avatarUrl: "" }),
+    }));
 
   const sourceMap = new Map<string, number>();
   for (const row of utmRows) sourceMap.set(row.utm_source, (sourceMap.get(row.utm_source) || 0) + 1);
@@ -194,7 +212,9 @@ export async function GET(request: Request) {
   const utmStats = {
     totalAttributed: utmRows.length,
     bySource: [...sourceMap.entries()].map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count),
-    campaigns: [...utmCampaignMap.values()].sort((a, b) => b.count - a.count),
+    campaigns: [...utmCampaignMap.values()]
+      .sort((a, b) => b.count - a.count)
+      .map(({ userIds, ...c }) => ({ ...c, users: toUserSummaries(userIds) })),
     recentAttributions: utmRows.slice(0, 50).map((r) => ({
       userId: r.user_id,
       contentType: r.content_type,
@@ -207,8 +227,13 @@ export async function GET(request: Request) {
     })),
   };
 
-  const completionAttribution = attributeCompletions(progress, utmRows, modules, learningPaths);
-  const rankAttribution = attributeRanks(progress, utmRows, modules);
+  const completionAttribution = attributeCompletions(progress, utmRows, modules, learningPaths).map(
+    ({ userIds, ...c }) => ({ ...c, users: toUserSummaries(userIds) })
+  );
+  const rankAttribution = attributeRanks(progress, utmRows, modules).map(({ userIds, ...r }) => ({
+    ...r,
+    users: toUserSummaries(userIds),
+  }));
 
   const leaderboard = profiles
     .map((p) => {
