@@ -5,12 +5,13 @@ import Link from "next/link";
 import { getAllModules } from "@/lib/content-loader";
 import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import { ranks } from "@/lib/scoring";
+import { BASE_PATH, apiPath } from "@/lib/base-path";
 
 async function getAppUrl() {
   const h = await headers();
   const host = h.get("x-forwarded-host") || h.get("host") || "quickstarts.postman.com";
   const proto = h.get("x-forwarded-proto") || "https";
-  return `${proto}://${host}`;
+  return `${proto}://${host}${BASE_PATH}`;
 }
 
 interface Props {
@@ -98,7 +99,7 @@ export default async function SharePage({ params }: Props) {
 
         <div className="relative glass-card p-10 text-center max-w-lg w-full">
           <img
-            src={`/api/modules/${mod.id}/badge`}
+            src={apiPath(`/api/modules/${mod.id}/badge`)}
             alt={`${mod.title} badge`}
             width={140}
             height={140}
@@ -157,7 +158,7 @@ export default async function SharePage({ params }: Props) {
         <div className="relative glass-card p-10 text-center max-w-lg w-full">
           {rank.badgeImgFull ? (
             <img
-              src={rank.badgeImgFull.split("?")[0]}
+              src={`${BASE_PATH}${rank.badgeImgFull.split("?")[0]}`}
               alt={rank.title}
               width={160}
               height={160}

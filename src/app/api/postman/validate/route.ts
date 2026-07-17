@@ -5,6 +5,7 @@ import { getMe } from "@/lib/postman-api";
 import { createClient } from "@/lib/supabase/server";
 import { detectCompletionEvents } from "@/lib/completion-events";
 import { dispatchWebhook } from "@/lib/webhooks";
+import { absoluteBase } from "@/lib/base-path";
 
 export async function POST(request: NextRequest) {
   const apiKey = request.cookies.get("postman_api_key")?.value;
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
               pointsBefore,
               pointsAfter: pointsBefore + result.pointsAwarded,
               discordId: profile?.discord_id ?? null,
-              baseUrl: request.nextUrl.origin,
+              baseUrl: absoluteBase(request.nextUrl.origin),
               occurredAt: new Date().toISOString(),
             });
             await Promise.all(events.map(dispatchWebhook));

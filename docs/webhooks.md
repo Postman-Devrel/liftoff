@@ -36,7 +36,7 @@ Each event is a single JSON object, one event per HTTP POST. A step that complet
   "discordId": "123456789012345678",
   "moduleId": "api-basics",
   "moduleTitle": "API Basics",
-  "badgeUrl": "https://liftoff.postman.com/api/modules/api-basics/badge",
+  "badgeUrl": "https://liftoff.postman.com/liftoff/api/modules/api-basics/badge",
   "occurredAt": "2026-07-14T18:32:00.000Z"
 }
 ```
@@ -48,7 +48,7 @@ Each event is a single JSON object, one event per HTTP POST. A step that complet
   "discordId": "123456789012345678",
   "learningPathId": "intro-to-postman",
   "learningPathTitle": "Introduction to Postman",
-  "badgeUrl": "https://liftoff.postman.com/api/learning-paths/intro-to-postman/badge",
+  "badgeUrl": "https://liftoff.postman.com/liftoff/api/learning-paths/intro-to-postman/badge",
   "occurredAt": "2026-07-14T18:32:00.000Z"
 }
 ```
@@ -60,7 +60,7 @@ Each event is a single JSON object, one event per HTTP POST. A step that complet
   "discordId": "123456789012345678",
   "rankId": "commander",
   "rankTitle": "Commander",
-  "badgeUrl": "https://liftoff.postman.com/ranks/commander-full.png?v=6",
+  "badgeUrl": "https://liftoff.postman.com/liftoff/ranks/commander-full.png?v=6",
   "occurredAt": "2026-07-14T18:32:00.000Z"
 }
 ```

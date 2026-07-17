@@ -14,6 +14,7 @@ import ShareDebug from "@/components/ShareDebug";
 import ShareButtons from "@/components/ShareButtons";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import InlineMarkdown from "@/components/lesson/InlineMarkdown";
+import { apiPath } from "@/lib/base-path";
 
 export default function ModuleOverviewPage() {
   const params = useParams();
@@ -49,7 +50,7 @@ export default function ModuleOverviewPage() {
                 <h1 className="text-lg font-bold text-white flex items-center gap-2">
                   {!imgError ? (
                     <img
-                      src={`/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`}
+                      src={apiPath(`/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`)}
                       alt=""
                       width={28}
                       height={28}

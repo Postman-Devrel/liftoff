@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/context/ProgressContext";
 import { ValidationResult } from "@/types/validation";
+import { apiPath } from "@/lib/base-path";
 
 interface ValidateButtonProps {
   stepId: string;
@@ -37,7 +38,7 @@ export default function ValidateButton({
     setResult(null);
 
     try {
-      const res = await fetch("/api/postman/validate", {
+      const res = await fetch(apiPath("/api/postman/validate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Module } from "@/types/module";
 import { useProgress } from "@/context/ProgressContext";
+import { apiPath } from "@/lib/base-path";
 
 interface ModuleBadgeProps {
   module: Module;
@@ -55,7 +56,7 @@ export default function ModuleBadge({ module, size = 120 }: ModuleBadgeProps) {
 
   return (
     <img
-      src={`/api/modules/${module.id}/badge?v=${Date.now().toString(36)}`}
+      src={apiPath(`/api/modules/${module.id}/badge?v=${Date.now().toString(36)}`)}
       alt={`${module.title} badge`}
       width={size}
       height={size}

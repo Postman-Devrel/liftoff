@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { apiPath } from "@/lib/base-path";
 
 export function useUtmTracking(
   contentType: "module" | "learning_path",
@@ -16,7 +17,7 @@ export function useUtmTracking(
     const utmSource = params.get("utm_source");
     if (!utmSource) return;
 
-    fetch("/api/utm/track", {
+    fetch(apiPath("/api/utm/track"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

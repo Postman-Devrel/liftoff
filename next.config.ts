@@ -1,12 +1,13 @@
 import type { NextConfig } from "next";
+import { BASE_PATH } from "./src/lib/base-path";
 
 const nextConfig: NextConfig = {
-  basePath: "/liftoff",
+  basePath: BASE_PATH,
   trailingSlash: true,
   async redirects() {
     return [
       // Keep existing links to the domain root working.
-      { source: "/", destination: "/liftoff", basePath: false, permanent: false },
+      { source: "/", destination: BASE_PATH, basePath: false, permanent: false },
     ];
   },
 };

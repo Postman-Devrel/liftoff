@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { apiPath } from "@/lib/base-path";
 
 export default function ApiKeyForm() {
   const [key, setKey] = useState("");
@@ -17,7 +18,7 @@ export default function ApiKeyForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/postman/validate-key", {
+      const res = await fetch(apiPath("/api/postman/validate-key"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey: key.trim() }),

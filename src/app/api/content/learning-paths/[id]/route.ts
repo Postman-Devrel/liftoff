@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getLearningPath, getModulesForLearningPath } from "@/lib/content-loader";
+import { absoluteBase } from "@/lib/base-path";
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function GET(
   }
 
   const modules = getModulesForLearningPath(path.id);
-  const base = new URL(request.url).origin;
+  const base = absoluteBase(new URL(request.url).origin);
 
   const data = {
     id: path.id,

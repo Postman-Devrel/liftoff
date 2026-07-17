@@ -9,6 +9,7 @@ import NavMenu from "@/components/NavMenu";
 import { Module } from "@/types/module";
 import { useUtmTracking } from "@/hooks/useUtmTracking";
 import InlineMarkdown from "@/components/lesson/InlineMarkdown";
+import { apiPath } from "@/lib/base-path";
 
 const BADGE_VERSION = "1";
 
@@ -32,7 +33,7 @@ function ModuleCard({ module }: { module: Module }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${module.title} badge`}
             width={56}
             height={56}
@@ -142,7 +143,7 @@ export default function LearningPathPage({ params }: { params: Promise<{ pathId:
           <div className="flex items-center gap-5">
             {!pathImgError ? (
               <img
-                src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${path.title} badge`}
                 width={72}
                 height={72}

@@ -11,6 +11,7 @@ import NavMenu from "@/components/NavMenu";
 import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import { LearningPath } from "@/types/learning-path";
 import { Module } from "@/types/module";
+import { BASE_PATH, apiPath } from "@/lib/base-path";
 
 const BADGE_VERSION = "1";
 
@@ -233,7 +234,7 @@ function EarnedBadges() {
           >
             {!imgErrors[`path-${path.id}`] ? (
               <img
-                src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${path.title} path badge`}
                 width={56}
                 height={56}
@@ -261,7 +262,7 @@ function EarnedBadges() {
           >
             {!imgErrors[mod.id] ? (
               <img
-                src={`/api/modules/${mod.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/modules/${mod.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${mod.title} badge`}
                 width={56}
                 height={56}
@@ -313,7 +314,7 @@ function LearningPathCard({ path }: { path: LearningPath }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${path.title} badge`}
             width={56}
             height={56}
@@ -400,7 +401,7 @@ function ModuleCard({ module }: { module: Module }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${module.title} badge`}
             width={56}
             height={56}
@@ -476,7 +477,7 @@ export default function Home() {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--orange)]/10 border border-[var(--orange)]/20 text-[var(--orange)] text-sm font-medium mb-8">
-            <img src="/postman-logo.png" alt="Postman" className="h-5 w-auto object-contain" />
+            <img src={`${BASE_PATH}/postman-logo.png`} alt="Postman" className="h-5 w-auto object-contain" />
             <span>Powered by Postman</span>
           </div>
           <h1 className="text-6xl md:text-7xl font-black tracking-tight mb-4">

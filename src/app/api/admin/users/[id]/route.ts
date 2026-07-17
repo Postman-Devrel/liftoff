@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAllModules, getAllLearningPaths } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
 import { attributeUserRank, attributeUserCompletions } from "@/lib/achievement-attribution";
+import { BASE_PATH } from "@/lib/base-path";
 
 function verifyAdmin(request: Request): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -128,7 +129,7 @@ export async function GET(
       totalSteps: userProgress.length,
       rank: rank.title,
       rankBadge: rank.badge,
-      rankBadgeImg: rank.badgeImg,
+      rankBadgeImg: `${BASE_PATH}${rank.badgeImg}`,
     },
     modules: moduleProgress,
     recentActivity,
