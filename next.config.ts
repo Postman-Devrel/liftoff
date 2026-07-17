@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  basePath: "/liftoff",
+  trailingSlash: true,
+  async redirects() {
+    return [
+      // Keep existing links to the domain root working.
+      { source: "/", destination: "/liftoff", basePath: false, permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;
