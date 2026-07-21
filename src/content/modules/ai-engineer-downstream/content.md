@@ -1,111 +1,63 @@
 **PRIVATE**
-# Managing Downstream Dependencies with the AI Engineer
+# Making Multi-Repo changes with the AI engineer
 
-Most coding agents can rename a field in seconds — but they routinely break things because they don't understand how that code connects to everything else. In this module, you'll use the **Postman AI Engineer** to do what senior engineers do *before* they touch the code: walk the dependency graph, find every downstream consumer, and ship a safe change.
+Most coding agents can add a feature in a single repo — but they routinely break things because they don't understand how that code connects to everything else across an organization. The **Postman AI Engineer** is different because it's grounded in the **Context Graph**: a live, cross-repo model of your APIs, services, collections, and the calls that link them. Instead of guessing from files inside a single working directory, it reads the actual relationships between services — who produces what schema, who consumes it, which endpoints back which flows — so a change in one repo surfaces every service it ripples into. In this module, you'll use the AI Engineer to do what senior engineers do *before* they touch the code: walk the Context Graph across an entire fleet of services, find every downstream consumer, and ship a coordinated change.
 
-You'll rename a field in the **Create Employee** response schema, ask the AI Engineer to surface every downstream consumer of that field, and merge the PR it opens — without paging the iOS team at 2 a.m.
+You'll add localisation support to an ERP platform composed of 10 microservices, and let the AI Engineer open coordinated PRs across every affected repo — all with a single prompt.
 
 ## Part 1: Set Up Your Workspace
 
-### Step 1: Fork and Clone the ERP Repo
+Before the AI Engineer can walk the dependency graph, it needs a workspace to work from and access to your GitHub account. In this part you'll create a fresh workspace and wire up the GitHub MCP so Agent Mode can fork repos on your behalf.
 
-Everything in this module happens inside your own copy of the ERP project, so you can safely rename fields and merge PRs without touching the shared original. Forking gets you a repo of your own; cloning it locally is what lets Postman link a workspace to it.
+### Step 1: Create a New Postman Workspace
 
-1. Fork the Enterprise Resource Planning repo: [https://github.com/buildwithtalia/enterprise-resource-planning](https://github.com/buildwithtalia/enterprise-resource-planning).
-2. Clone your fork to your machine:
-   ```
-   git clone https://github.com/<your-username>/enterprise-resource-planning.git
-   ```
-3. Change into the cloned directory:
-   ```
-   cd enterprise-resource-planning
-   ```
+1. In Postman, click **Workspaces** in the left sidebar.
+2. Click **Create Workspace** and choose the **Blank workspace** template.
+3. Name it something memorable (for example, **ERP Fleet - [your name]**), set the visibility, and click **Create**.
 
-**Validation:** [MANUAL] Mark this step complete after you have forked the repo on GitHub and cloned it locally.
+**Validation:** [MANUAL] Mark this step complete once your new workspace is open in Postman.
 
-### Step 2: Create a Workspace and Push to the Cloud
+### Step 2: Connect the GitHub MCP
 
-With a local clone in hand, link a Postman workspace to it so the AI Engineer can read the repo's context — then push it up so your collections and specs are synced to Postman's servers.
+1. Inside your new workspace, open the **MCP** panel (or **Integrations**).
+2. Add the **GitHub MCP** server and authenticate with your GitHub account.
+3. Confirm the connection shows as active.
 
-1. In Postman, click **Workspaces** in the header, then click **Create Workspace**.
-2. Name it exactly: **Enterprise Resource Planning - [your name]** (for example, *Enterprise Resource Planning - Alex*).
-3. Set the workspace type to **Internal** — linking a Git repository is only supported for Internal workspaces.
-4. Choose **From a Git repository** instead of **Blank workspace**, then point it at the local ERP repo you just cloned.
-5. Set who can access the workspace, then click **Create Workspace**. Postman imports the ERP API spec and the **Enterprise Resource Planning API** collection, including the **Create Employee** request.
-6. Once the workspace is created, push it to the cloud so your collections and specs sync to Postman.
+**Validation:** [MANUAL] Mark this step complete once the GitHub MCP is connected and authenticated in your workspace.
 
-For more detail on any of these steps, see [Create workspaces](https://learning.postman.com/docs/collaborating-in-postman/using-workspaces/create-workspaces).
+## Part 2: Fork the ERP Fleet
 
-**Validation:**
+The ERP platform is split across 10 repos — a top-level service, a gateway, and 8 domain services. Instead of clicking **Fork** 10 times, you'll ask Agent Mode to do it for you through the GitHub MCP.
 
-- **[Workspace]** A workspace whose name starts with "Enterprise Resource Planning -" exists and was created by the current user.
-- **[Collection]** The **Enterprise Resource Planning API** collection exists in that workspace and contains a **Create Employee** request.
-
-## Part 2: Update the Create Employee Response Schema
-
-You're about to rename `id` to `employee-id` on the **Create Employee** response. In a normal repo, this is a one-line change. In Postman, the spec is the source of truth — updating it here is what the AI Engineer will diff against to find consumers.
-
-### Step 1: Ask Agent Mode to Rename the Field
-
-This is the change that kicks off the whole exercise — a seemingly small rename that the AI Engineer will later need to trace through every downstream consumer.
+### Step 1: Ask Agent Mode to Fork All ERP Repos
 
 1. Open **Agent Mode** in Postman.
 2. Enter the prompt exactly:
-  > Update Create Employee response schema to include "employee-id" instead of "id"
-3. Let the agent apply the change to the ERP spec, and review the diff it shows you — confirm the **Create Employee** response schema now defines `employee-id` instead of `id`.
+  > Fork and clone the following repos to my Github account:
+  >
+  > - [https://github.com/buildwithtalia/enterprise-resource-planning](https://github.com/buildwithtalia/enterprise-resource-planning)
+  > - [https://github.com/buildwithtalia/erp-gateway](https://github.com/buildwithtalia/erp-gateway)
+  > - [https://github.com/buildwithtalia/erp-billing](https://github.com/buildwithtalia/erp-billing)
+  > - [https://github.com/buildwithtalia/erp-finance](https://github.com/buildwithtalia/erp-finance)
+  > - [https://github.com/buildwithtalia/erp-payroll](https://github.com/buildwithtalia/erp-payroll)
+  > - [https://github.com/buildwithtalia/erp-procurement](https://github.com/buildwithtalia/erp-procurement)
+  > - [https://github.com/buildwithtalia/erp-accounting](https://github.com/buildwithtalia/erp-accounting)
+  > - [https://github.com/buildwithtalia/erp-hr](https://github.com/buildwithtalia/erp-hr)
+  > - [https://github.com/buildwithtalia/erp-inventory](https://github.com/buildwithtalia/erp-inventory)
+  > - [https://github.com/buildwithtalia/erp-supply-chain](https://github.com/buildwithtalia/erp-supply-chain)
+3. Let Agent Mode fork and clone each repo to your account.
 
-**Validation:** [MANUAL] Mark this step complete after you've confirmed the diff renames `id` to `employee-id` on the Create Employee response schema.
+**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/user/repos?type=owner&per_page=100` returns status `200` and the response body contains forks of all 10 ERP repos: `enterprise-resource-planning`, `erp-gateway`, `erp-billing`, `erp-finance`, `erp-payroll`, `erp-procurement`, `erp-accounting`, `erp-hr`, `erp-inventory`, and `erp-supply-chain`.
 
-### Step 2: Merge Changes to Main
+## Part 3: Add Localisation Support Across the Fleet
 
-The AI Engineer diffs against what's on `main`, so the schema change needs to actually land there before it can find anything to fix downstream.
+This is the moment that separates confident-locality from organizational context. Instead of manually adding localisation code service by service, you'll ask the AI Engineer to walk the Context Graph and open coordinated PRs across every affected repo — with one prompt.
 
-1. Review the diff Agent Mode produced against the ERP spec.
-2. Merge the schema change to `main` in your fork.
-
-**Validation:** [MANUAL] Mark this step complete after you have merged the schema change to `main`.
-
-### Step 3: Git Pull
-
-Your local working copy is still on the old schema until you pull — do this now so the next step reflects the merged change.
-
-1. Pull the latest `main` locally so your working copy reflects the merged schema change.
-
-**Validation:** [MANUAL] Mark this step complete after your local `main` is up to date with the merged schema change.
-
-## Part 3: Update Downstream Dependencies
-
-This is the moment that separates confident-locality from organizational context. Instead of grepping your repos, you'll ask the AI Engineer to walk the dependency graph and update every downstream consumer of the field you just renamed.
-
-### Step 1: Ask Agent Tasks to Update Downstream Dependencies
-
-This is the step that would normally mean grepping every repo in your org by hand — instead, you'll ask the AI Engineer to do that walk for you and hand back a ready-to-review PR.
+### Step 1: Ask the AI Engineer to Add Localisation Support
 
 1. Open **Agent Tasks** in Postman.
-2. Ask the agent to update all downstream dependencies from the response schema update you just merged.
-3. The AI Engineer walks the Context Graph, identifies every consumer of the old `id` field, and opens a pull request with the updates wired in.
+2. In the Agent Tasks text field, enter the prompt exactly:
+  > Add localisation support for the ERP app including currencies and languages based on location. Make this fix and then find and update all the downstream dependencies
+3. The AI Engineer writes the code, queries the Context Graph across the ERP fleet, identifies every service that needs localisation-aware logic, updates all downstream dependencies, and opens a pull request against each affected repo.
 
-**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=open` returns status `200` and the response body contains at least one PR opened by the AI Engineer that touches the downstream consumers of `employee-id`.
-
-## Part 4: Merge the PR
-
-The AI Engineer doesn't just identify consumers — it opens a PR with the consumer-test updates ready to go. Your last job is to review and merge it, then pull the changes locally.
-
-### Step 1: Merge the PR
-
-The AI Engineer's PR is a proposal, not an automatic change — you're still the one who reviews and approves what ships to consumers.
-
-1. Open the PR the AI Engineer created against your ERP fork.
-2. Review the diff to confirm the downstream updates look correct.
-3. Merge the PR into `main`.
-
-**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=closed` returns status `200`, and the response body contains at least one PR with `"merged": true` whose diff renames `id` to `employee-id` in the downstream consumers.
-
-### Step 2: Git Pull in the Postman Terminal
-
-One last sync so your local collection matches what's now on `main`, including the downstream fixes the AI Engineer just merged.
-
-1. Open the terminal in Postman.
-2. Run `git pull` to bring the merged downstream updates into your local working copy.
-
-**Validation:** **[Collection Request]** After the pull, the downstream consumer requests in the **Enterprise Resource Planning API** collection reference `employee-id` (not `id`) in their URLs, request bodies, or test scripts.
+**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/search/issues?q=is:pr+is:open+user:<your-account>+localisation` returns status `200` and the response body contains at least one open PR opened by the AI Engineer across the forked ERP repos.

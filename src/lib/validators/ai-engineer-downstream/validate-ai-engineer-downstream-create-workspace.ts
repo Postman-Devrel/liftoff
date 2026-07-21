@@ -1,13 +1,13 @@
 import { ValidatorFn } from "@/types/validation";
 
-export const validateAiEngineerDownstreamForkAndCloneErpRepo: ValidatorFn = async (
+export const validateAiEngineerDownstreamCreateWorkspace: ValidatorFn = async (
   _apiKey,
   context
 ) => {
   return {
     success: true,
     message:
-      "Self-verified: You confirmed the ERP repo was forked and cloned locally.",
+      "Self-verified: You confirmed a new Postman workspace is created and open.",
     pointsAwarded: 10,
     context,
   };

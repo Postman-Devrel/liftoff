@@ -29,12 +29,14 @@ LiftOff uses two independent authentication layers:
 - **Discord OAuth** (via Supabase Auth) — persistent identity. Sign in once, your progress is saved across sessions and devices.
 - **Postman API Key** (sessionStorage) — ephemeral, per-session. Required to validate exercises. Never stored server-side.
 
-| State | Postman Key | Discord | Progress Storage |
-|-------|------------|---------|-----------------|
-| Anonymous | No | No | None |
-| Browsing | No | Yes | Can view saved progress, can't validate |
-| Postman-only | Yes | No | localStorage (local only) |
-| Registered | Yes | Yes | Supabase (persistent) |
+
+| State        | Postman Key | Discord | Progress Storage                        |
+| ------------ | ----------- | ------- | --------------------------------------- |
+| Anonymous    | No          | No      | None                                    |
+| Browsing     | No          | Yes     | Can view saved progress, can't validate |
+| Postman-only | Yes         | No      | localStorage (local only)               |
+| Registered   | Yes         | Yes     | Supabase (persistent)                   |
+
 
 ### Architecture
 
@@ -156,11 +158,13 @@ supabase/
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anonymous key (safe to expose — RLS protects data) |
-| `GEMINI_API_KEY` | No | Google Gemini API key for badge generation |
+
+| Variable                        | Required | Description                                                 |
+| ------------------------------- | -------- | ----------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Supabase project URL                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Supabase anonymous key (safe to expose — RLS protects data) |
+| `GEMINI_API_KEY`                | No       | Google Gemini API key for badge generation                  |
+
 
 ---
 
@@ -171,9 +175,9 @@ supabase/
 1. Create a project at [supabase.com](https://supabase.com)
 2. Run `supabase/migrations/001_initial_schema.sql` in the [SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
 3. Enable **Discord** under Authentication → Providers:
-   - Create a Discord application at [discord.com/developers](https://discord.com/developers/applications)
-   - Copy Client ID and Client Secret into Supabase
-   - Add redirect URL: `https://<your-domain>/api/auth/callback`
+  - Create a Discord application at [discord.com/developers](https://discord.com/developers/applications)
+  - Copy Client ID and Client Secret into Supabase
+  - Add redirect URL: `https://<your-domain>/api/auth/callback`
 4. Copy the project URL and anon key into your environment variables
 
 ### Vercel (Recommended)
@@ -183,8 +187,8 @@ supabase/
 3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GEMINI_API_KEY`
 4. Deploy
 5. Add your Vercel production URL to:
-   - Discord Developer Portal → OAuth2 → Redirects: `https://<app>.vercel.app/api/auth/callback`
-   - Supabase → Authentication → URL Configuration → Redirect URLs: same URL
+  - Discord Developer Portal → OAuth2 → Redirects: `https://<app>.vercel.app/api/auth/callback`
+  - Supabase → Authentication → URL Configuration → Redirect URLs: same URL
 
 ### Any Node.js Host
 
@@ -199,15 +203,17 @@ Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environmen
 
 ## Scoring
 
-| Rank | Points | Badge |
-|------|--------|-------|
-| Space Cadet | 0 | ![Space Cadet](public/ranks/cadet.png) |
-| Mission Specialist | 50 | ![Mission Specialist](public/ranks/specialist.png) |
-| Commander | 100 | ![Commander](public/ranks/commander.png) |
-| Flight Director | 500 | ![Flight Director](public/ranks/flight-director.png) |
-| Galaxy Brain | 1,000 | ![Galaxy Brain](public/ranks/galaxy-brain.png) |
-| Supernova | 5,000 | ![Supernova](public/ranks/supernova.png) |
-| Mass Relay | 10,000 | ![Mass Relay](public/ranks/mass-relay.png) |
+
+| Rank               | Points | Badge              |
+| ------------------ | ------ | ------------------ |
+| Space Cadet        | 0      | Space Cadet        |
+| Mission Specialist | 50     | Mission Specialist |
+| Commander          | 100    | Commander          |
+| Flight Director    | 500    | Flight Director    |
+| Galaxy Brain       | 1,000  | Galaxy Brain       |
+| Supernova          | 5,000  | Supernova          |
+| Mass Relay         | 10,000 | Mass Relay         |
+
 
 ## Tech Stack
 
@@ -217,3 +223,4 @@ Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environmen
 - **Tailwind CSS v4** with dark glassmorphism theme
 - **Postman API** for workspace/collection/environment validation
 - **Vercel** for deployment
+

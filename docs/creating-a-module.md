@@ -85,7 +85,7 @@ To publish a private module later, remove the `**PRIVATE**` line from `content.m
 
 - Each **Part** (`## Part N`) becomes a **Lesson** (a groupable section)
 - Each **Step** (`### Step N`) within a Part is an individually validated task worth 10 points
-- Always include a `**Validation:**` block describing what the Postman API should check
+- Always include a `**Validation:`** block describing what the Postman API should check
 - For steps that **cannot** be validated via the Postman API (local CLI commands, MCP configuration, etc.), prefix the validation block with `[MANUAL]`: `**Validation:** [MANUAL] Learner should verify that...`. This sets `"manual": true` in module.json and shows a **Done** button instead of **Validate** in the UI
 - Be specific about expected names, values, and states
 - Include URLs, code snippets, and exact values the learner will need
@@ -94,17 +94,17 @@ To publish a private module later, remove the `**PRIVATE**` line from `content.m
 
 Step descriptions are the ONLY thing the learner sees. They must be **self-contained and actionable** — the learner should never need to leave the page to figure out what to do. Every step should include:
 
-| Element | When to include | Example |
-|---------|----------------|---------|
-| Preamble | Always, before the numbered instructions | 1–2 sentences on what this step accomplishes and why — never open cold with "1. Open..." |
-| Numbered instructions | Always | 1. Open the request 2. Set the body 3. Click Send |
-| JSON payloads | Any step with a request body | Full JSON in a fenced code block |
-| AI/Agent Mode prompts | Any step using Postman Agent Mode | Exact prompt in a blockquote |
-| Expected outcomes | Always | "Expect `201 Created`", "Dashboard appears in Visualize tab" |
-| Troubleshooting tips | When common errors exist | "If you get a 401, check that apiKey is set" |
-| Reference tables | When choosing from allowed values | Table of valid phases, categories, etc. |
-| Reference links | When external docs help | Link to API guides, story context, etc. |
-| Cautions/warnings | When gotchas exist | "Anomaly logs cannot be deleted" |
+| Element               | When to include                          | Example                                                                                    |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Preamble              | Always, before the numbered instructions | 1–2 sentences on what this step accomplishes and why — never open cold with "1. Open..."   |
+| Numbered instructions | Always                                   | 1. Open the request 2. Set the body 3. Click Send                                          |
+| JSON payloads         | Any step with a request body             | Full JSON in a fenced code block                                                           |
+| AI/Agent Mode prompts | Any step using Postman Agent Mode        | Exact prompt in a blockquote                                                               |
+| Expected outcomes     | Always                                   | "Expect `201 Created`", "Dashboard appears in Visualize tab"                               |
+| Troubleshooting tips  | When common errors exist                 | "If you get a 401, check that apiKey is set"                                               |
+| Reference tables      | When choosing from allowed values        | Table of valid phases, categories, etc.                                                    |
+| Reference links       | When external docs help                  | Link to API guides, story context, etc.                                                    |
+| Cautions/warnings     | When gotchas exist                       | "Anomaly logs cannot be deleted"                                                           |
 
 **Bad:** "Create 3 logs using POST /logs with different categories."
 
@@ -149,14 +149,16 @@ Claude diffs the markdown against the current `module.json` and applies all chan
 
 ## Other Skills
 
-| Command | What it does |
-|---------|-------------|
-| `/liftoff-module create` | Create a new module from a URL or markdown file |
+
+| Command                          | What it does                                             |
+| -------------------------------- | -------------------------------------------------------- |
+| `/liftoff-module create`         | Create a new module from a URL or markdown file          |
 | `/liftoff-module create --badge` | Create a new module and auto-generate a completion badge |
-| `/liftoff-module update` | Sync `module.json` to match the current `content.md` |
-| `/liftoff-module update --badge` | Update and generate a badge if one doesn't exist |
-| `/liftoff-module badge` | Generate or regenerate a badge for an existing module |
-| `/liftoff-module sync` | Regenerate missing validators and verify the build |
+| `/liftoff-module update`         | Sync `module.json` to match the current `content.md`     |
+| `/liftoff-module update --badge` | Update and generate a badge if one doesn't exist         |
+| `/liftoff-module badge`          | Generate or regenerate a badge for an existing module    |
+| `/liftoff-module sync`           | Regenerate missing validators and verify the build       |
+
 
 Once you've created a module, add it to a learning path to surface it on the home page:
 
@@ -166,21 +168,23 @@ Once you've created a module, add it to a learning path to surface it on the hom
 
 Your `**Validation:**` blocks should describe one of these check types:
 
-| Check Type | Description | Example |
-|------------|-------------|---------|
-| Api Response | Call an API and check the response | "GET /health returns 200 OK" |
-| Collection Exists | Check a collection exists in a workspace | "Collection containing 'Mission Control' in name" |
-| Collection Requests | Verify a collection contains expected requests by name | "Collection has fromAccount, toAccount, and Create new transaction requests" |
-| Collection Run | Check that a collection run passed | "All tests in the collection pass" |
-| Env Var Secret | Verify an environment variable is marked as sensitive/secret | "apiKey variable type is 'secret'" |
-| Environment Exists | Check an environment with specific name exists | "Environment 'Banking.local' exists in workspace" |
-| Environment Values | Check specific variable values or presence | "baseUrl = 'https://example.com', apiKey is non-empty" |
-| Manual | Self-verified step that cannot be validated via API | "Learner confirmed MCP server is configured" |
-| Post Response Script | Check a request has a post-response script setting a variable | "fromAccount request has script saving accountId to env var" |
-| Request Urls | Verify request URLs use a variable instead of hardcoded values | "All requests use {{baseUrl}} in their URL" |
-| Test Scripts | Verify requests have test scripts (pm.test) | "All requests have status code and response time tests" |
-| Workspace Exists | Check a workspace with a specific name pattern | "Workspace named 'Artemis II - [name]' exists" |
-| Workspace Visibility | Verify workspace visibility/type settings | "Workspace visibility is Internal (team)" |
+
+| Check Type           | Description                                                    | Example                                                                       |
+| -------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Api Response         | Call an API and check the response                             | "GET /health returns 200 OK"                                                  |
+| Collection Exists    | Check a collection exists in a workspace                       | "Collection containing 'Mission Control' in name"                             |
+| Collection Requests  | Verify a collection contains expected requests by name         | "Collection has fromAccount, toAccount, and Create new transaction requests"  |
+| Collection Run       | Check that a collection run passed                             | "All tests in the collection pass"                                            |
+| Env Var Secret       | Verify an environment variable is marked as sensitive/secret   | "apiKey variable type is 'secret'"                                            |
+| Environment Exists   | Check an environment with specific name exists                 | "Environment 'Banking.local' exists in workspace"                             |
+| Environment Values   | Check specific variable values or presence                     | "baseUrl = '[https://example.com](https://example.com)', apiKey is non-empty" |
+| Manual               | Self-verified step that cannot be validated via API            | "Learner confirmed MCP server is configured"                                  |
+| Post Response Script | Check a request has a post-response script setting a variable  | "fromAccount request has script saving accountId to env var"                  |
+| Request Urls         | Verify request URLs use a variable instead of hardcoded values | "All requests use {{baseUrl}} in their URL"                                   |
+| Test Scripts         | Verify requests have test scripts (pm.test)                    | "All requests have status code and response time tests"                       |
+| Workspace Exists     | Check a workspace with a specific name pattern                 | "Workspace named 'Artemis II - [name]' exists"                                |
+| Workspace Visibility | Verify workspace visibility/type settings                      | "Workspace visibility is Internal (team)"                                     |
+
 
 ## Module Badge
 

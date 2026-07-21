@@ -59,14 +59,10 @@ import { validateClaudeCodePluginRunSetup } from "./claude-code-plugin/validate-
 import { validateClaudeCodePluginSearchWorkspace } from "./claude-code-plugin/validate-claude-code-plugin-search-workspace";
 import { validateClaudeCodePluginQueryMoviesApi } from "./claude-code-plugin/validate-claude-code-plugin-query-movies-api";
 import { validateClaudeCodePluginRunCollectionTests } from "./claude-code-plugin/validate-claude-code-plugin-run-collection-tests";
-import { validateAiEngineerDownstreamForkAndCloneErpRepo } from "./ai-engineer-downstream/validate-ai-engineer-downstream-fork-and-clone-erp-repo";
-import { validateAiEngineerDownstreamCreateWorkspaceAndPushToCloud } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace-and-push-to-cloud";
-import { validateAiEngineerDownstreamRenameSchemaField } from "./ai-engineer-downstream/validate-ai-engineer-downstream-rename-schema-field";
-import { validateAiEngineerDownstreamMergeToMain } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-to-main";
-import { validateAiEngineerDownstreamGitPull } from "./ai-engineer-downstream/validate-ai-engineer-downstream-git-pull";
-import { validateAiEngineerDownstreamAiEngineerOpensPr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-ai-engineer-opens-pr";
-import { validateAiEngineerDownstreamMergePr } from "./ai-engineer-downstream/validate-ai-engineer-downstream-merge-pr";
-import { validateAiEngineerDownstreamConsumersUseEmployeeId } from "./ai-engineer-downstream/validate-ai-engineer-downstream-consumers-use-employee-id";
+import { validateAiEngineerDownstreamCreateWorkspace } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace";
+import { validateAiEngineerDownstreamConnectGithubMcp } from "./ai-engineer-downstream/validate-ai-engineer-downstream-connect-github-mcp";
+import { validateAiEngineerDownstreamForkErpFleet } from "./ai-engineer-downstream/validate-ai-engineer-downstream-fork-erp-fleet";
+import { validateAiEngineerDownstreamAddLocalisationSupport } from "./ai-engineer-downstream/validate-ai-engineer-downstream-add-localisation-support";
 
 export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-workspace": validateWorkspace,
@@ -129,12 +125,8 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-claude-code-plugin-search-workspace": validateClaudeCodePluginSearchWorkspace,
   "validate-claude-code-plugin-query-movies-api": validateClaudeCodePluginQueryMoviesApi,
   "validate-claude-code-plugin-run-collection-tests": validateClaudeCodePluginRunCollectionTests,
-  "validate-ai-engineer-downstream-fork-and-clone-erp-repo": validateAiEngineerDownstreamForkAndCloneErpRepo,
-  "validate-ai-engineer-downstream-create-workspace-and-push-to-cloud": validateAiEngineerDownstreamCreateWorkspaceAndPushToCloud,
-  "validate-ai-engineer-downstream-rename-schema-field": validateAiEngineerDownstreamRenameSchemaField,
-  "validate-ai-engineer-downstream-merge-to-main": validateAiEngineerDownstreamMergeToMain,
-  "validate-ai-engineer-downstream-git-pull": validateAiEngineerDownstreamGitPull,
-  "validate-ai-engineer-downstream-ai-engineer-opens-pr": validateAiEngineerDownstreamAiEngineerOpensPr,
-  "validate-ai-engineer-downstream-merge-pr": validateAiEngineerDownstreamMergePr,
-  "validate-ai-engineer-downstream-consumers-use-employee-id": validateAiEngineerDownstreamConsumersUseEmployeeId,
+  "validate-ai-engineer-downstream-create-workspace": validateAiEngineerDownstreamCreateWorkspace,
+  "validate-ai-engineer-downstream-connect-github-mcp": validateAiEngineerDownstreamConnectGithubMcp,
+  "validate-ai-engineer-downstream-fork-erp-fleet": validateAiEngineerDownstreamForkErpFleet,
+  "validate-ai-engineer-downstream-add-localisation-support": validateAiEngineerDownstreamAddLocalisationSupport,
 };
