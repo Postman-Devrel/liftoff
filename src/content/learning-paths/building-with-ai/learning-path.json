@@ -5,5 +5,5 @@
   "icon": "🧠",
   "color": "#7C3AED",
   "moduleIds": ["agent-mode-basics", "postman-mcp", "claude-code-plugin", "ai-engineer-downstream"],
-  "private": true
+  "private": false
 }
