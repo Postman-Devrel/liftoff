@@ -1,5 +1,7 @@
 "use client";
 
+import { BASE_PATH } from "@/lib/base-path";
+
 interface RankBadgeProps {
   badgeImg: string;
   badgeImgFull: string;
@@ -9,7 +11,7 @@ interface RankBadgeProps {
 }
 
 export default function RankBadge({ badgeImg, badgeImgFull, title, size = 48, variant = "full" }: RankBadgeProps) {
-  const src = variant === "full" ? badgeImgFull : badgeImg;
+  const src = `${BASE_PATH}${variant === "full" ? badgeImgFull : badgeImg}`;
 
   return (
     <img

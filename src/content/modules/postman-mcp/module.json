@@ -1,0 +1,70 @@
+{
+  "id": "postman-mcp",
+  "title": "Connect to Postman with MCP",
+  "description": "Connect your coding assistant to Postman using the Postman MCP Server, then read and run requests from the workspace and collection you built in *Getting Started with Agent Mode* — directly from your editor. These instructions use a code-editor MCP config as the example, but the same server works with almost any MCP-compatible IDE or agent (Claude Code, Cursor, VS Code Copilot, Windsurf, Gemini CLI, and more).",
+  "color": "#EC4899",
+  "icon": "🔌",
+  "lessons": [
+    {
+      "id": "lesson-1-connect-the-server",
+      "slug": "connect-the-server",
+      "title": "Connect the Postman MCP Server",
+      "partNumber": 1,
+      "steps": [
+        {
+          "id": "step-1-get-api-key",
+          "stepNumber": 1,
+          "title": "Get a Postman API Key",
+          "description": "Your coding assistant needs its own credential to talk to Postman on your behalf — this API key is what the MCP server uses to authenticate as you.\n\n1. Go to [go.postman.co/settings/me/api-keys](https://go.postman.co/settings/me/api-keys).\n2. Generate a new API key and copy it somewhere safe — you won't be able to see it again.",
+          "points": 10,
+          "validatorId": "validate-postman-mcp-get-api-key",
+          "manual": true
+        },
+        {
+          "id": "step-2-add-mcp-server",
+          "stepNumber": 2,
+          "title": "Add the Postman MCP Server to Your Editor",
+          "description": "The [Postman MCP Server](https://github.com/postmanlabs/postman-mcp-server) implements the Model Context Protocol so any compatible agent or IDE can read and act on your Postman workspaces, collections, specs, and environments.\n\n**Remote server (recommended)** — add this to your editor's MCP configuration, using your API key from Step 1:\n\n```json\n{\n  \"mcpServers\": {\n    \"postman\": {\n      \"url\": \"https://mcp.postman.com/minimal\",\n      \"headers\": {\n        \"Authorization\": \"Bearer YOUR_POSTMAN_API_KEY\"\n      }\n    }\n  }\n}\n```\n\n**Local server** — an alternative if you'd rather run it locally, or if you ever need MCP to reach an API running on your own machine:\n\n```bash\nexport POSTMAN_API_KEY=YOUR_POSTMAN_API_KEY\nnpx @postman/postman-mcp-server\n```\n\nChange `/minimal` to `/code` or `/mcp` (or add `--code` / `--full` locally) for more tools. `minimal` is enough for this module.\n\nEvery major agent and IDE has its own config file location — see the [IDE-specific setup docs](https://learning.postman.com/docs/reference/postman-api/postman-mcp-server/overview) for Claude Code, Cursor, VS Code, Windsurf, Gemini CLI, and others.",
+          "points": 10,
+          "validatorId": "validate-postman-mcp-add-mcp-server",
+          "manual": true
+        },
+        {
+          "id": "step-3-connect-workspace",
+          "stepNumber": 3,
+          "title": "Connect to Your Module 1 Workspace",
+          "description": "With the MCP server connected, your assistant can now see your Postman account directly. Confirm it actually works by pointing it at the workspace you built in the previous module.\n\n1. In your editor, ask your assistant something like:\n\n   > Using the Postman MCP tools, find my \"[Your Name] - AI Basics\" workspace and tell me what collections are in it.\n\n2. Confirm it finds the workspace and collection you created in *Getting Started with Agent Mode*.",
+          "points": 10,
+          "validatorId": "validate-postman-mcp-connect-workspace",
+          "manual": true
+        }
+      ]
+    },
+    {
+      "id": "lesson-2-read-and-run",
+      "slug": "read-and-run",
+      "title": "Read and Run Requests via MCP",
+      "partNumber": 2,
+      "steps": [
+        {
+          "id": "step-1-read-collection",
+          "stepNumber": 1,
+          "title": "Read the Movies API Collection",
+          "description": "Before asking your assistant to act on anything, confirm it can actually see your collection's contents through MCP — this read-only check is what everyday API context-awareness looks like in practice.\n\n1. Ask your assistant:\n\n   > Using the Postman MCP tools, list every request in my Movies API collection along with their methods and URLs.\n\n2. Confirm the response matches the requests you built in Module 1: list, get one, create, update, and delete for animated movies.",
+          "points": 10,
+          "validatorId": "validate-postman-mcp-read-collection",
+          "manual": true
+        },
+        {
+          "id": "step-2-execute-endpoint",
+          "stepNumber": 2,
+          "title": "Execute a Movies Endpoint via MCP",
+          "description": "The [Movies API](https://sampleapis.com/api-list/movies) is publicly hosted, so either the remote or local MCP server can reach it — no need to run anything locally.\n\n1. Ask your assistant:\n\n   > Using the Postman MCP tools, run the GET request for the animated movies list in my Movies API collection and show me the response.\n\n2. Confirm you get back a `200` response with a list of movies.",
+          "points": 10,
+          "validatorId": "validate-postman-mcp-execute-endpoint",
+          "manual": true
+        }
+      ]
+    }
+  ]
+}

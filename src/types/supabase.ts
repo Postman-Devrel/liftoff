@@ -12,6 +12,7 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
+          discord_id: string | null;
           discord_username: string | null;
           discord_avatar_url: string | null;
           display_name: string | null;
@@ -20,6 +21,7 @@ export interface Database {
         };
         Insert: {
           id: string;
+          discord_id?: string | null;
           discord_username?: string | null;
           discord_avatar_url?: string | null;
           display_name?: string | null;
@@ -28,6 +30,7 @@ export interface Database {
         };
         Update: {
           id?: string;
+          discord_id?: string | null;
           discord_username?: string | null;
           discord_avatar_url?: string | null;
           display_name?: string | null;
@@ -72,6 +75,53 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "progress_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      utm_attribution: {
+        Row: {
+          id: string;
+          user_id: string;
+          content_type: string;
+          content_id: string;
+          utm_source: string;
+          utm_medium: string | null;
+          utm_campaign: string | null;
+          utm_term: string | null;
+          utm_content: string | null;
+          first_seen_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          content_type: string;
+          content_id: string;
+          utm_source: string;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          utm_term?: string | null;
+          utm_content?: string | null;
+          first_seen_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          content_type?: string;
+          content_id?: string;
+          utm_source?: string;
+          utm_medium?: string | null;
+          utm_campaign?: string | null;
+          utm_term?: string | null;
+          utm_content?: string | null;
+          first_seen_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "utm_attribution_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";

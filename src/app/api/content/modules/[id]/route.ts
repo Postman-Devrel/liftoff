@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getAllModules } from "@/lib/content-loader";
+import { absoluteBase } from "@/lib/base-path";
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
     return Response.json({ error: "Module not found" }, { status: 404 });
   }
 
-  const base = new URL(request.url).origin;
+  const base = absoluteBase(new URL(request.url).origin);
 
   const data = {
     id: module.id,

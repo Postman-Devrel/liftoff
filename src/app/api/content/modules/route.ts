@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { getAllModules, getModulesForLearningPath } from "@/lib/content-loader";
+import { absoluteBase } from "@/lib/base-path";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const base = new URL(request.url).origin;
+  const base = absoluteBase(new URL(request.url).origin);
 
   const data = modules.map((m) => {
     const stepCount = m.lessons.reduce((a, l) => a + l.steps.length, 0);

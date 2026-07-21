@@ -4,6 +4,7 @@
   "description": "You'll add localisation support to an ERP platform composed of 10 microservices, and let the AI Engineer open coordinated PRs across every affected repo — all with a single prompt.",
   "color": "#10B981",
   "icon": "🕸️",
+  "private": true,
   "lessons": [
     {
       "id": "lesson-1-set-up-your-workspace",

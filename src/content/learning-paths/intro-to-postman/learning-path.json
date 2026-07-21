@@ -4,6 +4,6 @@
   "description": "Start your API journey here. Learn the core Postman features: workspaces, collections, environments, and your first real API requests.",
   "icon": "🛸",
   "color": "#8B5CF6",
-  "moduleIds": ["api-basics", "artemis-mission-control"],
+  "moduleIds": ["api-basics", "agent-mode-basics", "world-explorer"],
   "private": false
 }

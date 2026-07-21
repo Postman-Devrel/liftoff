@@ -8,8 +8,10 @@ import { getAllModules, getAllLearningPaths, getModulesForLearningPath } from "@
 import { calculateRank, getNextRank } from "@/lib/scoring";
 import RankBadge from "@/components/scoring/RankBadge";
 import NavMenu from "@/components/NavMenu";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
 import { LearningPath } from "@/types/learning-path";
 import { Module } from "@/types/module";
+import { BASE_PATH, apiPath } from "@/lib/base-path";
 
 const BADGE_VERSION = "1";
 
@@ -232,7 +234,7 @@ function EarnedBadges() {
           >
             {!imgErrors[`path-${path.id}`] ? (
               <img
-                src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${path.title} path badge`}
                 width={56}
                 height={56}
@@ -260,7 +262,7 @@ function EarnedBadges() {
           >
             {!imgErrors[mod.id] ? (
               <img
-                src={`/api/modules/${mod.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/modules/${mod.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${mod.title} badge`}
                 width={56}
                 height={56}
@@ -312,7 +314,7 @@ function LearningPathCard({ path }: { path: LearningPath }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${path.title} badge`}
             width={56}
             height={56}
@@ -339,7 +341,7 @@ function LearningPathCard({ path }: { path: LearningPath }) {
             {path.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {path.description}
+            <InlineMarkdown>{path.description}</InlineMarkdown>
           </p>
         </div>
       </div>
@@ -399,7 +401,7 @@ function ModuleCard({ module }: { module: Module }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${module.title} badge`}
             width={56}
             height={56}
@@ -426,7 +428,7 @@ function ModuleCard({ module }: { module: Module }) {
             {module.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {module.description}
+            <InlineMarkdown>{module.description}</InlineMarkdown>
           </p>
         </div>
       </div>
@@ -475,7 +477,7 @@ export default function Home() {
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--orange)]/10 border border-[var(--orange)]/20 text-[var(--orange)] text-sm font-medium mb-8">
-            <img src="/postman-logo.png" alt="Postman" className="h-5 w-auto object-contain" />
+            <img src={`${BASE_PATH}/postman-logo.png`} alt="Postman" className="h-5 w-auto object-contain" />
             <span>Powered by Postman</span>
           </div>
           <h1 className="text-6xl md:text-7xl font-black tracking-tight mb-4">
@@ -487,6 +489,10 @@ export default function Home() {
             <span className="text-white font-medium">real-time API validation</span>.
             Complete steps in Postman, validate your work, earn your rank.
           </p>
+          <p className="text-sm text-[var(--text-tertiary)] max-w-xl mx-auto mt-4 leading-relaxed">
+            <span className="text-white font-medium">Learning Paths</span> string modules together into a guided curriculum.{" "}
+            <span className="text-white font-medium">Modules</span> are standalone lessons you can jump into on their own — use the tabs below to switch between them.
+          </p>
         </div>
       </header>
 
@@ -497,7 +503,37 @@ export default function Home() {
           </div>
 
           <div className="lg:col-span-2 order-1 lg:order-2">
-            <div className="mb-6 flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit">
+            <div className="relative mb-6 flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10 w-fit">
+              <svg
+                className="hidden sm:block absolute -top-16 left-2 w-40 h-16 pointer-events-none select-none"
+                viewBox="0 0 160 70"
+                fill="none"
+                aria-hidden="true"
+              >
+                <text
+                  x="2"
+                  y="22"
+                  fill="var(--orange)"
+                  fontSize="26"
+                  transform="rotate(-4 2 22)"
+                  style={{ fontFamily: "var(--font-caveat)" }}
+                >
+                  Start here!
+                </text>
+                <path
+                  d="M20 34 C 10 42, 40 46, 50 54 S 70 58, 78 64"
+                  stroke="var(--orange)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M73 55 L78 64 L68 62 Z"
+                  fill="var(--orange)"
+                  stroke="var(--orange)"
+                  strokeWidth="1"
+                  strokeLinejoin="round"
+                />
+              </svg>
               <button
                 onClick={() => setView("paths")}
                 className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${

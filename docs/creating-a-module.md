@@ -40,6 +40,8 @@ Brief intro to this lesson.
 
 ### Step 1: Step Title
 
+A sentence or two on what this step accomplishes and why it matters — orient the learner before the instructions start.
+
 Detailed instructions for what the learner needs to do.
 
 - Bullet points for specific actions
@@ -92,18 +94,17 @@ To publish a private module later, remove the `**PRIVATE**` line from `content.m
 
 Step descriptions are the ONLY thing the learner sees. They must be **self-contained and actionable** — the learner should never need to leave the page to figure out what to do. Every step should include:
 
-
-| Element               | When to include                   | Example                                                      |
-| --------------------- | --------------------------------- | ------------------------------------------------------------ |
-| Numbered instructions | Always                            | 1. Open the request 2. Set the body 3. Click Send            |
-| JSON payloads         | Any step with a request body      | Full JSON in a fenced code block                             |
-| AI/Agent Mode prompts | Any step using Postman Agent Mode | Exact prompt in a blockquote                                 |
-| Expected outcomes     | Always                            | "Expect `201 Created`", "Dashboard appears in Visualize tab" |
-| Troubleshooting tips  | When common errors exist          | "If you get a 401, check that apiKey is set"                 |
-| Reference tables      | When choosing from allowed values | Table of valid phases, categories, etc.                      |
-| Reference links       | When external docs help           | Link to API guides, story context, etc.                      |
-| Cautions/warnings     | When gotchas exist                | "Anomaly logs cannot be deleted"                             |
-
+| Element               | When to include                          | Example                                                                                    |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Preamble              | Always, before the numbered instructions | 1–2 sentences on what this step accomplishes and why — never open cold with "1. Open..."   |
+| Numbered instructions | Always                                   | 1. Open the request 2. Set the body 3. Click Send                                          |
+| JSON payloads         | Any step with a request body             | Full JSON in a fenced code block                                                           |
+| AI/Agent Mode prompts | Any step using Postman Agent Mode        | Exact prompt in a blockquote                                                               |
+| Expected outcomes     | Always                                   | "Expect `201 Created`", "Dashboard appears in Visualize tab"                               |
+| Troubleshooting tips  | When common errors exist                 | "If you get a 401, check that apiKey is set"                                               |
+| Reference tables      | When choosing from allowed values        | Table of valid phases, categories, etc.                                                    |
+| Reference links       | When external docs help                  | Link to API guides, story context, etc.                                                    |
+| Cautions/warnings     | When gotchas exist                       | "Anomaly logs cannot be deleted"                                                           |
 
 **Bad:** "Create 3 logs using POST /logs with different categories."
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useProgress } from "@/context/ProgressContext";
@@ -8,6 +8,7 @@ import ValidateButton from "./ValidateButton";
 import DiscordHelpButton from "./DiscordHelpButton";
 import { Step } from "@/types/module";
 import {
+  CopyableCode,
   CopyableCodeBlock,
   CopyableBlockquote,
 } from "./CopyableBlock";
@@ -66,7 +67,13 @@ export default function StepCard({ step, moduleTitle, moduleColor = "#FF6C37" }:
               remarkPlugins={[remarkGfm]}
               components={{
                 pre: CopyableCodeBlock,
+                code: CopyableCode,
                 blockquote: CopyableBlockquote,
+                a: ({ href, children }: { href?: string; children?: ReactNode }) => (
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {children}
+                  </a>
+                ),
               }}
             >{step.description}</ReactMarkdown>
           </div>

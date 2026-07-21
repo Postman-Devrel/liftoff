@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useProgress } from "@/context/ProgressContext";
+import { apiPath } from "@/lib/base-path";
 
 export default function SettingsPage() {
   const { profile, isAuthenticated, setAuth, clearApiKey } = useAuth();
@@ -19,7 +20,7 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/postman/validate-key", {
+      const res = await fetch(apiPath("/api/postman/validate-key"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey: key.trim() }),

@@ -9,8 +9,12 @@ import AuthGuard from "@/components/auth/AuthGuard";
 import PostmanConnectionBar from "@/components/auth/PostmanConnectionBar";
 import PointsDisplay from "@/components/scoring/PointsDisplay";
 import ModuleBadge from "@/components/scoring/ModuleBadge";
+import ModuleGettingStarted from "@/components/module/ModuleGettingStarted";
 import ShareDebug from "@/components/ShareDebug";
 import ShareButtons from "@/components/ShareButtons";
+import { useUtmTracking } from "@/hooks/useUtmTracking";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
+import { apiPath } from "@/lib/base-path";
 
 export default function ModuleOverviewPage() {
   const params = useParams();
@@ -18,6 +22,7 @@ export default function ModuleOverviewPage() {
   const { isStepCompleted, resetModule } = useProgress();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [imgError, setImgError] = useState(false);
+  useUtmTracking("module", params.moduleId as string);
 
   const totalSteps = mod.lessons.reduce((a, l) => a + l.steps.length, 0);
   const completedTotal = mod.lessons.reduce(
@@ -45,7 +50,7 @@ export default function ModuleOverviewPage() {
                 <h1 className="text-lg font-bold text-white flex items-center gap-2">
                   {!imgError ? (
                     <img
-                      src={`/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`}
+                      src={apiPath(`/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`)}
                       alt=""
                       width={28}
                       height={28}
@@ -69,8 +74,12 @@ export default function ModuleOverviewPage() {
           </div>
 
           <p className="text-[var(--text-secondary)] mb-6 leading-relaxed">
-            {mod.description}
+            <InlineMarkdown>{mod.description}</InlineMarkdown>
           </p>
+
+          {mod.gettingStarted && (
+            <ModuleGettingStarted content={mod.gettingStarted} color={mod.color} />
+          )}
 
           <div className="mb-8">
             <div className="flex justify-between text-sm mb-2">

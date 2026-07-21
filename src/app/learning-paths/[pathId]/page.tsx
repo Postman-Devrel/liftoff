@@ -7,6 +7,9 @@ import { useProgress } from "@/context/ProgressContext";
 import { getLearningPath, getModulesForLearningPath } from "@/lib/content-loader";
 import NavMenu from "@/components/NavMenu";
 import { Module } from "@/types/module";
+import { useUtmTracking } from "@/hooks/useUtmTracking";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
+import { apiPath } from "@/lib/base-path";
 
 const BADGE_VERSION = "1";
 
@@ -30,7 +33,7 @@ function ModuleCard({ module }: { module: Module }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`}
+            src={apiPath(`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`)}
             alt={`${module.title} badge`}
             width={56}
             height={56}
@@ -62,7 +65,7 @@ function ModuleCard({ module }: { module: Module }) {
             {module.title}
           </h3>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed line-clamp-2">
-            {module.description}
+            <InlineMarkdown>{module.description}</InlineMarkdown>
           </p>
         </div>
       </div>
@@ -96,6 +99,7 @@ export default function LearningPathPage({ params }: { params: Promise<{ pathId:
   const modules = getModulesForLearningPath(pathId);
   const { isStepCompleted } = useProgress();
   const [pathImgError, setPathImgError] = useState(false);
+  useUtmTracking("learning_path", pathId);
 
   const totalSteps = modules.reduce(
     (a, mod) => a + mod.lessons.reduce((b, l) => b + l.steps.length, 0),
@@ -139,7 +143,7 @@ export default function LearningPathPage({ params }: { params: Promise<{ pathId:
           <div className="flex items-center gap-5">
             {!pathImgError ? (
               <img
-                src={`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`}
+                src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
                 alt={`${path.title} badge`}
                 width={72}
                 height={72}
@@ -162,7 +166,7 @@ export default function LearningPathPage({ params }: { params: Promise<{ pathId:
           </div>
 
           <p className="mt-4 text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-            {path.description}
+            <InlineMarkdown>{path.description}</InlineMarkdown>
           </p>
 
           <div className="mt-6 flex items-center gap-6">

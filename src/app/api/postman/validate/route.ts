@@ -3,6 +3,9 @@ import { validatorRegistry } from "@/lib/validators";
 import { ValidationContext } from "@/types/validation";
 import { getMe } from "@/lib/postman-api";
 import { createClient } from "@/lib/supabase/server";
+import { detectCompletionEvents } from "@/lib/completion-events";
+import { dispatchWebhook } from "@/lib/webhooks";
+import { absoluteBase } from "@/lib/base-path";
 
 export async function POST(request: NextRequest) {
   const apiKey = request.cookies.get("postman_api_key")?.value;
@@ -49,6 +52,15 @@ export async function POST(request: NextRequest) {
 
         console.log("[validate] supabaseUser:", supabaseUser?.id ?? "NOT AUTHENTICATED");
         if (supabaseUser) {
+          const { data: priorProgress } = await supabase
+            .from("progress")
+            .select("step_id, points_awarded")
+            .eq("user_id", supabaseUser.id);
+
+          const completedBefore = new Set((priorProgress ?? []).map((r) => r.step_id));
+          const isNewCompletion = !completedBefore.has(stepId);
+          const pointsBefore = (priorProgress ?? []).reduce((sum, r) => sum + r.points_awarded, 0);
+
           const { error: upsertErr } = await supabase.from("progress").upsert(
             {
               user_id: supabaseUser.id,
@@ -59,6 +71,25 @@ export async function POST(request: NextRequest) {
             { onConflict: "user_id,step_id" }
           );
           if (upsertErr) console.error("[validate] upsert error:", upsertErr);
+
+          if (!upsertErr && isNewCompletion) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("discord_id")
+              .eq("id", supabaseUser.id)
+              .single();
+
+            const events = detectCompletionEvents({
+              completedBefore,
+              completedAfter: new Set([...completedBefore, stepId]),
+              pointsBefore,
+              pointsAfter: pointsBefore + result.pointsAwarded,
+              discordId: profile?.discord_id ?? null,
+              baseUrl: absoluteBase(request.nextUrl.origin),
+              occurredAt: new Date().toISOString(),
+            });
+            await Promise.all(events.map(dispatchWebhook));
+          }
 
           if (result.context) {
             const { data: activeCtx } = await supabase

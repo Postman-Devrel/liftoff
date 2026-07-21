@@ -1,5 +1,7 @@
 # LiftOff API Reference
 
+The app is deployed under the `/liftoff` basePath (see `next.config.ts`), so every route below — including static assets and badge images — is served at `/liftoff/<path>`, not at the domain root. All example paths in this doc are shown relative to that basePath (e.g. `GET /api/content/modules` means `GET https://your-app.vercel.app/liftoff/api/content/modules`).
+
 The LiftOff API is split into two namespaces:
 
 - **`/api/content/`** — public, no authentication required
@@ -42,7 +44,7 @@ GET /api/content/learning-paths?moduleId=api-basics
       "title": "Introduction to Postman",
       "description": "...",
       "icon": "🚀",
-      "badgeUrl": "https://your-app.vercel.app/api/learning-paths/intro-to-postman/badge",
+      "badgeUrl": "https://your-app.vercel.app/liftoff/api/learning-paths/intro-to-postman/badge",
       "color": "#FF6C37",
       "moduleCount": 2,
       "stepCount": 24,
@@ -84,7 +86,7 @@ Returns a single learning path with a summary of each module it contains.
       "title": "API Basics",
       "description": "...",
       "icon": "📡",
-      "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
+      "badgeUrl": "https://your-app.vercel.app/liftoff/api/modules/api-basics/badge",
       "color": "#06B6D4",
       "lessonCount": 3,
       "stepCount": 12,
@@ -135,7 +137,7 @@ GET /api/content/modules?pathId=intro-to-postman
       "title": "API Basics",
       "description": "...",
       "icon": "📡",
-      "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
+      "badgeUrl": "https://your-app.vercel.app/liftoff/api/modules/api-basics/badge",
       "color": "#06B6D4",
       "lessonCount": 3,
       "stepCount": 12,
@@ -170,7 +172,7 @@ Returns a single module with its full lesson and step structure.
   "title": "API Basics",
   "description": "...",
   "icon": "📡",
-  "badgeUrl": "https://your-app.vercel.app/api/modules/api-basics/badge",
+  "badgeUrl": "https://your-app.vercel.app/liftoff/api/modules/api-basics/badge",
   "color": "#06B6D4",
   "lessons": [
     {
@@ -312,7 +314,7 @@ Returns a user's profile, point total, rank, per-module progress, and recent act
     "totalSteps": 98,
     "rank": "Galaxy Brain",
     "rankBadge": "🧠",
-    "rankBadgeImg": "/ranks/galaxy-brain.png"
+    "rankBadgeImg": "/liftoff/ranks/galaxy-brain.png"
   },
   "modules": [
     {

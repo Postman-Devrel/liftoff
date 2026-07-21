@@ -1,3 +1,4 @@
+**PRIVATE**
 # Making Multi-Repo changes with the AI engineer
 
 Most coding agents can add a feature in a single repo — but they routinely break things because they don't understand how that code connects to everything else across an organization. The **Postman AI Engineer** is different because it's grounded in the **Context Graph**: a live, cross-repo model of your APIs, services, collections, and the calls that link them. Instead of guessing from files inside a single working directory, it reads the actual relationships between services — who produces what schema, who consumes it, which endpoints back which flows — so a change in one repo surfaces every service it ripples into. In this module, you'll use the AI Engineer to do what senior engineers do *before* they touch the code: walk the Context Graph across an entire fleet of services, find every downstream consumer, and ship a coordinated change.

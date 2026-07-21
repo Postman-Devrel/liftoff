@@ -1,7 +1,8 @@
 import { timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAllModules } from "@/lib/content-loader";
+import { getAllModules, getAllLearningPaths } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
+import { attributeCompletions, attributeRanks } from "@/lib/achievement-attribution";
 
 function verifyAdmin(request: Request): boolean {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
 
   const supabase = createAdminClient();
   const modules = getAllModules();
+  const learningPaths = getAllLearningPaths();
 
   let activityQuery = supabase
     .from("progress")
@@ -37,18 +39,20 @@ export async function GET(request: Request) {
     );
   }
 
-  const [profilesRes, progressRes, activityRes, userPointsRes] =
+  const [profilesRes, progressRes, activityRes, userPointsRes, utmRes] =
     await Promise.all([
       supabase.from("profiles").select("*"),
       supabase.from("progress").select("*"),
       activityQuery,
       supabase.from("user_points").select("*"),
+      supabase.from("utm_attribution").select("*").order("first_seen_at", { ascending: false }),
     ]);
 
   const profiles = profilesRes.data || [];
   const progress = progressRes.data || [];
   const recentActivity = activityRes.data || [];
   const userPoints = userPointsRes.data || [];
+  const utmRows = utmRes.data || [];
 
   const totalUsers = profiles.length;
   const totalStepsCompleted = progress.length;
@@ -154,6 +158,83 @@ export async function GET(request: Request) {
     badge: r.badge,
   })).filter((r) => r.count > 0);
 
+  // UTM attribution: resolve content titles then aggregate
+  const contentTitles: Record<string, string> = {};
+  for (const mod of modules) contentTitles[`module:${mod.id}`] = mod.title;
+  for (const lp of learningPaths) contentTitles[`learning_path:${lp.id}`] = lp.title;
+
+  const utmCampaignMap = new Map<string, {
+    source: string; medium: string | null; campaign: string | null;
+    contentType: string; contentId: string; contentTitle: string;
+    count: number; firstSeen: string; userIds: string[];
+  }>();
+  for (const row of utmRows) {
+    const key = `${row.utm_source}|${row.utm_medium ?? ""}|${row.utm_campaign ?? ""}|${row.content_type}|${row.content_id}`;
+    const existing = utmCampaignMap.get(key);
+    if (existing) {
+      existing.count++;
+      existing.userIds.push(row.user_id);
+      if (row.first_seen_at < existing.firstSeen) existing.firstSeen = row.first_seen_at;
+    } else {
+      utmCampaignMap.set(key, {
+        source: row.utm_source,
+        medium: row.utm_medium,
+        campaign: row.utm_campaign,
+        contentType: row.content_type,
+        contentId: row.content_id,
+        contentTitle: contentTitles[`${row.content_type}:${row.content_id}`] || row.content_id,
+        count: 1,
+        firstSeen: row.first_seen_at,
+        userIds: [row.user_id],
+      });
+    }
+  }
+
+  const profileMap = new Map(
+    profiles.map((p) => [
+      p.id,
+      {
+        displayName: p.display_name || p.discord_username || "Unknown",
+        discordUsername: p.discord_username || "",
+        avatarUrl: p.discord_avatar_url || "",
+      },
+    ])
+  );
+  const toUserSummaries = (userIds: string[]) =>
+    userIds.map((userId) => ({
+      userId,
+      ...(profileMap.get(userId) ?? { displayName: "Unknown", discordUsername: "", avatarUrl: "" }),
+    }));
+
+  const sourceMap = new Map<string, number>();
+  for (const row of utmRows) sourceMap.set(row.utm_source, (sourceMap.get(row.utm_source) || 0) + 1);
+
+  const utmStats = {
+    totalAttributed: utmRows.length,
+    bySource: [...sourceMap.entries()].map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count),
+    campaigns: [...utmCampaignMap.values()]
+      .sort((a, b) => b.count - a.count)
+      .map(({ userIds, ...c }) => ({ ...c, users: toUserSummaries(userIds) })),
+    recentAttributions: utmRows.slice(0, 50).map((r) => ({
+      userId: r.user_id,
+      contentType: r.content_type,
+      contentId: r.content_id,
+      contentTitle: contentTitles[`${r.content_type}:${r.content_id}`] || r.content_id,
+      utmSource: r.utm_source,
+      utmMedium: r.utm_medium,
+      utmCampaign: r.utm_campaign,
+      firstSeenAt: r.first_seen_at,
+    })),
+  };
+
+  const completionAttribution = attributeCompletions(progress, utmRows, modules, learningPaths).map(
+    ({ userIds, ...c }) => ({ ...c, users: toUserSummaries(userIds) })
+  );
+  const rankAttribution = attributeRanks(progress, utmRows, modules).map(({ userIds, ...r }) => ({
+    ...r,
+    users: toUserSummaries(userIds),
+  }));
+
   const leaderboard = profiles
     .map((p) => {
       const up = pointsMap.get(p.id);
@@ -185,5 +266,8 @@ export async function GET(request: Request) {
     moduleStats,
     rankDistribution,
     leaderboard,
+    utmStats,
+    completionAttribution,
+    rankAttribution,
   });
 }

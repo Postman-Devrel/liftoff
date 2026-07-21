@@ -78,6 +78,7 @@ Create a brand new module from a content markdown file.
 
 ### Rich description requirements — CRITICAL:
 Step descriptions are the ONLY thing the learner sees in the UI. Copy the FULL content from content.md — do NOT summarize, truncate, or paraphrase. Descriptions must include:
+- **A preamble** (1–2 sentences, before the numbered instructions) explaining *what* this step accomplishes and *why* it matters — the concept being introduced, or how it connects to the step before/after it. Never start a step cold with "1. Open..." — orient the learner first. Don't just restate the step title back to them.
 - **Numbered instructions** (1, 2, 3...) for the exact sequence of actions
 - **Exact JSON payloads** in fenced code blocks — never summarize request bodies
 - **AI/Agent Mode prompts** in blockquotes — the learner should copy-paste these
@@ -88,6 +89,8 @@ Step descriptions are the ONLY thing the learner sees in the UI. Copy the FULL c
 - **Cautions/warnings** about gotchas (e.g. data that can't be deleted)
 
 The description field supports full markdown including headings, code blocks, tables, blockquotes, and lists. Use them.
+
+If a step in `content.md` is missing a preamble, write one when generating `module.json` rather than passing the gap through — but also add the preamble back into `content.md` itself so the two stay in sync.
 
 ---
 

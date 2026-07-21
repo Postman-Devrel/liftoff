@@ -16,6 +16,10 @@ export interface ValidationContext {
   bankingWorkspaceId?: string;
   bankingEnvironmentId?: string;
   bankingCollectionUid?: string;
+  worldExplorerWorkspaceId?: string;
+  worldExplorerCollectionUid?: string;
+  agentModeBasicsWorkspaceId?: string;
+  agentModeBasicsCollectionUid?: string;
   aiEngineerWorkspaceId?: string;
   aiEngineerEnvironmentId?: string;
   aiEngineerConsumersCollectionUid?: string;

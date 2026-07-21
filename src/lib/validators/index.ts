@@ -34,6 +34,31 @@ import { validateBankingQueryMcp } from "./banking-ai-mcp-bootcamp/validate-bank
 import { validateBankingAddMcpClaude } from "./banking-ai-mcp-bootcamp/validate-banking-add-mcp-claude";
 import { validateBankingVerifyConnection } from "./banking-ai-mcp-bootcamp/validate-banking-verify-connection";
 import { validateBankingAddTestsMcp } from "./banking-ai-mcp-bootcamp/validate-banking-add-tests-mcp";
+import { validateWorldExplorerCreateWorkspace } from "./world-explorer/validate-world-explorer-create-workspace";
+import { validateWorldExplorerCreateCollection } from "./world-explorer/validate-world-explorer-create-collection";
+import { validateWorldExplorerAddLookup } from "./world-explorer/validate-world-explorer-add-lookup";
+import { validateWorldExplorerPickDestination } from "./world-explorer/validate-world-explorer-pick-destination";
+import { validateWorldExplorerStoreVariable } from "./world-explorer/validate-world-explorer-store-variable";
+import { validateWorldExplorerAgentModeTest } from "./world-explorer/validate-world-explorer-agent-mode-test";
+import { validateWorldExplorerStampPassport } from "./world-explorer/validate-world-explorer-stamp-passport";
+import { validateWorldExplorerVisualization } from "./world-explorer/validate-world-explorer-visualization";
+import { validateWorldExplorerVerifyJourney } from "./world-explorer/validate-world-explorer-verify-journey";
+import { validateWorldExplorerSurpriseDestination } from "./world-explorer/validate-world-explorer-surprise-destination";
+import { validateAgentModeBasicsOpenAgentMode } from "./agent-mode-basics/validate-agent-mode-basics-open-agent-mode";
+import { validateAgentModeBasicsCreateWorkspace } from "./agent-mode-basics/validate-agent-mode-basics-create-workspace";
+import { validateAgentModeBasicsCreateCollection } from "./agent-mode-basics/validate-agent-mode-basics-create-collection";
+import { validateAgentModeBasicsAddTests } from "./agent-mode-basics/validate-agent-mode-basics-add-tests";
+import { validateAgentModeBasicsRunTemplate } from "./agent-mode-basics/validate-agent-mode-basics-run-template";
+import { validatePostmanMcpGetApiKey } from "./postman-mcp/validate-postman-mcp-get-api-key";
+import { validatePostmanMcpAddMcpServer } from "./postman-mcp/validate-postman-mcp-add-mcp-server";
+import { validatePostmanMcpConnectWorkspace } from "./postman-mcp/validate-postman-mcp-connect-workspace";
+import { validatePostmanMcpReadCollection } from "./postman-mcp/validate-postman-mcp-read-collection";
+import { validatePostmanMcpExecuteEndpoint } from "./postman-mcp/validate-postman-mcp-execute-endpoint";
+import { validateClaudeCodePluginInstallAndConfigure } from "./claude-code-plugin/validate-claude-code-plugin-install-and-configure";
+import { validateClaudeCodePluginRunSetup } from "./claude-code-plugin/validate-claude-code-plugin-run-setup";
+import { validateClaudeCodePluginSearchWorkspace } from "./claude-code-plugin/validate-claude-code-plugin-search-workspace";
+import { validateClaudeCodePluginQueryMoviesApi } from "./claude-code-plugin/validate-claude-code-plugin-query-movies-api";
+import { validateClaudeCodePluginRunCollectionTests } from "./claude-code-plugin/validate-claude-code-plugin-run-collection-tests";
 import { validateAiEngineerDownstreamCreateWorkspace } from "./ai-engineer-downstream/validate-ai-engineer-downstream-create-workspace";
 import { validateAiEngineerDownstreamConnectGithubMcp } from "./ai-engineer-downstream/validate-ai-engineer-downstream-connect-github-mcp";
 import { validateAiEngineerDownstreamForkErpFleet } from "./ai-engineer-downstream/validate-ai-engineer-downstream-fork-erp-fleet";
@@ -75,6 +100,31 @@ export const validatorRegistry: Record<string, ValidatorFn> = {
   "validate-banking-add-mcp-claude": validateBankingAddMcpClaude,
   "validate-banking-verify-connection": validateBankingVerifyConnection,
   "validate-banking-add-tests-mcp": validateBankingAddTestsMcp,
+  "validate-world-explorer-create-workspace": validateWorldExplorerCreateWorkspace,
+  "validate-world-explorer-create-collection": validateWorldExplorerCreateCollection,
+  "validate-world-explorer-add-lookup": validateWorldExplorerAddLookup,
+  "validate-world-explorer-pick-destination": validateWorldExplorerPickDestination,
+  "validate-world-explorer-store-variable": validateWorldExplorerStoreVariable,
+  "validate-world-explorer-agent-mode-test": validateWorldExplorerAgentModeTest,
+  "validate-world-explorer-stamp-passport": validateWorldExplorerStampPassport,
+  "validate-world-explorer-visualization": validateWorldExplorerVisualization,
+  "validate-world-explorer-verify-journey": validateWorldExplorerVerifyJourney,
+  "validate-world-explorer-surprise-destination": validateWorldExplorerSurpriseDestination,
+  "validate-agent-mode-basics-open-agent-mode": validateAgentModeBasicsOpenAgentMode,
+  "validate-agent-mode-basics-create-workspace": validateAgentModeBasicsCreateWorkspace,
+  "validate-agent-mode-basics-create-collection": validateAgentModeBasicsCreateCollection,
+  "validate-agent-mode-basics-add-tests": validateAgentModeBasicsAddTests,
+  "validate-agent-mode-basics-run-template": validateAgentModeBasicsRunTemplate,
+  "validate-postman-mcp-get-api-key": validatePostmanMcpGetApiKey,
+  "validate-postman-mcp-add-mcp-server": validatePostmanMcpAddMcpServer,
+  "validate-postman-mcp-connect-workspace": validatePostmanMcpConnectWorkspace,
+  "validate-postman-mcp-read-collection": validatePostmanMcpReadCollection,
+  "validate-postman-mcp-execute-endpoint": validatePostmanMcpExecuteEndpoint,
+  "validate-claude-code-plugin-install-and-configure": validateClaudeCodePluginInstallAndConfigure,
+  "validate-claude-code-plugin-run-setup": validateClaudeCodePluginRunSetup,
+  "validate-claude-code-plugin-search-workspace": validateClaudeCodePluginSearchWorkspace,
+  "validate-claude-code-plugin-query-movies-api": validateClaudeCodePluginQueryMoviesApi,
+  "validate-claude-code-plugin-run-collection-tests": validateClaudeCodePluginRunCollectionTests,
   "validate-ai-engineer-downstream-create-workspace": validateAiEngineerDownstreamCreateWorkspace,
   "validate-ai-engineer-downstream-connect-github-mcp": validateAiEngineerDownstreamConnectGithubMcp,
   "validate-ai-engineer-downstream-fork-erp-fleet": validateAiEngineerDownstreamForkErpFleet,

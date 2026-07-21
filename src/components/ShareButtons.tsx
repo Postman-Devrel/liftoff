@@ -1,8 +1,13 @@
 "use client";
 
+import { BASE_PATH } from "@/lib/base-path";
+
 function getAppUrl() {
-  if (typeof window !== "undefined") return window.location.origin;
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://quickstarts.postman.com";
+  const origin =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_SITE_URL || "https://quickstarts.postman.com";
+  return `${origin}${BASE_PATH}`;
 }
 
 function XIcon({ size = 18 }: { size?: number }) {

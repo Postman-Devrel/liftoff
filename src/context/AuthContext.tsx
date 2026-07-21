@@ -10,6 +10,7 @@ import {
   ReactNode,
 } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { apiPath } from "@/lib/base-path";
 import type { User } from "@supabase/supabase-js";
 
 export interface PostmanProfile {
@@ -100,14 +101,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearApiKey = useCallback(async () => {
     localStorage.removeItem("postman_profile");
     setProfile(null);
-    await fetch("/api/postman/validate-key", { method: "DELETE" });
+    await fetch(apiPath("/api/postman/validate-key"), { method: "DELETE" });
   }, []);
 
   const signInWithDiscord = useCallback(async () => {
     await getSupabase().auth.signInWithOAuth({
       provider: "discord",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback`,
+        redirectTo: `${window.location.origin}${apiPath("/api/auth/callback")}`,
       },
     });
   }, []);

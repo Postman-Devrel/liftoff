@@ -1,0 +1,9 @@
+{
+  "id": "building-with-ai",
+  "title": "Building with AI",
+  "description": "Use AI to accelerate your API workflow: prompt Postman's Agent Mode to build and test a collection, connect it to your editor with the Postman MCP Server, then drive it all from Claude Code.",
+  "icon": "🧠",
+  "color": "#7C3AED",
+  "moduleIds": ["agent-mode-basics", "postman-mcp", "claude-code-plugin", "ai-engineer-downstream"],
+  "private": true
+}

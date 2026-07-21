@@ -1,6 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
+import {
+  getAllModulesIncludingPrivate,
+  getAllLearningPathsIncludingPrivate,
+} from "@/lib/content-loader";
+import InlineMarkdown from "@/components/lesson/InlineMarkdown";
+import { apiPath } from "@/lib/base-path";
 import {
   AreaChart,
   Area,
@@ -59,12 +66,74 @@ interface LeaderboardUser {
   joinedAt: string;
 }
 
+interface AttributedUser {
+  userId: string;
+  displayName: string;
+  discordUsername: string;
+  avatarUrl: string;
+}
+
+interface UtmCampaign {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  count: number;
+  firstSeen: string;
+  users: AttributedUser[];
+}
+
+interface UtmAttribution {
+  userId: string;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  utmSource: string;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  firstSeenAt: string;
+}
+
+interface UtmStats {
+  totalAttributed: number;
+  bySource: { source: string; count: number }[];
+  campaigns: UtmCampaign[];
+  recentAttributions: UtmAttribution[];
+}
+
+interface CompletionAttribution {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  usersCompleted: number;
+  users: AttributedUser[];
+}
+
+interface RankAttribution {
+  source: string;
+  medium: string | null;
+  campaign: string | null;
+  rankTitle: string;
+  rankBadge: string;
+  usersReached: number;
+  users: AttributedUser[];
+  attributionType: "crossing_module" | "acquisition_fallback";
+}
+
 interface DashboardData {
   stats: DashboardStats;
   activity: ActivityPoint[];
   moduleStats: ModuleStat[];
   rankDistribution: RankDist[];
   leaderboard: LeaderboardUser[];
+  utmStats: UtmStats;
+  completionAttribution: CompletionAttribution[];
+  rankAttribution: RankAttribution[];
 }
 
 interface UserDetailStep {
@@ -84,6 +153,26 @@ interface UserDetailModule {
   totalSteps: number;
   completedSteps: number;
   steps: UserDetailStep[];
+}
+
+interface UserRankAttribution {
+  rankTitle: string;
+  rankBadge: string;
+  crossingModuleId: string | null;
+  crossingModuleTitle: string | null;
+  utmSource: string;
+  utmMedium: string | null;
+  utmCampaign: string | null;
+  attributionType: "crossing_module" | "acquisition_fallback";
+}
+
+interface UserCompletionAttribution {
+  contentType: string;
+  contentId: string;
+  contentTitle: string;
+  utmSource: string;
+  utmMedium: string | null;
+  utmCampaign: string | null;
 }
 
 interface UserDetailData {
@@ -109,6 +198,10 @@ interface UserDetailData {
     completedAt: string;
     points: number;
   }[];
+  attribution: {
+    rank: UserRankAttribution | null;
+    completions: UserCompletionAttribution[];
+  };
 }
 
 // ─── Login Gate ──────────────────────────────────────────
@@ -123,7 +216,7 @@ function AdminLogin({ onAuth }: { onAuth: (pw: string) => void }) {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/admin/dashboard", {
+    const res = await fetch(apiPath("/api/admin/dashboard"), {
       headers: { Authorization: `Bearer ${password}` },
     });
 
@@ -707,7 +800,7 @@ function UserDetailPanel({
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/admin/users/${userId}`, {
+    fetch(apiPath(`/api/admin/users/${userId}`), {
       headers: { Authorization: `Bearer ${password}` },
     })
       .then((r) => r.json())
@@ -802,6 +895,34 @@ function UserDetailPanel({
                 </p>
               </div>
             </div>
+
+            {/* Attribution */}
+            {(data.attribution.rank || data.attribution.completions.length > 0) && (
+              <div className="glass-card p-4 space-y-2">
+                <h4 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+                  Attribution
+                </h4>
+                {data.attribution.rank && (
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Reached <span className="text-white">{data.attribution.rank.rankTitle}</span> via{" "}
+                    <span className="text-[var(--orange)]">{data.attribution.rank.utmSource}</span>
+                    {data.attribution.rank.utmCampaign && ` / ${data.attribution.rank.utmCampaign}`}
+                    {data.attribution.rank.attributionType === "crossing_module" ? (
+                      <> ({data.attribution.rank.crossingModuleTitle})</>
+                    ) : (
+                      <span className="text-[var(--text-tertiary)]"> — acquisition channel, not a direct link</span>
+                    )}
+                  </p>
+                )}
+                {data.attribution.completions.map((c) => (
+                  <p key={c.contentId} className="text-xs text-[var(--text-secondary)]">
+                    Completed <span className="text-white">{c.contentTitle}</span> via{" "}
+                    <span className="text-[var(--orange)]">{c.utmSource}</span>
+                    {c.utmCampaign && ` / ${c.utmCampaign}`}
+                  </p>
+                ))}
+              </div>
+            )}
 
             {/* Module Progress */}
             <div>
@@ -957,6 +1078,467 @@ function UserDetailPanel({
   );
 }
 
+// ─── Users List Modal ────────────────────────────────────
+
+function UsersListModal({
+  title,
+  users,
+  onSelectUser,
+  onClose,
+}: {
+  title: string;
+  users: AttributedUser[];
+  onSelectUser: (userId: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <>
+      <div
+        className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="fixed right-0 top-0 bottom-0 w-full max-w-md z-50 overflow-y-auto bg-[var(--bg-surface)] border-l border-white/10 shadow-2xl animate-slide-in">
+        <div className="sticky top-0 z-10 bg-[var(--bg-surface)]/95 backdrop-blur-md border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-white">Users</h2>
+            <p className="text-xs text-[var(--text-tertiary)] mt-0.5 truncate">{title}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-[var(--text-tertiary)] hover:text-white transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="p-3">
+          {users.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No users
+            </p>
+          ) : (
+            <div className="space-y-1">
+              {users.map((u) => (
+                <button
+                  key={u.userId}
+                  onClick={() => onSelectUser(u.userId)}
+                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                >
+                  {u.avatarUrl ? (
+                    <img
+                      src={u.avatarUrl}
+                      alt=""
+                      className="w-9 h-9 rounded-full border border-[#5865F2] flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-[#5865F2] flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
+                      {u.displayName[0]?.toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm text-white truncate">{u.displayName}</p>
+                    {u.discordUsername && (
+                      <p className="text-xs text-[var(--text-tertiary)] truncate">
+                        @{u.discordUsername}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ─── UTM Attribution Panel ───────────────────────────────
+
+function UtmPanel({
+  data,
+  onSelectUser,
+}: {
+  data: UtmStats;
+  onSelectUser: (userId: string) => void;
+}) {
+  const [view, setView] = useState<"campaigns" | "recent">("campaigns");
+  const [usersModal, setUsersModal] = useState<{ title: string; users: AttributedUser[] } | null>(null);
+
+  const campaignLabel = (c: UtmCampaign) =>
+    [c.source, c.medium, c.campaign].filter(Boolean).join(" / ") + ` — ${c.contentTitle}`;
+
+  if (data.totalAttributed === 0) {
+    return (
+      <div className="glass-card p-6">
+        <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+          UTM Attribution
+        </h3>
+        <div className="py-8 space-y-3 max-w-xl mx-auto">
+          <p className="text-center text-[var(--text-tertiary)] text-sm">
+            No UTM attributions recorded yet. Append any campaign values you like to a module or learning path URL — the values are free-form.
+          </p>
+          <p className="text-center text-xs text-[var(--text-tertiary)]">Example:</p>
+          <code className="block text-center text-[var(--orange)] bg-white/5 px-4 py-3 rounded-lg text-xs leading-relaxed">
+            /learning-paths/intro-to-postman<br />
+            ?utm_source=discord<br />
+            &amp;utm_medium=community<br />
+            &amp;utm_campaign=onboarding
+          </code>
+          <p className="text-center text-xs text-[var(--text-tertiary)]">
+            Change <span className="text-white">utm_campaign</span> to anything — <span className="text-[var(--text-secondary)]">onboarding</span>, <span className="text-[var(--text-secondary)]">postman-101-launch</span>, <span className="text-[var(--text-secondary)]">monthly-digest</span> — each becomes its own row here.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+    <div className="glass-card p-6">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+            UTM Attribution
+          </h3>
+          <p className="text-xs text-[var(--text-tertiary)] mt-1">
+            {data.totalAttributed} first-visit{data.totalAttributed !== 1 ? "s" : ""} attributed
+          </p>
+        </div>
+        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+          <button
+            onClick={() => setView("campaigns")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "campaigns"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Campaigns
+          </button>
+          <button
+            onClick={() => setView("recent")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "recent"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Recent
+          </button>
+        </div>
+      </div>
+
+      {/* Source breakdown pills */}
+      <div className="flex flex-wrap gap-2 mb-5">
+        {data.bySource.map((s) => (
+          <span
+            key={s.source}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs"
+          >
+            <span className="w-2 h-2 rounded-full bg-[var(--orange)]" />
+            <span className="text-[var(--text-secondary)] font-medium">{s.source}</span>
+            <span className="text-[var(--text-tertiary)] font-mono">{s.count}</span>
+          </span>
+        ))}
+      </div>
+
+      {view === "campaigns" && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-[var(--text-tertiary)] font-mono uppercase tracking-wider text-[10px]">
+                <th className="text-left py-2 px-2">Source</th>
+                <th className="text-left py-2 px-2">Medium</th>
+                <th className="text-left py-2 px-2">Campaign</th>
+                <th className="text-left py-2 px-2">Content</th>
+                <th className="text-right py-2 px-2">Users</th>
+                <th className="text-right py-2 px-2 hidden sm:table-cell">First Seen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.campaigns.map((c, i) => (
+                <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <td className="py-2.5 px-2">
+                    <span className="text-[var(--orange)] font-medium">{c.source}</span>
+                  </td>
+                  <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                    {c.medium || <span className="text-[var(--text-tertiary)]">—</span>}
+                  </td>
+                  <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                    {c.campaign || <span className="text-[var(--text-tertiary)]">—</span>}
+                  </td>
+                  <td className="py-2.5 px-2">
+                    <div>
+                      <span className="text-white">{c.contentTitle}</span>
+                      <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[var(--text-tertiary)] font-mono">
+                        {c.contentType === "learning_path" ? "path" : "module"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-2.5 px-2 text-right">
+                    <button
+                      onClick={() => setUsersModal({ title: campaignLabel(c), users: c.users })}
+                      className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                    >
+                      {c.count}
+                    </button>
+                  </td>
+                  <td className="py-2.5 px-2 text-right hidden sm:table-cell">
+                    <span className="text-[var(--text-tertiary)] font-mono">
+                      {new Date(c.firstSeen).toLocaleDateString()}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {view === "recent" && (
+        <div className="space-y-2">
+          {data.recentAttributions.map((a, i) => (
+            <div key={i} className="flex items-center gap-3 py-2 border-t border-white/5 text-xs">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[var(--orange)] font-medium">{a.utmSource}</span>
+                  {a.utmMedium && (
+                    <span className="text-[var(--text-tertiary)]">/ {a.utmMedium}</span>
+                  )}
+                  {a.utmCampaign && (
+                    <span className="text-[var(--text-tertiary)]">/ {a.utmCampaign}</span>
+                  )}
+                </div>
+                <p className="text-[var(--text-secondary)] truncate">
+                  {a.contentTitle}
+                  <span className="ml-1.5 text-[10px] px-1 py-0.5 rounded bg-white/5 text-[var(--text-tertiary)] font-mono">
+                    {a.contentType === "learning_path" ? "path" : "module"}
+                  </span>
+                </p>
+              </div>
+              <span className="text-[var(--text-tertiary)] font-mono flex-shrink-0">
+                {new Date(a.firstSeenAt).toLocaleDateString()}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+    {usersModal && (
+      <UsersListModal
+        title={usersModal.title}
+        users={usersModal.users}
+        onSelectUser={(id) => {
+          setUsersModal(null);
+          onSelectUser(id);
+        }}
+        onClose={() => setUsersModal(null)}
+      />
+    )}
+    </>
+  );
+}
+
+// ─── Achievement Attribution ─────────────────────────────
+
+function AchievementAttributionPanel({
+  completions,
+  ranks,
+  onSelectUser,
+}: {
+  completions: CompletionAttribution[];
+  ranks: RankAttribution[];
+  onSelectUser: (userId: string) => void;
+}) {
+  const [view, setView] = useState<"completions" | "ranks">("completions");
+  const [usersModal, setUsersModal] = useState<{ title: string; users: AttributedUser[] } | null>(null);
+
+  const completionLabel = (c: CompletionAttribution) =>
+    [c.source, c.medium, c.campaign].filter(Boolean).join(" / ") + ` — ${c.contentTitle}`;
+  const rankLabel = (r: RankAttribution) =>
+    [r.source, r.medium, r.campaign].filter(Boolean).join(" / ") + ` — ${r.rankTitle}`;
+
+  if (completions.length === 0 && ranks.length === 0) {
+    return (
+      <div className="glass-card p-6">
+        <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+          Achievement Attribution
+        </h3>
+        <p className="text-center text-[var(--text-tertiary)] text-sm py-8 max-w-xl mx-auto">
+          No campaign is linked to a completed module, path, or rank yet. This
+          needs a user to both arrive via a tracked UTM link <em>and</em>{" "}
+          finish the content or cross a rank threshold — not just visit.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+    <div className="glass-card p-6">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="text-sm font-mono uppercase tracking-widest text-[var(--text-tertiary)]">
+            Achievement Attribution
+          </h3>
+          <p className="text-xs text-[var(--text-tertiary)] mt-1">
+            Which campaigns drove completions and ranks, not just visits
+          </p>
+        </div>
+        <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+          <button
+            onClick={() => setView("completions")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "completions"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Completions
+          </button>
+          <button
+            onClick={() => setView("ranks")}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              view === "ranks"
+                ? "bg-[var(--purple)] text-white"
+                : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+            }`}
+          >
+            Ranks
+          </button>
+        </div>
+      </div>
+
+      {view === "completions" && (
+        <div className="overflow-x-auto">
+          {completions.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No campaign has a directly attributed module or path completion yet.
+            </p>
+          ) : (
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] font-mono uppercase tracking-wider text-[10px]">
+                  <th className="text-left py-2 px-2">Source</th>
+                  <th className="text-left py-2 px-2">Medium</th>
+                  <th className="text-left py-2 px-2">Campaign</th>
+                  <th className="text-left py-2 px-2">Content</th>
+                  <th className="text-right py-2 px-2">Users</th>
+                </tr>
+              </thead>
+              <tbody>
+                {completions.map((c, i) => (
+                  <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 px-2">
+                      <span className="text-[var(--orange)] font-medium">{c.source}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {c.medium || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {c.campaign || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2">
+                      <div>
+                        <span className="text-white">{c.contentTitle}</span>
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-[var(--text-tertiary)] font-mono">
+                          {c.contentType === "learning_path" ? "path" : "module"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-2.5 px-2 text-right">
+                      <button
+                        onClick={() => setUsersModal({ title: completionLabel(c), users: c.users })}
+                        className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                      >
+                        {c.usersCompleted}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {view === "ranks" && (
+        <div className="overflow-x-auto">
+          {ranks.length === 0 ? (
+            <p className="text-center text-[var(--text-tertiary)] text-sm py-8">
+              No campaign has a directly attributed rank yet.
+            </p>
+          ) : (
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-[var(--text-tertiary)] font-mono uppercase tracking-wider text-[10px]">
+                  <th className="text-left py-2 px-2">Source</th>
+                  <th className="text-left py-2 px-2">Medium</th>
+                  <th className="text-left py-2 px-2">Campaign</th>
+                  <th className="text-left py-2 px-2">Rank</th>
+                  <th className="text-right py-2 px-2">Users</th>
+                  <th className="text-right py-2 px-2 hidden sm:table-cell">Attribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ranks.map((r, i) => (
+                  <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
+                    <td className="py-2.5 px-2">
+                      <span className="text-[var(--orange)] font-medium">{r.source}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {r.medium || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2 text-[var(--text-secondary)]">
+                      {r.campaign || <span className="text-[var(--text-tertiary)]">—</span>}
+                    </td>
+                    <td className="py-2.5 px-2">
+                      <span className="mr-1">{r.rankBadge}</span>
+                      <span className="text-white">{r.rankTitle}</span>
+                    </td>
+                    <td className="py-2.5 px-2 text-right">
+                      <button
+                        onClick={() => setUsersModal({ title: rankLabel(r), users: r.users })}
+                        className="font-mono font-bold text-[var(--cyan)] hover:underline"
+                      >
+                        {r.usersReached}
+                      </button>
+                    </td>
+                    <td className="py-2.5 px-2 text-right hidden sm:table-cell">
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                          r.attributionType === "crossing_module"
+                            ? "bg-[var(--green)]/10 text-[var(--green)]"
+                            : "bg-white/5 text-[var(--text-tertiary)]"
+                        }`}
+                      >
+                        {r.attributionType === "crossing_module" ? "via module" : "acquisition"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+    </div>
+    {usersModal && (
+      <UsersListModal
+        title={usersModal.title}
+        users={usersModal.users}
+        onSelectUser={(id) => {
+          setUsersModal(null);
+          onSelectUser(id);
+        }}
+        onClose={() => setUsersModal(null)}
+      />
+    )}
+    </>
+  );
+}
+
 // ─── Dashboard ───────────────────────────────────────────
 
 function Dashboard({ password }: { password: string }) {
@@ -965,11 +1547,24 @@ function Dashboard({ password }: { password: string }) {
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [activityDays, setActivityDays] = useState<string>("30");
+  const [tab, setTab] = useState<"analytics" | "private">(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("tab") === "private"
+        ? "private"
+        : "analytics";
+    }
+    return "analytics";
+  });
+
+  function handleTabChange(newTab: "analytics" | "private") {
+    setTab(newTab);
+    window.history.replaceState(null, "", `/admin?tab=${newTab}`);
+  }
 
   const fetchData = useCallback((daysOverride?: string) => {
     setLoading(true);
     const d = daysOverride ?? activityDays;
-    fetch(`/api/admin/dashboard?days=${d}`, {
+    fetch(apiPath(`/api/admin/dashboard?days=${d}`), {
       headers: { Authorization: `Bearer ${password}` },
     })
       .then((r) => {
@@ -1050,6 +1645,28 @@ function Dashboard({ password }: { password: string }) {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1">
+              <button
+                onClick={() => handleTabChange("analytics")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  tab === "analytics"
+                    ? "bg-[var(--purple)] text-white"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                Analytics
+              </button>
+              <button
+                onClick={() => handleTabChange("private")}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  tab === "private"
+                    ? "bg-[var(--purple)] text-white"
+                    : "text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                Private
+              </button>
+            </div>
             <button
               onClick={handleRefresh}
               className="btn-ghost !py-2 !px-4 text-xs flex items-center gap-2"
@@ -1080,7 +1697,9 @@ function Dashboard({ password }: { password: string }) {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      {tab === "private" && <PrivatePreview />}
+
+      {tab === "analytics" && <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
@@ -1125,12 +1744,26 @@ function Dashboard({ password }: { password: string }) {
           </div>
         </div>
 
+        {/* UTM Attribution */}
+        <div className="mb-8">
+          <UtmPanel data={data.utmStats} onSelectUser={setSelectedUser} />
+        </div>
+
+        {/* Achievement Attribution */}
+        <div className="mb-8">
+          <AchievementAttributionPanel
+            completions={data.completionAttribution}
+            ranks={data.rankAttribution}
+            onSelectUser={setSelectedUser}
+          />
+        </div>
+
         {/* Leaderboard */}
         <Leaderboard
           users={data.leaderboard}
           onSelect={setSelectedUser}
         />
-      </main>
+      </main>}
 
       {/* User Detail */}
       {selectedUser && (
@@ -1139,6 +1772,122 @@ function Dashboard({ password }: { password: string }) {
           password={password}
           onClose={() => setSelectedUser(null)}
         />
+      )}
+    </div>
+  );
+}
+
+// ─── Private Preview ─────────────────────────────────────
+
+function PrivatePreview() {
+  const privateModules = getAllModulesIncludingPrivate().filter((m) => m.private);
+  const privatePaths = getAllLearningPathsIncludingPrivate().filter((p) => p.private);
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="mb-2">
+        <h2 className="text-lg font-bold text-white">Private Content</h2>
+        <p className="text-sm text-[var(--text-tertiary)] mt-1">
+          Hidden from public users. Click any item to test it.
+        </p>
+      </div>
+
+      {privatePaths.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+            Learning Paths ({privatePaths.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {privatePaths.map((path) => (
+              <Link
+                key={path.id}
+                href={`/learning-paths/${path.id}`}
+                className="glass-card p-5 hover:border-[var(--purple)]/50 transition-all group block"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">{path.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-semibold text-white group-hover:text-[var(--purple)] transition-colors truncate">
+                        {path.title}
+                      </h4>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-400 border border-yellow-500/20 shrink-0">
+                        PRIVATE
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">
+                      {path.description}
+                    </p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-2">
+                      {path.moduleIds.length} module{path.moduleIds.length !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {privateModules.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-[var(--text-tertiary)] mb-4">
+            Modules ({privateModules.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {privateModules.map((mod) => {
+              const totalSteps = mod.lessons.reduce(
+                (sum, l) => sum + l.steps.length,
+                0
+              );
+              const firstSlug = mod.lessons[0]?.slug;
+              const href = firstSlug
+                ? `/modules/${mod.id}/${firstSlug}`
+                : `/modules/${mod.id}`;
+              return (
+                <Link
+                  key={mod.id}
+                  href={href}
+                  className="glass-card p-5 hover:border-[var(--purple)]/50 transition-all group block"
+                  style={{ borderLeftColor: mod.color, borderLeftWidth: 3 }}
+                >
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={apiPath(`/api/modules/${mod.id}/badge`)}
+                      alt=""
+                      className="w-12 h-12 rounded-lg object-cover shrink-0"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-semibold text-white group-hover:text-[var(--purple)] transition-colors truncate">
+                          {mod.title}
+                        </h4>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-400 border border-yellow-500/20 shrink-0">
+                          PRIVATE
+                        </span>
+                      </div>
+                      <p className="text-xs text-[var(--text-tertiary)] line-clamp-2">
+                        <InlineMarkdown>{mod.description}</InlineMarkdown>
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-2">
+                        {mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""} · {totalSteps} step{totalSteps !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {privateModules.length === 0 && privatePaths.length === 0 && (
+        <div className="mt-16 text-center text-[var(--text-tertiary)] text-sm">
+          No private content found.
+        </div>
       )}
     </div>
   );
