@@ -179,10 +179,10 @@ supabase/
   - Create a Discord application at [discord.com/developers](https://discord.com/developers/applications)
   - Copy Client ID and Client Secret into Supabase
   - Copy the Redirect URL Supabase shows on that page (`https://<project>.supabase.co/auth/v1/callback`) into the Discord app's OAuth2 → Redirects — Discord redirects to Supabase, not to this app directly
-4. Under Authentication → URL Configuration, add `https://<your-domain>/api/auth/callback/` (trailing slash required — see note below) to Redirect URLs, and set Site URL to `https://<your-domain>`
+4. Under Authentication → URL Configuration, add `https://<your-domain>/auth/` (trailing slash required — see note below) to Redirect URLs, and set Site URL to `https://<your-domain>`
 5. Copy the project URL and anon key into your environment variables
 
-> If this app runs behind a CDN/proxy, that layer may normalize paths by adding a trailing slash and dropping query strings in the process — which silently strips the OAuth `code` param. Registering the callback URL with a trailing slash from the start (as `AuthContext.tsx` does) avoids the redirect entirely.
+> The OAuth code is exchanged client-side (the Supabase browser client auto-detects `?code=` in `window.location` via `detectSessionInUrl`), not via a server route. This is deliberate: a CDN/proxy in front of this app may drop query strings when normalizing paths (e.g. adding a trailing slash), which would silently strip the OAuth `code` param from any server-side redirect target before it reaches this app. The browser's own address bar isn't affected by that, so client-side exchange sidesteps it entirely. Still register the redirect URL with a trailing slash to avoid an unnecessary redirect hop.
 
 ### Vercel (Recommended)
 
@@ -190,7 +190,7 @@ supabase/
 2. Import the repo at [vercel.com/new](https://vercel.com/new) — point to repo root `/`
 3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GEMINI_API_KEY`, and `NEXT_PUBLIC_SITE_URL` if serving behind a CDN/custom domain that rewrites the Host header
 4. Deploy
-5. Add `https://<app>.vercel.app/api/auth/callback/` (trailing slash) to Supabase → Authentication → URL Configuration → Redirect URLs, and set Site URL to `https://<app>.vercel.app`
+5. Add `https://<app>.vercel.app/auth/` (trailing slash) to Supabase → Authentication → URL Configuration → Redirect URLs, and set Site URL to `https://<app>.vercel.app`
 
 ### Any Node.js Host
 
