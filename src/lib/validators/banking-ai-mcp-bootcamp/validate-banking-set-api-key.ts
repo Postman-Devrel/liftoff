@@ -22,21 +22,32 @@ export const validateBankingSetApiKey: ValidatorFn = async (apiKey, context) => 
   }
 
   const envDetail = await getEnvironment(apiKey, bankingEnv.uid);
-  const values: { key: string; value: string; type?: string }[] = envDetail.values || [];
+  const values: {
+    key: string;
+    enabled?: boolean;
+    type?: string;
+    secret?: boolean;
+  }[] = envDetail.values || [];
 
-  const apiKeyVar = values.find(
-    (v) => v.key === "apiKey" && v.value && v.value.trim().length > 0
-  );
+  const apiKeyVar = values.find((v) => v.key === "apiKey");
 
   if (!apiKeyVar) {
     return {
       success: false,
-      message: 'Variable "apiKey" not found or is empty in Banking.local. Send the Generate API Key request and ensure the value is saved.',
+      message: 'Variable "apiKey" not found in Banking.local. Send the Generate API Key request and ensure the value is saved.',
       pointsAwarded: 0,
     };
   }
 
-  if (apiKeyVar.type !== "secret") {
+  if (apiKeyVar.enabled === false) {
+    return {
+      success: false,
+      message: 'Variable "apiKey" is disabled in Banking.local. Enable it in the environment.',
+      pointsAwarded: 0,
+    };
+  }
+
+  if (apiKeyVar.secret !== true) {
     return {
       success: false,
       message: 'Variable "apiKey" is set but not marked as sensitive. Go to Environments, click on the apiKey value, and set its type to "secret".',

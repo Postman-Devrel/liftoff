@@ -55,7 +55,7 @@
           "id": "banking-step-5-set-api-key",
           "stepNumber": 3,
           "title": "Generate and Set the API Key",
-          "description": "Send the **Generate API Key** GET request, then verify that the environment variable has been set in the **Environment** tab next to the AI Panel on the top right corner.\n\n> **Note:** Go to your Environments on the side panel and set the `apiKey` value to **sensitive**.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared values — not local session values.",
+          "description": "Send the **Generate API Key** GET request, then verify that the environment variable has been set in the **Environment** tab next to the AI Panel on the top right corner.\n\n> **Note:** Go to your Environments on the side panel and set the `apiKey` as **secured**.\n\n**Important:** After setting values, click the **Share** button (or **Persist All**) in the environment editor to sync your values to the cloud. LiftOff validates via the Postman API, which can only see shared/initial values — not local current values. Secured variables are shared through an online vault. On the Postman Free plan, only the local vault is accessible — but that's not an issue for completing this module.",
           "points": 10,
           "validatorId": "validate-banking-set-api-key"
         },
