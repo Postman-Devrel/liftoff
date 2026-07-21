@@ -163,6 +163,7 @@ supabase/
 | ------------------------------- | -------- | ----------------------------------------------------------- |
 | `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Supabase project URL                                        |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Supabase anonymous key (safe to expose — RLS protects data) |
+| `NEXT_PUBLIC_SITE_URL`          | Yes*     | Public origin (no basePath), e.g. `https://www.postman.com`. Required whenever a CDN/proxy in front of the deployment rewrites the Host header — otherwise the OAuth callback redirect breaks |
 | `GEMINI_API_KEY`                | No       | Google Gemini API key for badge generation                  |
 
 
@@ -184,7 +185,7 @@ supabase/
 
 1. Push to GitHub
 2. Import the repo at [vercel.com/new](https://vercel.com/new) — point to repo root `/`
-3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GEMINI_API_KEY`
+3. Add environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `GEMINI_API_KEY`, and `NEXT_PUBLIC_SITE_URL` if serving behind a CDN/custom domain that rewrites the Host header
 4. Deploy
 5. Add your Vercel production URL to:
   - Discord Developer Portal → OAuth2 → Redirects: `https://<app>.vercel.app/api/auth/callback`
