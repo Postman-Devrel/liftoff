@@ -1,7 +1,7 @@
 {
   "id": "ai-engineer-downstream",
-  "title": "Managing Downstream Dependencies with the AI Engineer",
-  "description": "You'll rename a field in the **Create Employee** response schema, ask the AI Engineer to surface every downstream consumer of that field, and merge the PR it opens — without paging the iOS team at 2 a.m.",
+  "title": "Making Multi-Repo changes with the AI engineer",
+  "description": "You'll add localisation support to an ERP platform composed of 10 microservices, and let the AI Engineer open coordinated PRs across every affected repo — all with a single prompt.",
   "color": "#10B981",
   "icon": "🕸️",
   "lessons": [
@@ -12,97 +12,56 @@
       "partNumber": 1,
       "steps": [
         {
-          "id": "ai-engineer-downstream-step-1-fork-repo-create-workspace",
+          "id": "ai-engineer-downstream-step-1-create-workspace",
           "stepNumber": 1,
-          "title": "Fork the ERP Repo and Create a Workspace",
-          "description": "1. Fork the Enterprise Resource Planning repo: [https://github.com/buildwithtalia/enterprise-resource-planning](https://github.com/buildwithtalia/enterprise-resource-planning).\n2. Open Postman and create a new workspace from the forked repo. Name it exactly: **Enterprise Resource Planning - [your name]** (for example, *Enterprise Resource Planning - Alex*). The workspace will import the ERP API spec and the **Enterprise Resource Planning** collection, including the **Create Employee** request.\n\n**Validation:**\n\n- **[Workspace]** A workspace whose name starts with \"Enterprise Resource Planning -\" exists and was created by the current user.\n- **[Collection]** The **Enterprise Resource Planning** collection exists in that workspace and contains a **Create Employee** request.",
+          "title": "Create a New Postman Workspace",
+          "description": "1. In Postman, click **Workspaces** in the left sidebar.\n2. Click **Create Workspace** and choose the **Blank workspace** template.\n3. Name it something memorable (for example, **ERP Fleet - [your name]**), set the visibility, and click **Create**.\n\n**Validation:** [MANUAL] Mark this step complete once your new workspace is open in Postman.",
           "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-fork-repo-create-workspace"
+          "validatorId": "validate-ai-engineer-downstream-create-workspace",
+          "manual": true
+        },
+        {
+          "id": "ai-engineer-downstream-step-2-connect-github-mcp",
+          "stepNumber": 2,
+          "title": "Connect the GitHub MCP",
+          "description": "1. Inside your new workspace, open the **MCP** panel (or **Integrations**).\n2. Add the **GitHub MCP** server and authenticate with your GitHub account.\n3. Confirm the connection shows as active.\n\n**Validation:** [MANUAL] Mark this step complete once the GitHub MCP is connected and authenticated in your workspace.",
+          "points": 10,
+          "validatorId": "validate-ai-engineer-downstream-connect-github-mcp",
+          "manual": true
         }
       ]
     },
     {
-      "id": "lesson-2-update-the-response-schema",
-      "slug": "update-the-response-schema",
-      "title": "Update the Create Employee Response Schema",
+      "id": "lesson-2-fork-the-erp-fleet",
+      "slug": "fork-the-erp-fleet",
+      "title": "Fork the ERP Fleet",
       "partNumber": 2,
       "steps": [
         {
-          "id": "ai-engineer-downstream-step-2-rename-schema-field",
+          "id": "ai-engineer-downstream-step-3-fork-erp-fleet",
           "stepNumber": 1,
-          "title": "Ask Agent Mode to Rename the Field",
-          "description": "1. Open **Agent Mode** in Postman.\n2. Enter the prompt exactly:\n  > Update Create Employee response schema to include \"employee-id\" instead of \"id\"\n3. Let the agent apply the change to the ERP spec.\n\n**Validation:** **[Collection Request]** The **Create Employee** request in the **Enterprise Resource Planning** collection has a saved response (or response example) whose body contains a top-level `employee-id` field. The legacy `id` field must be absent.",
+          "title": "Ask Agent Mode to Fork All ERP Repos",
+          "description": "1. Open **Agent Mode** in Postman.\n2. Enter the prompt exactly:\n  > Fork and clone the following repos to my Github account:\n  >\n  > - [https://github.com/buildwithtalia/enterprise-resource-planning](https://github.com/buildwithtalia/enterprise-resource-planning)\n  > - [https://github.com/buildwithtalia/erp-gateway](https://github.com/buildwithtalia/erp-gateway)\n  > - [https://github.com/buildwithtalia/erp-billing](https://github.com/buildwithtalia/erp-billing)\n  > - [https://github.com/buildwithtalia/erp-finance](https://github.com/buildwithtalia/erp-finance)\n  > - [https://github.com/buildwithtalia/erp-payroll](https://github.com/buildwithtalia/erp-payroll)\n  > - [https://github.com/buildwithtalia/erp-procurement](https://github.com/buildwithtalia/erp-procurement)\n  > - [https://github.com/buildwithtalia/erp-accounting](https://github.com/buildwithtalia/erp-accounting)\n  > - [https://github.com/buildwithtalia/erp-hr](https://github.com/buildwithtalia/erp-hr)\n  > - [https://github.com/buildwithtalia/erp-inventory](https://github.com/buildwithtalia/erp-inventory)\n  > - [https://github.com/buildwithtalia/erp-supply-chain](https://github.com/buildwithtalia/erp-supply-chain)\n3. Let Agent Mode fork and clone each repo to your account.\n\n**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/user/repos?type=owner&per_page=100` returns status `200` and the response body contains forks of all 10 ERP repos: `enterprise-resource-planning`, `erp-gateway`, `erp-billing`, `erp-finance`, `erp-payroll`, `erp-procurement`, `erp-accounting`, `erp-hr`, `erp-inventory`, and `erp-supply-chain`.",
           "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-rename-schema-field"
-        },
-        {
-          "id": "ai-engineer-downstream-step-3-merge-to-main",
-          "stepNumber": 2,
-          "title": "Merge Changes to Main",
-          "description": "1. Review the diff Agent Mode produced against the ERP spec.\n2. Merge the schema change to `main` in your fork.\n\n**Validation:** [MANUAL] Mark this step complete after you have merged the schema change to `main`.",
-          "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-merge-to-main",
-          "manual": true
-        },
-        {
-          "id": "ai-engineer-downstream-step-4-git-pull",
-          "stepNumber": 3,
-          "title": "Git Pull",
-          "description": "1. Pull the latest `main` locally so your working copy reflects the merged schema change.\n\n**Validation:** [MANUAL] Mark this step complete after your local `main` is up to date with the merged schema change.",
-          "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-git-pull",
-          "manual": true
-        },
-        {
-          "id": "ai-engineer-downstream-step-5-run-create-employee-request",
-          "stepNumber": 4,
-          "title": "Run the Create Employee Request",
-          "description": "1. Back in Postman, open the **Create Employee** request in the **Enterprise Resource Planning** collection.\n2. Send the request.\n\n**Validation:** **[Api Response]** A `POST` to the Create Employee endpoint returns status `200` (or `201`) and the response body contains a top-level `employee-id` field. The legacy `id` field must be absent.",
-          "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-run-create-employee-request",
+          "validatorId": "validate-ai-engineer-downstream-fork-erp-fleet",
           "manual": true
         }
       ]
     },
     {
-      "id": "lesson-3-update-downstream-dependencies",
-      "slug": "update-downstream-dependencies",
-      "title": "Update Downstream Dependencies",
+      "id": "lesson-3-add-localisation-support",
+      "slug": "add-localisation-support",
+      "title": "Add Localisation Support Across the Fleet",
       "partNumber": 3,
       "steps": [
         {
-          "id": "ai-engineer-downstream-step-6-ai-engineer-opens-pr",
+          "id": "ai-engineer-downstream-step-4-add-localisation-support",
           "stepNumber": 1,
-          "title": "Ask Agent Tasks to Update Downstream Dependencies",
-          "description": "1. Open **Agent Tasks** in Postman.\n2. Ask the agent to update all downstream dependencies from the response schema update you just merged.\n3. The AI Engineer walks the Context Graph, identifies every consumer of the old `id` field, and opens a pull request with the updates wired in.\n\n**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=open` returns status `200` and the response body contains at least one PR opened by the AI Engineer that touches the downstream consumers of `employee-id`.",
+          "title": "Ask the AI Engineer to Add Localisation Support",
+          "description": "1. Open **Agent Tasks** in Postman.\n2. In the Agent Tasks text field, enter the prompt exactly:\n  > Add localisation support for the ERP app including currencies and languages based on location. Make this fix and then find and update all the downstream dependencies\n3. The AI Engineer writes the code, queries the Context Graph across the ERP fleet, identifies every service that needs localisation-aware logic, updates all downstream dependencies, and opens a pull request against each affected repo.\n\n**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/search/issues?q=is:pr+is:open+user:<your-account>+localisation` returns status `200` and the response body contains at least one open PR opened by the AI Engineer across the forked ERP repos.",
           "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-ai-engineer-opens-pr",
+          "validatorId": "validate-ai-engineer-downstream-add-localisation-support",
           "manual": true
-        }
-      ]
-    },
-    {
-      "id": "lesson-4-merge-the-pr",
-      "slug": "merge-the-pr",
-      "title": "Merge the PR",
-      "partNumber": 4,
-      "steps": [
-        {
-          "id": "ai-engineer-downstream-step-7-merge-pr",
-          "stepNumber": 1,
-          "title": "Merge the PR",
-          "description": "1. Open the PR the AI Engineer created against your ERP fork.\n2. Review the diff to confirm the downstream updates look correct.\n3. Merge the PR into `main`.\n\n**Validation:** **[Api Response — GitHub]** A `GET` to `https://api.github.com/repos/<your-fork>/pulls?state=closed` returns status `200`, and the response body contains at least one PR with `\"merged\": true` whose diff renames `id` to `employee-id` in the downstream consumers.",
-          "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-merge-pr",
-          "manual": true
-        },
-        {
-          "id": "ai-engineer-downstream-step-8-consumers-use-employee-id",
-          "stepNumber": 2,
-          "title": "Git Pull in the Postman Terminal",
-          "description": "1. Open the terminal in Postman.\n2. Run `git pull` to bring the merged downstream updates into your local working copy.\n\n**Validation:** **[Collection Request]** After the pull, the downstream consumer requests in the **Enterprise Resource Planning** collection reference `employee-id` (not `id`) in their URLs, request bodies, or test scripts.",
-          "points": 10,
-          "validatorId": "validate-ai-engineer-downstream-consumers-use-employee-id"
         }
       ]
     }
