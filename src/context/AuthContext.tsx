@@ -108,7 +108,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await getSupabase().auth.signInWithOAuth({
       provider: "discord",
       options: {
-        redirectTo: `${window.location.origin}${apiPath("/api/auth/callback")}`,
+        // Trailing slash avoids a CDN redirect in front of this app that
+        // normalizes the path but drops the ?code= query string in doing so.
+        redirectTo: `${window.location.origin}${apiPath("/api/auth/callback/")}`,
       },
     });
   }, []);
