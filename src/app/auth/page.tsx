@@ -1,7 +1,21 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import DiscordSignInButton from "@/components/auth/DiscordSignInButton";
 import Link from "next/link";
 
 export default function AuthPage() {
+  const router = useRouter();
+  const { isRegistered } = useAuth();
+
+  useEffect(() => {
+    if (isRegistered) {
+      router.replace("/");
+    }
+  }, [isRegistered, router]);
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center min-h-screen px-6">
       <div className="w-full max-w-md">
