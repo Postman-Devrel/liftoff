@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { BASE_PATH } from "@/lib/base-path";
 import DiscordSignInButton from "@/components/auth/DiscordSignInButton";
 import Link from "next/link";
 
@@ -19,13 +20,12 @@ export default function AuthPage() {
   });
 
   function redirectAfterSignIn() {
-    const returnTo = sessionStorage.getItem(RETURN_TO_KEY);
+    const stored = sessionStorage.getItem(RETURN_TO_KEY);
     sessionStorage.removeItem(RETURN_TO_KEY);
-    if (returnTo) {
-      window.location.replace(returnTo);
-    } else {
-      router.replace("/");
-    }
+    const route = stored
+      ? stored.replace(new RegExp(`^${BASE_PATH}`), "") || "/"
+      : "/";
+    router.replace(route);
   }
 
   useEffect(() => {
