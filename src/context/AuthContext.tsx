@@ -104,30 +104,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.setItem("liftoff_return_to", currentPath);
     }
 
-    const { data } = await createClient().auth.signInWithOAuth({
+    await createClient().auth.signInWithOAuth({
       provider: "discord",
       options: {
-        skipBrowserRedirect: true,
         redirectTo: `${window.location.origin}${apiPath("/auth/")}`,
       },
     });
-
-    // Shadow the PKCE verifier to localStorage before leaving for Discord.
-    // Privacy/ad-blocking extensions can clear cookies during the cross-origin
-    // redirect; the auth page restores the verifier from here if needed.
-    document.cookie.split("; ").forEach((pair) => {
-      const idx = pair.indexOf("=");
-      if (idx !== -1) {
-        const name = pair.slice(0, idx);
-        if (name.includes("-code-verifier")) {
-          localStorage.setItem(`__pkce_${name}`, pair.slice(idx + 1));
-        }
-      }
-    });
-
-    if (data?.url) {
-      window.location.assign(data.url);
-    }
   }, []);
 
   const signOut = useCallback(async () => {

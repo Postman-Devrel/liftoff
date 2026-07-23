@@ -39,41 +39,21 @@ export default function AuthPage() {
     if (!code) return;
 
     setIsExchanging(true);
-    const supabase = createClient();
-
-    // _initialize's _recoverAndRefresh can call _removeSession when it finds
-    // stale session cookies, which deletes the code verifier cookie as a side
-    // effect. Wait for initialization to finish before restoring the verifier
-    // from localStorage so it doesn't get immediately wiped out.
-    supabase.auth.getSession().then(() => {
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const key = localStorage.key(i);
-        if (key?.startsWith("__pkce_") && key.includes("-code-verifier")) {
-          const cookieName = key.slice(7);
-          const rawValue = localStorage.getItem(key)!;
-          const hasCookie = document.cookie.split("; ").some(
-            (p) => p.startsWith(`${cookieName}=`)
-          );
-          if (!hasCookie) {
-            document.cookie = `${cookieName}=${rawValue}; path=/; samesite=lax; max-age=${400 * 24 * 60 * 60}`;
-          }
-          localStorage.removeItem(key);
+    createClient()
+      .auth.exchangeCodeForSession(code)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Discord sign-in code exchange failed:", error);
+          setExchangeError(error.message);
+          setIsExchanging(false);
         }
-      }
-
-      return supabase.auth.exchangeCodeForSession(code);
-    }).then(({ error }) => {
-      if (error) {
-        console.error("Discord sign-in code exchange failed:", error);
-        setExchangeError(error.message);
+        window.history.replaceState(null, "", window.location.pathname);
+      })
+      .catch((err) => {
+        console.error("Discord sign-in failed:", err);
+        setExchangeError(err.message ?? "Unknown error");
         setIsExchanging(false);
-      }
-      window.history.replaceState(null, "", window.location.pathname);
-    }).catch((err) => {
-      console.error("Discord sign-in failed:", err);
-      setExchangeError(err.message ?? "Unknown error");
-      setIsExchanging(false);
-    });
+      });
   }, []);
 
   if (isExchanging) {
