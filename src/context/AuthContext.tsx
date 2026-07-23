@@ -99,13 +99,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithDiscord = useCallback(async () => {
+    const currentPath = window.location.pathname;
+    if (!currentPath.endsWith("/auth") && !currentPath.endsWith("/auth/")) {
+      sessionStorage.setItem("liftoff_return_to", currentPath);
+    }
+
     await createClient().auth.signInWithOAuth({
       provider: "discord",
       options: {
-        // Redirect straight to a page, not the API route: the CDN in front of
-        // this app drops the ?code= query string before it reaches any server
-        // route, but the browser's own address bar still has it. The browser
-        // Supabase client auto-detects and exchanges it from window.location.
         redirectTo: `${window.location.origin}${apiPath("/auth/")}`,
       },
     });

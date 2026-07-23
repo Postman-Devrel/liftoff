@@ -7,34 +7,65 @@ import { createClient } from "@/lib/supabase/client";
 import DiscordSignInButton from "@/components/auth/DiscordSignInButton";
 import Link from "next/link";
 
+const RETURN_TO_KEY = "liftoff_return_to";
+
 export default function AuthPage() {
   const router = useRouter();
   const { isRegistered } = useAuth();
   const [exchangeError, setExchangeError] = useState<string | null>(null);
+  const [isExchanging, setIsExchanging] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).has("code");
+  });
+
+  function redirectAfterSignIn() {
+    const returnTo = sessionStorage.getItem(RETURN_TO_KEY);
+    sessionStorage.removeItem(RETURN_TO_KEY);
+    if (returnTo) {
+      window.location.replace(returnTo);
+    } else {
+      router.replace("/");
+    }
+  }
 
   useEffect(() => {
     if (isRegistered) {
-      router.replace("/");
+      redirectAfterSignIn();
     }
-  }, [isRegistered, router]);
+  }, [isRegistered]);
 
-  // detectSessionInUrl is off (see lib/supabase/client.ts), so the ?code=
-  // from Discord's redirect must be exchanged explicitly. This also gives us
-  // a real error to look at instead of silently landing back here signed out.
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
     if (!code) return;
 
+    setIsExchanging(true);
     createClient()
       .auth.exchangeCodeForSession(code)
       .then(({ error }) => {
         if (error) {
           console.error("Discord sign-in code exchange failed:", error);
           setExchangeError(error.message);
+          setIsExchanging(false);
         }
-        router.replace("/auth");
+        // Strip ?code= from the URL; the onAuthStateChange listener in
+        // AuthContext will set isRegistered, triggering redirectAfterSignIn.
+        window.history.replaceState(null, "", window.location.pathname);
       });
-  }, [router]);
+  }, []);
+
+  if (isExchanging) {
+    return (
+      <div className="flex flex-col flex-1 items-center justify-center min-h-screen px-6">
+        <div className="text-center">
+          <div className="text-5xl mb-4">🚀</div>
+          <h1 className="text-2xl font-bold text-white mb-2">Signing you in…</h1>
+          <p className="text-[var(--text-secondary)]">
+            Completing Discord authentication
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center min-h-screen px-6">

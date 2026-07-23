@@ -22,7 +22,10 @@ function parseCookies(): { name: string; value: string }[] {
   return document.cookie.split("; ").map((pair) => {
     const idx = pair.indexOf("=");
     if (idx === -1) return { name: pair, value: "" };
-    return { name: pair.slice(0, idx), value: pair.slice(idx + 1) };
+    return {
+      name: decodeURIComponent(pair.slice(0, idx)),
+      value: decodeURIComponent(pair.slice(idx + 1)),
+    };
   });
 }
 
@@ -31,7 +34,7 @@ function setCookie(
   value: string,
   options?: Record<string, unknown>
 ) {
-  let cookie = `${name}=${value}`;
+  let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
   if (options?.path) cookie += `; path=${options.path}`;
   if (options?.maxAge != null) cookie += `; max-age=${options.maxAge}`;
   if (options?.domain) cookie += `; domain=${options.domain}`;
