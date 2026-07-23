@@ -13,6 +13,7 @@ import {
 import { ValidationContext } from "@/types/validation";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import { ranks } from "@/lib/scoring";
 
 interface ProgressState {
   completedSteps: Record<string, boolean>;
@@ -240,7 +241,11 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
             celebrated.modules = celebrated.modules.filter((id: string) => id !== moduleId);
           }
           if (Array.isArray(celebrated.ranks)) {
-            celebrated.ranks = [];
+            const newPoints = Math.max(0, state.points - pointsToRemove);
+            celebrated.ranks = celebrated.ranks.filter((id: string) => {
+              const rank = ranks.find((r) => r.id === id);
+              return !rank || rank.minPoints <= newPoints;
+            });
           }
           localStorage.setItem("liftoff_celebrated", JSON.stringify(celebrated));
         }
