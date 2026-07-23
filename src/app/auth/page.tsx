@@ -1,20 +1,40 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 import DiscordSignInButton from "@/components/auth/DiscordSignInButton";
 import Link from "next/link";
 
 export default function AuthPage() {
   const router = useRouter();
   const { isRegistered } = useAuth();
+  const [exchangeError, setExchangeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isRegistered) {
       router.replace("/");
     }
   }, [isRegistered, router]);
+
+  // detectSessionInUrl is off (see lib/supabase/client.ts), so the ?code=
+  // from Discord's redirect must be exchanged explicitly. This also gives us
+  // a real error to look at instead of silently landing back here signed out.
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (!code) return;
+
+    createClient()
+      .auth.exchangeCodeForSession(code)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Discord sign-in code exchange failed:", error);
+          setExchangeError(error.message);
+        }
+        router.replace("/auth");
+      });
+  }, [router]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center min-h-screen px-6">
@@ -36,6 +56,11 @@ export default function AuthPage() {
 
         <div className="glass-card p-6 mb-6">
           <DiscordSignInButton />
+          {exchangeError && (
+            <p className="mt-4 text-sm text-red-400">
+              Sign-in failed: {exchangeError}. Please try again.
+            </p>
+          )}
         </div>
 
         <div className="glass-card p-5">
