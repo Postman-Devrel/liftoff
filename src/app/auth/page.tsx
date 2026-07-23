@@ -29,10 +29,10 @@ export default function AuthPage() {
   }
 
   useEffect(() => {
-    if (isRegistered) {
+    if (isRegistered && !isExchanging) {
       redirectAfterSignIn();
     }
-  }, [isRegistered]);
+  }, [isRegistered, isExchanging]);
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
@@ -45,14 +45,15 @@ export default function AuthPage() {
         if (error) {
           console.error("Discord sign-in code exchange failed:", error);
           setExchangeError(error.message);
-          setIsExchanging(false);
         }
-        window.history.replaceState(null, "", window.location.pathname);
       })
       .catch((err) => {
         console.error("Discord sign-in failed:", err);
         setExchangeError(err.message ?? "Unknown error");
+      })
+      .finally(() => {
         setIsExchanging(false);
+        window.history.replaceState(null, "", window.location.pathname);
       });
   }, []);
 
