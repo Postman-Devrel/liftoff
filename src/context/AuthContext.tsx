@@ -42,12 +42,6 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (!_supabase) _supabase = createClient();
-  return _supabase;
-}
-
 function extractDiscordProfile(user: User): DiscordProfile {
   const meta = user.user_metadata ?? {};
   return {
@@ -80,13 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    getSupabase().auth.getUser().then(({ data: { user } }) => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
       setSupabaseUser(user);
     });
 
     const {
       data: { subscription },
-    } = getSupabase().auth.onAuthStateChange((_event, session) => {
+    } = createClient().auth.onAuthStateChange((_event, session) => {
       setSupabaseUser(session?.user ?? null);
     });
 
@@ -105,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithDiscord = useCallback(async () => {
-    await getSupabase().auth.signInWithOAuth({
+    await createClient().auth.signInWithOAuth({
       provider: "discord",
       options: {
         // Redirect straight to a page, not the API route: the CDN in front of
@@ -118,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await getSupabase().auth.signOut();
+    await createClient().auth.signOut();
     setSupabaseUser(null);
   }, []);
 
