@@ -53,6 +53,15 @@ export default function AuthPage() {
           .split("; ")
           .map((c) => c.split("=")[0])
           .filter((n) => n.startsWith("sb-"));
+
+        document.cookie = "__liftoff_test=1; path=/; max-age=60; samesite=lax";
+        const canWriteCookies = document.cookie.includes("__liftoff_test=1");
+        document.cookie = "__liftoff_test=; path=/; max-age=0";
+
+        const allCookieCount = document.cookie
+          ? document.cookie.split("; ").length
+          : 0;
+
         setExchangeResult(
           JSON.stringify(
             {
@@ -62,6 +71,8 @@ export default function AuthPage() {
               getUserResult: !!userData?.user,
               isRegistered,
               supabaseCookies: cookieKeys,
+              canWriteCookies,
+              allCookieCount,
             },
             null,
             2
