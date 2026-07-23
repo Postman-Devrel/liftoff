@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import confetti from "canvas-confetti";
 import { useProgress } from "@/context/ProgressContext";
 import { calculateRank } from "@/lib/scoring";
@@ -40,6 +40,7 @@ interface Celebration {
 export default function CelebrationOverlay() {
   const { points, completedSteps, isHydrated } = useProgress();
   const [celebration, setCelebration] = useState<Celebration | null>(null);
+  const hasSeededRef = useRef(false);
 
   const fireConfetti = useCallback(() => {
     const duration = 2500;
@@ -73,6 +74,30 @@ export default function CelebrationOverlay() {
 
     const celebrated = getCelebrated();
     const currentRank = calculateRank(points);
+    const modules = getAllModules();
+
+    // The very first hydrated snapshot may already contain ranks/modules
+    // earned elsewhere (a different browser or device, or a batch of
+    // onAuthStateChange-triggered reloads right after signing in). Seed
+    // those as already-celebrated silently instead of popping a modal for
+    // each one — only genuinely new completions from here on get celebrated.
+    if (!hasSeededRef.current) {
+      hasSeededRef.current = true;
+      if (currentRank.minPoints > 0) {
+        markCelebrated("ranks", currentRank.id);
+      }
+      for (const mod of modules) {
+        const totalSteps = mod.lessons.reduce((a, l) => a + l.steps.length, 0);
+        const doneSteps = mod.lessons.reduce(
+          (a, l) => a + l.steps.filter((s) => completedSteps[s.id]).length,
+          0
+        );
+        if (doneSteps === totalSteps && totalSteps > 0) {
+          markCelebrated("modules", mod.id);
+        }
+      }
+      return;
+    }
 
     if (!celebrated.ranks.includes(currentRank.id) && currentRank.minPoints > 0) {
       markCelebrated("ranks", currentRank.id);
@@ -90,7 +115,6 @@ export default function CelebrationOverlay() {
       return;
     }
 
-    const modules = getAllModules();
     for (const mod of modules) {
       if (celebrated.modules.includes(mod.id)) continue;
       const totalSteps = mod.lessons.reduce((a, l) => a + l.steps.length, 0);

@@ -1,9 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function DiscordSignInButton() {
   const { signInWithDiscord, isRegistered, discordProfile, signOut } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // signInWithOAuth stores a fresh PKCE code verifier before redirecting to
+  // Discord. A second concurrent click (e.g. an impatient double-click while
+  // the redirect is still in flight) overwrites that verifier, so whichever
+  // Discord tab/redirect completes may no longer match what's in storage.
+  const handleSignIn = () => {
+    if (isRedirecting) return;
+    setIsRedirecting(true);
+    signInWithDiscord();
+  };
 
   if (isRegistered && discordProfile) {
     return (
@@ -37,8 +49,9 @@ export default function DiscordSignInButton() {
 
   return (
     <button
-      onClick={signInWithDiscord}
-      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold text-white bg-[#5865F2] hover:bg-[#4752C4] transition-colors"
+      onClick={handleSignIn}
+      disabled={isRedirecting}
+      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold text-white bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
     >
       <svg width="20" height="15" viewBox="0 0 71 55" fill="none">
         <path
@@ -46,7 +59,7 @@ export default function DiscordSignInButton() {
           fill="currentColor"
         />
       </svg>
-      Sign in with Discord
+      {isRedirecting ? "Redirecting to Discord…" : "Sign in with Discord"}
     </button>
   );
 }
