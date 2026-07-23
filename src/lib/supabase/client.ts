@@ -1,18 +1,33 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { parse, serialize } from "cookie";
+import { parse } from "cookie";
 import type { Database } from "@/types/supabase";
 
-// Uses the same parse/serialize from the `cookie` package that @supabase/ssr
-// uses internally, so encoding round-trips are identical to the default
-// document.cookie handler. The only addition: code-verifier entries are
-// shadowed to localStorage on write and restored on read, so they survive
-// browser extensions that clear cookies during the Discord OAuth redirect.
+// Custom cookie handlers that:
+// 1. Read via parse() from the `cookie` package (same as @supabase/ssr default)
+// 2. Write via direct document.cookie assignment (bypassing serialize() which
+//    was producing cookies the browser silently rejected on postman.com)
+// 3. Shadow code-verifier entries to localStorage so they survive browser
+//    extensions that clear cookies during the Discord OAuth redirect
 //
 // detectSessionInUrl is off because its automatic PKCE exchange swallows
 // errors silently. /auth calls exchangeCodeForSession explicitly.
 
 function isVerifier(name: string) {
   return name.includes("-code-verifier");
+}
+
+function writeCookie(
+  name: string,
+  value: string,
+  options?: Record<string, unknown>
+) {
+  let cookie = `${name}=${value}`;
+  if (options?.path) cookie += `; path=${options.path}`;
+  if (options?.maxAge != null) cookie += `; max-age=${options.maxAge}`;
+  if (options?.domain) cookie += `; domain=${options.domain}`;
+  if (options?.sameSite) cookie += `; samesite=${options.sameSite}`;
+  if (options?.secure) cookie += "; secure";
+  document.cookie = cookie;
 }
 
 export function createClient() {
@@ -45,10 +60,10 @@ export function createClient() {
         },
         setAll(cookiesToSet) {
           for (const { name, value, options } of cookiesToSet) {
-            document.cookie = serialize(name, value, options);
+            writeCookie(name, value, options as Record<string, unknown>);
 
             if (isVerifier(name)) {
-              if (value && (!options || options.maxAge !== 0)) {
+              if (value && (!options || (options as Record<string, unknown>).maxAge !== 0)) {
                 localStorage.setItem(`__pkce_${name}`, value);
               } else {
                 localStorage.removeItem(`__pkce_${name}`);
