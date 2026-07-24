@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { apiPath } from "@/lib/base-path";
 
 export default function ApiKeyForm() {
   const [key, setKey] = useState("");
@@ -18,21 +17,27 @@ export default function ApiKeyForm() {
     setLoading(true);
 
     try {
-      const res = await fetch(apiPath("/api/postman/validate-key/"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey: key.trim() }),
+      const trimmed = key.trim();
+      const res = await fetch("https://api.getpostman.com/me", {
+        headers: { "x-api-key": trimmed },
       });
-      const data = await res.json();
 
-      if (data.valid) {
-        setAuth(data.profile);
+      if (res.ok) {
+        const data = await res.json();
+        const user = data.user || {};
+        setAuth({
+          username: user.username || "Unknown",
+          fullName: user.fullName || user.username || "Unknown",
+          email: user.email || "",
+          avatar: user.avatar || "",
+        });
+        sessionStorage.setItem("postman_api_key", trimmed);
         router.push("/");
       } else {
-        setError(data.message || "Invalid API key");
+        setError("Invalid API key. Please check and try again.");
       }
     } catch {
-      setError("Failed to validate API key. Please try again.");
+      setError("Failed to reach Postman API. Please try again.");
     } finally {
       setLoading(false);
     }

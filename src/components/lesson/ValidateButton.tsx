@@ -45,6 +45,7 @@ export default function ValidateButton({
           stepId,
           validatorId,
           context: validationContext,
+          apiKey: sessionStorage.getItem("postman_api_key"),
         }),
       });
       const data: ValidationResult = await res.json();

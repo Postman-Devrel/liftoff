@@ -8,13 +8,14 @@ import { dispatchWebhook } from "@/lib/webhooks";
 import { absoluteBase } from "@/lib/base-path";
 
 export async function POST(request: NextRequest) {
-  const apiKey = request.cookies.get("postman_api_key")?.value;
-
-  const { stepId, validatorId, context } = (await request.json()) as {
+  const { stepId, validatorId, context, apiKey: bodyKey } = (await request.json()) as {
     stepId: string;
     validatorId?: string;
     context?: ValidationContext;
+    apiKey?: string;
   };
+
+  const apiKey = bodyKey || request.cookies.get("postman_api_key")?.value;
 
   const lookupId = validatorId ?? stepId;
 
