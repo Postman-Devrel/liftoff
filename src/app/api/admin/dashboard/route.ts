@@ -1,24 +1,12 @@
-import { timingSafeEqual } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAllModules, getAllLearningPaths } from "@/lib/content-loader";
 import { ranks } from "@/lib/scoring";
 import { attributeCompletions, attributeRanks } from "@/lib/achievement-attribution";
-
-function verifyAdmin(request: Request): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) return false;
-  const token = request.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
-  try {
-    return timingSafeEqual(Buffer.from(token), Buffer.from(adminPassword));
-  } catch {
-    return false;
-  }
-}
+import { guardAdmin } from "@/lib/admin-auth";
 
 export async function GET(request: Request) {
-  if (!verifyAdmin(request)) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const blocked = guardAdmin(request);
+  if (blocked) return blocked;
 
   const url = new URL(request.url);
   const daysParam = url.searchParams.get("days");
