@@ -135,6 +135,24 @@ export default function SettingsPage() {
         </div>
 
         <div className="glass-card p-8 mt-6">
+          <h2 className="text-xl font-bold text-white mb-1">Privacy &amp; Data</h2>
+          <ul className="space-y-3 text-sm text-[var(--text-secondary)]">
+            <li className="flex gap-2.5">
+              <span className="text-[var(--green)] flex-shrink-0 mt-0.5">🔒</span>
+              <span>Your Postman API key is <strong className="text-white">never stored</strong>. It is only held in memory for the current browser session and is discarded when you close the tab or disconnect.</span>
+            </li>
+            <li className="flex gap-2.5">
+              <span className="text-[var(--green)] flex-shrink-0 mt-0.5">💾</span>
+              <span>All progress, ranks, and preferences are managed via your browser&apos;s local storage and your Supabase account. No data is sent to third-party analytics or tracking services.</span>
+            </li>
+            <li className="flex gap-2.5">
+              <span className="text-[var(--green)] flex-shrink-0 mt-0.5">🔗</span>
+              <span>Discord sign-in is handled by Supabase Auth. LiftOff only receives your Discord display name and avatar — never your password or Discord token.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className="glass-card p-8 mt-6">
           <h2 className="text-xl font-bold text-white mb-1">Reset All Progress</h2>
           <p className="text-sm text-[var(--text-secondary)] mb-6">
             This will permanently erase all your completed steps, points, and earned
