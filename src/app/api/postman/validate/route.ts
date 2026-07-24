@@ -6,8 +6,18 @@ import { createClient } from "@/lib/supabase/server";
 import { detectCompletionEvents } from "@/lib/completion-events";
 import { dispatchWebhook } from "@/lib/webhooks";
 import { absoluteBase } from "@/lib/base-path";
+import { isSameOrigin } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
+  // Reject cross-site requests: this route persists progress/points under the
+  // caller's session and fires webhooks, so it must not be driveable via CSRF.
+  if (!isSameOrigin(request)) {
+    return NextResponse.json(
+      { success: false, message: "Forbidden", pointsAwarded: 0 },
+      { status: 403 }
+    );
+  }
+
   const { stepId, validatorId, context, apiKey: bodyKey } = (await request.json()) as {
     stepId: string;
     validatorId?: string;
