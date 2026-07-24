@@ -99,7 +99,7 @@ export default async function SharePage({ params }: Props) {
 
         <div className="relative glass-card p-10 text-center max-w-lg w-full">
           <img
-            src={apiPath(`/api/modules/${mod.id}/badge`)}
+            src={apiPath(`/api/modules/${mod.id}/badge/`)}
             alt={`${mod.title} badge`}
             width={140}
             height={140}

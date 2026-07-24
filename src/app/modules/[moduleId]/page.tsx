@@ -50,7 +50,7 @@ export default function ModuleOverviewPage() {
                 <h1 className="text-lg font-bold text-white flex items-center gap-2">
                   {!imgError ? (
                     <img
-                      src={apiPath(`/api/modules/${mod.id}/badge?v=${Date.now().toString(36)}`)}
+                      src={apiPath(`/api/modules/${mod.id}/badge/?v=${Date.now().toString(36)}`)}
                       alt=""
                       width={28}
                       height={28}

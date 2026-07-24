@@ -1853,7 +1853,7 @@ function PrivatePreview() {
                 >
                   <div className="flex items-start gap-3">
                     <img
-                      src={apiPath(`/api/modules/${mod.id}/badge`)}
+                      src={apiPath(`/api/modules/${mod.id}/badge/`)}
                       alt=""
                       className="w-12 h-12 rounded-lg object-cover shrink-0"
                       onError={(e) => {

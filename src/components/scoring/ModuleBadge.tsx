@@ -56,7 +56,7 @@ export default function ModuleBadge({ module, size = 120 }: ModuleBadgeProps) {
 
   return (
     <img
-      src={apiPath(`/api/modules/${module.id}/badge?v=${Date.now().toString(36)}`)}
+      src={apiPath(`/api/modules/${module.id}/badge/?v=${Date.now().toString(36)}`)}
       alt={`${module.title} badge`}
       width={size}
       height={size}

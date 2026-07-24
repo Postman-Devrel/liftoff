@@ -234,7 +234,7 @@ function EarnedBadges() {
           >
             {!imgErrors[`path-${path.id}`] ? (
               <img
-                src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
+                src={apiPath(`/api/learning-paths/${path.id}/badge/?v=${BADGE_VERSION}`)}
                 alt={`${path.title} path badge`}
                 width={56}
                 height={56}
@@ -262,7 +262,7 @@ function EarnedBadges() {
           >
             {!imgErrors[mod.id] ? (
               <img
-                src={apiPath(`/api/modules/${mod.id}/badge?v=${BADGE_VERSION}`)}
+                src={apiPath(`/api/modules/${mod.id}/badge/?v=${BADGE_VERSION}`)}
                 alt={`${mod.title} badge`}
                 width={56}
                 height={56}
@@ -314,7 +314,7 @@ function LearningPathCard({ path }: { path: LearningPath }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={apiPath(`/api/learning-paths/${path.id}/badge?v=${BADGE_VERSION}`)}
+            src={apiPath(`/api/learning-paths/${path.id}/badge/?v=${BADGE_VERSION}`)}
             alt={`${path.title} badge`}
             width={56}
             height={56}
@@ -401,7 +401,7 @@ function ModuleCard({ module }: { module: Module }) {
       <div className="flex items-start gap-4">
         {!imgError ? (
           <img
-            src={apiPath(`/api/modules/${module.id}/badge?v=${BADGE_VERSION}`)}
+            src={apiPath(`/api/modules/${module.id}/badge/?v=${BADGE_VERSION}`)}
             alt={`${module.title} badge`}
             width={56}
             height={56}
