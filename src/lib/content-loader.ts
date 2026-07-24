@@ -8,7 +8,7 @@ import claudeCodePluginModule from "@/content/modules/claude-code-plugin/module.
 import aiEngineerDownstreamModule from "@/content/modules/ai-engineer-downstream/module.json";
 import introToPostmanPath from "@/content/learning-paths/intro-to-postman/learning-path.json";
 import buildingWithAiPath from "@/content/learning-paths/building-with-ai/learning-path.json";
-import { Module, Lesson } from "@/types/module";
+import { Module, Lesson, Step } from "@/types/module";
 import { LearningPath } from "@/types/learning-path";
 
 const allModules: Module[] = [
@@ -60,6 +60,20 @@ export function getAllLearningPathsIncludingPrivate(): LearningPath[] {
 
 export function getLearningPath(pathId: string): LearningPath | undefined {
   return allLearningPaths.find((p) => p.id === pathId);
+}
+
+// Authoritative server-side lookup of a step by its id. Step ids are globally
+// unique across all modules, so this resolves to at most one step. Used to bind
+// a credited step to the validator it is actually allowed to run — never trust a
+// client-supplied validatorId for this.
+export function getStepById(stepId: string): Step | undefined {
+  for (const mod of allModules) {
+    for (const lesson of mod.lessons) {
+      const step = lesson.steps.find((s) => s.id === stepId);
+      if (step) return step;
+    }
+  }
+  return undefined;
 }
 
 export function getModulesForLearningPath(pathId: string): Module[] {

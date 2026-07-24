@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validatorRegistry } from "@/lib/validators";
+import { getStepById } from "@/lib/content-loader";
 import { ValidationContext } from "@/types/validation";
 import { getMe } from "@/lib/postman-api";
 import { createClient } from "@/lib/supabase/server";
@@ -17,8 +18,6 @@ export async function POST(request: NextRequest) {
 
   const apiKey = bodyKey || request.cookies.get("postman_api_key")?.value;
 
-  const lookupId = validatorId ?? stepId;
-
   if (!apiKey || !stepId) {
     return NextResponse.json(
       { success: false, message: "Missing stepId or Postman connection", pointsAwarded: 0 },
@@ -26,6 +25,30 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // The validator that runs MUST be the one bound to the credited step in the
+  // content — never the client-supplied validatorId. Otherwise a learner could
+  // run a trivial always-pass validator while crediting a harder, uncompleted
+  // step (broken-access-control / integrity bypass). Resolve the canonical
+  // validator id from the step definition server-side.
+  const step = getStepById(stepId);
+  if (!step) {
+    return NextResponse.json(
+      { success: false, message: `Unknown step: ${stepId}`, pointsAwarded: 0 },
+      { status: 400 }
+    );
+  }
+
+  // Reject an attempt to run a different validator than the step's own. Legit
+  // clients always send the step's validatorId (or omit it), so this never
+  // fires in normal use; it surfaces tampering explicitly.
+  if (validatorId && validatorId !== step.validatorId) {
+    return NextResponse.json(
+      { success: false, message: "Validator does not match step", pointsAwarded: 0 },
+      { status: 400 }
+    );
+  }
+
+  const lookupId = step.validatorId;
   const validator = validatorRegistry[lookupId];
   if (!validator) {
     return NextResponse.json(
