@@ -8,6 +8,17 @@ import { ranks } from "@/lib/scoring";
 import { BASE_PATH, apiPath } from "@/lib/base-path";
 
 async function getAppUrl() {
+  // Absolute metadata URLs (og:image, twitter:image, badge) must NOT be built
+  // from the request Host / X-Forwarded-Host header: the CDN rewrites Host, and
+  // a spoofed header would poison the preview-image links to an attacker origin
+  // (phishing + web-cache poisoning). Use the operator-configured site URL in
+  // production; only fall back to request-derived host for local dev, where
+  // NEXT_PUBLIC_SITE_URL is unset and the host is not attacker-controlled.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (siteUrl) {
+    return `${siteUrl.replace(/\/+$/, "")}${BASE_PATH}`;
+  }
+
   const h = await headers();
   const host = h.get("x-forwarded-host") || h.get("host") || "quickstarts.postman.com";
   const proto = h.get("x-forwarded-proto") || "https";
