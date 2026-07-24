@@ -58,14 +58,19 @@ export function getAllLearningPathsIncludingPrivate(): LearningPath[] {
   return allLearningPaths;
 }
 
+// Resolve a single path by id, enforcing the same `private` visibility filter
+// as getAllLearningPaths() so the by-id endpoint can't be used to bypass it.
+// Callers that legitimately need private paths use
+// getAllLearningPathsIncludingPrivate() instead.
 export function getLearningPath(pathId: string): LearningPath | undefined {
-  return allLearningPaths.find((p) => p.id === pathId);
+  return allLearningPaths.find((p) => p.id === pathId && !p.private);
 }
 
 export function getModulesForLearningPath(pathId: string): Module[] {
   const path = getLearningPath(pathId);
   if (!path) return [];
+  // Exclude private modules too, so a public path can never surface one.
   return path.moduleIds
-    .map((id) => allModules.find((m) => m.id === id))
+    .map((id) => allModules.find((m) => m.id === id && !m.private))
     .filter((m): m is Module => m !== undefined);
 }
