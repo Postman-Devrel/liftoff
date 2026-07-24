@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isSameOrigin } from "@/lib/csrf";
 
 const COOKIE_NAME = "postman_api_key";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export async function POST(request: NextRequest) {
+  // Reject cross-site requests: this endpoint plants the trusted
+  // postman_api_key cookie, so an unprotected cross-site POST could fixate an
+  // attacker-controlled credential in the victim's browser.
+  if (!isSameOrigin(request)) {
+    return NextResponse.json(
+      { valid: false, message: "Forbidden" },
+      { status: 403 }
+    );
+  }
+
   const { apiKey } = await request.json();
 
   if (!apiKey || typeof apiKey !== "string") {
@@ -94,7 +105,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  if (!isSameOrigin(request)) {
+    return NextResponse.json(
+      { cleared: false, message: "Forbidden" },
+      { status: 403 }
+    );
+  }
+
   const response = NextResponse.json({ cleared: true });
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
