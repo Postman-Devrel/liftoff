@@ -33,9 +33,19 @@ export default function ValidateButton({
   const completed = isStepCompleted(stepId);
 
   async function handleValidate() {
-    if (!isAuthenticated || completed) return;
+    if (completed) return;
     setLoading(true);
     setResult(null);
+
+    if (manual) {
+      onError?.("");
+      completeStep(stepId, points, validationContext);
+      setResult({ success: true, message: "Step completed.", pointsAwarded: points });
+      setLoading(false);
+      return;
+    }
+
+    if (!isAuthenticated) return;
 
     try {
       const res = await fetch(apiPath("/api/postman/validate/"), {
