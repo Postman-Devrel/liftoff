@@ -13,17 +13,17 @@ Before the AI Engineer can walk the dependency graph, it needs a workspace to wo
 
 1. In Postman, click **Workspaces** in the left sidebar.
 2. Click **Create Workspace** and choose the **Blank workspace** template.
-3. Name it something memorable (for example, **ERP Fleet - [your name]**), set the visibility, and click **Create**.
+3. Name it **ERP Fleet - [your name]** (for example, **ERP Fleet - Jane**), set the visibility, and click **Create**.
 
-**Validation:** [MANUAL] Mark this step complete once your new workspace is open in Postman.
+**Validation:** LiftOff will check that your Postman account has a workspace whose name contains **"ERP Fleet"** and that you are the creator.
 
 ### Step 2: Connect the GitHub MCP
 
-1. Inside your new workspace, open the **MCP** panel (or **Integrations**).
-2. Add the **GitHub MCP** server and authenticate with your GitHub account.
-3. Confirm the connection shows as active.
+1. Inside your new workspace, click the **MCP** icon in the left sidebar (it looks like a plug). If you don't see it, click the **More** (⋯) menu at the bottom of the sidebar and enable **MCP**. You can also find it via **Settings → Integrations → MCP Servers**.
+2. Click **Add MCP Server**, select **GitHub**, and authenticate with your GitHub account.
+3. Confirm the connection shows as **Active** with a green indicator.
 
-**Validation:** [MANUAL] Mark this step complete once the GitHub MCP is connected and authenticated in your workspace.
+**Validation:** Mark this step complete once the GitHub MCP is connected and authenticated in your workspace. There is no API to verify MCP connections, so this step is self-verified.
 
 ## Part 2: Fork the ERP Fleet
 

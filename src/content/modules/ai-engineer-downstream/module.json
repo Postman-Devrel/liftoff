@@ -16,16 +16,16 @@
           "id": "ai-engineer-downstream-step-1-create-workspace",
           "stepNumber": 1,
           "title": "Create a New Postman Workspace",
-          "description": "1. In Postman, click **Workspaces** in the left sidebar.\n2. Click **Create Workspace** and choose the **Blank workspace** template.\n3. Name it something memorable (for example, **ERP Fleet - [your name]**), set the visibility, and click **Create**.\n\n**Validation:** [MANUAL] Mark this step complete once your new workspace is open in Postman.",
+          "description": "1. In Postman, click **Workspaces** in the left sidebar.\n2. Click **Create Workspace** and choose the **Blank workspace** template.\n3. Name it **ERP Fleet - [your name]** (for example, **ERP Fleet - Jane**), set the visibility, and click **Create**.\n\n**Validation:** LiftOff will check that your Postman account has a workspace whose name contains **\"ERP Fleet\"** and that you are the creator.",
           "points": 10,
           "validatorId": "validate-ai-engineer-downstream-create-workspace",
-          "manual": true
+          "manual": false
         },
         {
           "id": "ai-engineer-downstream-step-2-connect-github-mcp",
           "stepNumber": 2,
           "title": "Connect the GitHub MCP",
-          "description": "1. Inside your new workspace, open the **MCP** panel (or **Integrations**).\n2. Add the **GitHub MCP** server and authenticate with your GitHub account.\n3. Confirm the connection shows as active.\n\n**Validation:** [MANUAL] Mark this step complete once the GitHub MCP is connected and authenticated in your workspace.",
+          "description": "1. Inside your new workspace, click the **MCP** icon in the left sidebar (it looks like a plug). If you don't see it, click the **More** (⋯) menu at the bottom of the sidebar and enable **MCP**. You can also find it via **Settings → Integrations → MCP Servers**.\n2. Click **Add MCP Server**, select **GitHub**, and authenticate with your GitHub account.\n3. Confirm the connection shows as **Active** with a green indicator.\n\n**Validation:** Mark this step complete once the GitHub MCP is connected and authenticated in your workspace. There is no API to verify MCP connections, so this step is self-verified.",
           "points": 10,
           "validatorId": "validate-ai-engineer-downstream-connect-github-mcp",
           "manual": true
