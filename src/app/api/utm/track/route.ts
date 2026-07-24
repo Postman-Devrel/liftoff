@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isSameOrigin } from "@/lib/csrf";
 
 export async function POST(request: NextRequest) {
+  // Reject cross-site requests so UTM attribution can't be forged for a
+  // victim's account via CSRF.
+  if (!isSameOrigin(request)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
