@@ -3,12 +3,36 @@ import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
+// The `badge` param becomes the src of an <img> that next/og (satori) fetches
+// server-side to rasterize into the PNG. An unvalidated value is a server-side
+// request forgery (SSRF) primitive, so we only allow Postman-owned https origins.
+// Every legitimate badge URL is a same-origin asset on a *.postman.com host
+// (see src/app/share/[type]/[id]/page.tsx), so this does not break real usage.
+//
+// Returns the normalized URL to embed, or "" if the input is not allowed. We
+// return url.href (not the raw string) so the value we validated is exactly the
+// value that gets fetched — closing any URL parse-differential bypass.
+function safeBadgeUrl(raw: string): string {
+  if (!raw) return "";
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return "";
+  }
+  if (url.protocol !== "https:") return "";
+  if (url.port !== "") return ""; // legit badges use the default port only
+  const host = url.hostname.toLowerCase();
+  if (host === "postman.com" || host.endsWith(".postman.com")) return url.href;
+  return "";
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const type = searchParams.get("type") ?? "results";
   const title = searchParams.get("title") ?? "LiftOff";
   const subtitle = searchParams.get("subtitle") ?? "";
-  const badgeUrl = searchParams.get("badge") ?? "";
+  const badgeUrl = safeBadgeUrl(searchParams.get("badge") ?? "");
 
   const accentColor = type === "rank" ? "#8B5CF6" : "#FF6C37";
 
