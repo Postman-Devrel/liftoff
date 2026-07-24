@@ -143,11 +143,11 @@ export default function SettingsPage() {
             </li>
             <li className="flex gap-2.5">
               <span className="text-[var(--green)] flex-shrink-0 mt-0.5">💾</span>
-              <span>All progress, ranks, and preferences are managed via your browser&apos;s local storage and your Supabase account. No data is sent to third-party analytics or tracking services.</span>
+              <span>All progress, ranks, and preferences are managed via your browser&apos;s local storage and your account. No data is sent to third-party analytics or tracking services.</span>
             </li>
             <li className="flex gap-2.5">
               <span className="text-[var(--green)] flex-shrink-0 mt-0.5">🔗</span>
-              <span>Discord sign-in is handled by Supabase Auth. LiftOff only receives your Discord display name and avatar — never your password or Discord token.</span>
+              <span>Discord sign-in only shares your display name and avatar with LiftOff — never your password or Discord token.</span>
             </li>
           </ul>
         </div>
