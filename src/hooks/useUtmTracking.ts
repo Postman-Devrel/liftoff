@@ -17,7 +17,7 @@ export function useUtmTracking(
     const utmSource = params.get("utm_source");
     if (!utmSource) return;
 
-    fetch(apiPath("/api/utm/track"), {
+    fetch(apiPath("/api/utm/track/"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

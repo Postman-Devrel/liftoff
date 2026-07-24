@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearApiKey = useCallback(async () => {
     localStorage.removeItem("postman_profile");
     setProfile(null);
-    await fetch(apiPath("/api/postman/validate-key"), { method: "DELETE" });
+    await fetch(apiPath("/api/postman/validate-key/"), { method: "DELETE" });
   }, []);
 
   const signInWithDiscord = useCallback(async () => {

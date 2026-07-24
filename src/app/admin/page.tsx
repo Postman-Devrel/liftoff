@@ -216,7 +216,7 @@ function AdminLogin({ onAuth }: { onAuth: (pw: string) => void }) {
     setLoading(true);
     setError("");
 
-    const res = await fetch(apiPath("/api/admin/dashboard"), {
+    const res = await fetch(apiPath("/api/admin/dashboard/"), {
       headers: { Authorization: `Bearer ${password}` },
     });
 
@@ -800,7 +800,7 @@ function UserDetailPanel({
 
   useEffect(() => {
     setLoading(true);
-    fetch(apiPath(`/api/admin/users/${userId}`), {
+    fetch(apiPath(`/api/admin/users/${userId}/`), {
       headers: { Authorization: `Bearer ${password}` },
     })
       .then((r) => r.json())
@@ -1564,7 +1564,7 @@ function Dashboard({ password }: { password: string }) {
   const fetchData = useCallback((daysOverride?: string) => {
     setLoading(true);
     const d = daysOverride ?? activityDays;
-    fetch(apiPath(`/api/admin/dashboard?days=${d}`), {
+    fetch(apiPath(`/api/admin/dashboard/?days=${d}`), {
       headers: { Authorization: `Bearer ${password}` },
     })
       .then((r) => {

@@ -31,7 +31,7 @@ export default function ShareDebug({ moduleId }: ShareDebugProps) {
     setInfo(null);
 
     try {
-      const res = await fetch(apiPath("/api/postman/debug-info"), {
+      const res = await fetch(apiPath("/api/postman/debug-info/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ moduleId, context: validationContext }),

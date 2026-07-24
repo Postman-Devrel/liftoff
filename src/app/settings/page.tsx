@@ -20,7 +20,7 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(apiPath("/api/postman/validate-key"), {
+      const res = await fetch(apiPath("/api/postman/validate-key/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ apiKey: key.trim() }),
