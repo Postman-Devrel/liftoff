@@ -14,7 +14,6 @@ export default function AuthPage() {
   const router = useRouter();
   const { isRegistered } = useAuth();
   const [exchangeError, setExchangeError] = useState<string | null>(null);
-  const [exchangeResult, setExchangeResult] = useState<string | null>(null);
   const [isExchanging, setIsExchanging] = useState(() => {
     if (typeof window === "undefined") return false;
     return new URLSearchParams(window.location.search).has("code");
@@ -40,49 +39,17 @@ export default function AuthPage() {
     if (!code) return;
 
     setIsExchanging(true);
-    const supabase = createClient();
-    supabase.auth
-      .exchangeCodeForSession(code)
-      .then(async ({ data, error }) => {
+    createClient()
+      .auth.exchangeCodeForSession(code)
+      .then(({ error }) => {
         if (error) {
           console.error("Discord sign-in code exchange failed:", error);
           setExchangeError(error.message);
         }
-        const { data: userData } = await supabase.auth.getUser();
-        const cookieKeys = document.cookie
-          .split("; ")
-          .map((c) => c.split("=")[0])
-          .filter((n) => n.startsWith("sb-"));
-
-        document.cookie = "__liftoff_test=1; path=/; max-age=60; samesite=lax";
-        const canWriteCookies = document.cookie.includes("__liftoff_test=1");
-        document.cookie = "__liftoff_test=; path=/; max-age=0";
-
-        const allCookieCount = document.cookie
-          ? document.cookie.split("; ").length
-          : 0;
-
-        setExchangeResult(
-          JSON.stringify(
-            {
-              error: error?.message ?? null,
-              hasSession: !!data?.session,
-              hasUser: !!data?.user,
-              getUserResult: !!userData?.user,
-              isRegistered,
-              supabaseCookies: cookieKeys,
-              canWriteCookies,
-              allCookieCount,
-            },
-            null,
-            2
-          )
-        );
       })
       .catch((err) => {
         console.error("Discord sign-in failed:", err);
         setExchangeError(err.message ?? "Unknown error");
-        setExchangeResult(JSON.stringify({ thrown: err.message }, null, 2));
       })
       .finally(() => {
         setIsExchanging(false);
@@ -90,19 +57,15 @@ export default function AuthPage() {
       });
   }, []);
 
-  if (isExchanging || exchangeResult) {
+  if (isExchanging) {
     return (
       <div className="flex flex-col flex-1 items-center justify-center min-h-screen px-6">
-        <div className="text-center max-w-md">
+        <div className="text-center">
           <div className="text-5xl mb-4">🚀</div>
-          <h1 className="text-2xl font-bold text-white mb-2">
-            {isExchanging ? "Signing you in…" : "Exchange complete"}
-          </h1>
-          {exchangeResult && (
-            <pre className="text-left text-xs bg-black/40 rounded-lg p-4 mt-4 overflow-auto text-[var(--text-secondary)]">
-              {exchangeResult}
-            </pre>
-          )}
+          <h1 className="text-2xl font-bold text-white mb-2">Signing you in…</h1>
+          <p className="text-[var(--text-secondary)]">
+            Completing Discord authentication
+          </p>
         </div>
       </div>
     );
